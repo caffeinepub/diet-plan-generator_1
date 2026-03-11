@@ -1,0 +1,139 @@
+@font-face {
+  font-family: "Bricolage Grotesque";
+  src: url("/assets/fonts/BricolageGrotesque-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Outfit";
+  src: url("/assets/fonts/Outfit-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Green & White health theme */
+    --background: 0.99 0.008 145;
+    --foreground: 0.18 0.04 145;
+
+    --card: 1 0 0;
+    --card-foreground: 0.18 0.04 145;
+
+    --popover: 1 0 0;
+    --popover-foreground: 0.18 0.04 145;
+
+    --primary: 0.52 0.17 145;
+    --primary-foreground: 1 0 0;
+
+    --secondary: 0.94 0.04 145;
+    --secondary-foreground: 0.35 0.12 145;
+
+    --muted: 0.96 0.02 145;
+    --muted-foreground: 0.52 0.06 145;
+
+    --accent: 0.88 0.09 145;
+    --accent-foreground: 0.28 0.12 145;
+
+    --destructive: 0.58 0.22 25;
+    --destructive-foreground: 1 0 0;
+
+    --border: 0.9 0.04 145;
+    --input: 0.88 0.04 145;
+    --ring: 0.52 0.17 145;
+
+    --chart-1: 0.52 0.17 145;
+    --chart-2: 0.62 0.15 220;
+    --chart-3: 0.72 0.18 55;
+    --chart-4: 0.58 0.22 25;
+    --chart-5: 0.68 0.14 300;
+
+    --sidebar: 0.97 0.02 145;
+    --sidebar-foreground: 0.18 0.04 145;
+    --sidebar-primary: 0.52 0.17 145;
+    --sidebar-primary-foreground: 1 0 0;
+    --sidebar-accent: 0.9 0.06 145;
+    --sidebar-accent-foreground: 0.28 0.1 145;
+    --sidebar-border: 0.88 0.04 145;
+    --sidebar-ring: 0.52 0.17 145;
+
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: oklch(var(--muted));
+}
+::-webkit-scrollbar-thumb {
+  background: oklch(var(--primary) / 0.4);
+  border-radius: 3px;
+}
+
+/* Step transition */
+.step-enter {
+  opacity: 0;
+  transform: translateX(40px);
+}
+.step-enter-active {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 0.3s, transform 0.3s;
+}
+.step-exit {
+  opacity: 1;
+  transform: translateX(0);
+}
+.step-exit-active {
+  opacity: 0;
+  transform: translateX(-40px);
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .print-show-all [role="tabpanel"] {
+    display: block !important;
+  }
+
+  body {
+    font-size: 12pt;
+    background: white;
+  }
+
+  .result-page {
+    padding: 0;
+  }
+
+  .day-tab-content {
+    display: block !important;
+    page-break-inside: avoid;
+  }
+}
