@@ -15,6 +15,7 @@ import {
   Loader2,
   Lock,
   Moon,
+  Pill,
   Salad,
   Target,
   User,
@@ -35,7 +36,7 @@ import {
 import type { FormData } from "../types/diet";
 import { defaultFormData } from "../types/diet";
 
-const TOTAL_STEPS = 8;
+const TOTAL_STEPS = 11;
 
 const STEP_META = [
   { title: "Personal Details", subtitle: "Tell us about yourself", icon: User },
@@ -48,6 +49,16 @@ const STEP_META = [
     title: "Goal Targets",
     subtitle: "How much do you want to achieve?",
     icon: Target,
+  },
+  {
+    title: "Dietary Preferences",
+    subtitle: "Select your dietary reference",
+    icon: Leaf,
+  },
+  {
+    title: "Food Allergies",
+    subtitle: "Any foods you need to avoid?",
+    icon: Apple,
   },
   {
     title: "Meal Frequency",
@@ -74,6 +85,7 @@ const STEP_META = [
     subtitle: "Enter your metabolic rate values",
     icon: Activity,
   },
+  { title: "Supplements", subtitle: "What do you currently take?", icon: Pill },
 ];
 
 interface Props {
@@ -150,15 +162,21 @@ export default function DietForm({ onComplete, onViewPreviousReport }: Props) {
         errs.target_weight_kg = "Please enter your target weight (kg)";
       }
     }
-    // Step 5 – Health conditions required
-    if (step === 5) {
+    // Step 4 – Dietary preference required
+    if (step === 4) {
+      if (data.dietary_preferences.length === 0) {
+        errs.dietary_preferences = "Please select a dietary preference";
+      }
+    }
+    // Step 7 – Health conditions required
+    if (step === 7) {
       if (data.health_conditions.length === 0) {
         errs.health_conditions =
           "Please select at least one option (or select None)";
       }
     }
-    // Step 7 – Macro targets required
-    if (step === 7) {
+    // Step 9 – Macro targets required
+    if (step === 9) {
       if (!data.protein_target || data.protein_target <= 0)
         errs.protein_target = "Please enter your protein target";
       if (!data.carbs_target || data.carbs_target <= 0)
@@ -325,18 +343,34 @@ export default function DietForm({ onComplete, onViewPreviousReport }: Props) {
               {step === 2 && <Step2 data={data} update={update} />}
               {step === 3 && <StepGoalTargets data={data} update={update} />}
 
-              {step === 4 && <Step6 data={data} update={update} />}
-              {step === 5 && (
+              {step === 4 && (
+                <Step4
+                  data={data}
+                  update={update}
+                  toggleArrayItem={toggleArrayItem}
+                />
+              )}
+              {step === 5 && <StepAllergies data={data} update={update} />}
+              {step === 6 && <Step6 data={data} update={update} />}
+              {step === 7 && (
                 <Step8
                   data={data}
                   update={update}
                   toggleArrayItem={toggleArrayItem}
                 />
               )}
-              {step === 6 && <Step9 data={data} update={update} />}
-              {step === 7 && <Step10 data={data} update={update} />}
+              {step === 8 && <Step9 data={data} update={update} />}
+              {step === 9 && <Step10 data={data} update={update} />}
 
-              {step === 8 && <StepBmrTdee data={data} update={update} />}
+              {step === 10 && <StepBmrTdee data={data} update={update} />}
+              {step === 11 && (
+                <Step12
+                  data={data}
+                  errors={errors}
+                  toggleArrayItem={toggleArrayItem}
+                  update={update}
+                />
+              )}
             </motion.div>
           </AnimatePresence>
 
@@ -614,27 +648,6 @@ function Step1({ data, errors = {}, update }: StepProps) {
         </div>
       </div>
 
-      {/* User's WhatsApp Number */}
-      <div className="space-y-2">
-        <Label htmlFor="user_whatsapp">Your WhatsApp Number</Label>
-        <Input
-          id="user_whatsapp"
-          data-ocid="personal.user_whatsapp_input"
-          type="tel"
-          placeholder="Your WhatsApp number (10 digits)"
-          value={data.user_whatsapp}
-          onChange={(e) =>
-            update(
-              "user_whatsapp",
-              e.target.value.replace(/\D/g, "").slice(0, 10),
-            )
-          }
-        />
-        <p className="text-xs text-muted-foreground">
-          Your referral link will be generated using this number.
-        </p>
-      </div>
-
       {/* Referrer WhatsApp */}
       <div className="space-y-2">
         <Label
@@ -739,6 +752,108 @@ function Step2({ data, update }: StepProps) {
           <div className="text-sm text-muted-foreground mt-0.5">{g.desc}</div>
         </button>
       ))}
+    </div>
+  );
+}
+const DIETARY_PREFS = [
+  {
+    value: "vegetarian",
+    emoji: "🥗",
+    label: "Vegetarian",
+    desc: "No meat, poultry or seafood",
+  },
+  {
+    value: "non_vegetarian",
+    emoji: "🍗",
+    label: "Non-Vegetarian",
+    desc: "Includes meat, poultry, seafood",
+  },
+];
+
+function Step4({ data, update }: StepProps) {
+  const selected = data.dietary_preferences[0] ?? "";
+  return (
+    <div className="space-y-4">
+      <p className="text-sm text-muted-foreground">
+        Select your dietary reference:
+      </p>
+      <div className="space-y-3">
+        {DIETARY_PREFS.map((pref, i) => (
+          <button
+            key={pref.value}
+            type="button"
+            data-ocid={`dietary.item.${i + 1}`}
+            onClick={() => update("dietary_preferences", [pref.value])}
+            className={`w-full p-4 rounded-xl border-2 text-left flex items-center gap-4 transition-all ${
+              selected === pref.value
+                ? "border-primary bg-primary/10"
+                : "border-border hover:border-primary/40 hover:bg-secondary/50"
+            }`}
+          >
+            <span className="text-2xl">{pref.emoji}</span>
+            <div>
+              <div className="font-semibold text-foreground">{pref.label}</div>
+              <div className="text-sm text-muted-foreground">{pref.desc}</div>
+            </div>
+            {selected === pref.value && (
+              <div className="ml-auto w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                <svg
+                  className="w-3 h-3 text-primary-foreground"
+                  fill="currentColor"
+                  viewBox="0 0 12 12"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M10 3L5 8.5 2 5.5"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    fill="none"
+                  />
+                </svg>
+              </div>
+            )}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function StepAllergies({ data, update }: StepProps) {
+  return (
+    <div className="space-y-5">
+      <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+        <p className="text-sm text-amber-700">
+          Type any foods you are allergic to or need to avoid. Separate multiple
+          items with commas.
+        </p>
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="food_allergies_text">
+          Food Allergies / Foods to Avoid
+        </Label>
+        <Input
+          id="food_allergies_text"
+          data-ocid="allergies.input"
+          placeholder="e.g. Peanuts, Shellfish, Milk, Gluten — or type None"
+          value={data.food_allergies_text}
+          onChange={(e) => update("food_allergies_text", e.target.value)}
+        />
+        <p className="text-xs text-muted-foreground">
+          Leave blank or type "None" if you have no food allergies.
+        </p>
+      </div>
+      {data.food_allergies_text &&
+        data.food_allergies_text.toLowerCase() !== "none" && (
+          <div className="bg-primary/5 rounded-xl p-4 text-sm">
+            <span className="font-medium text-foreground">Avoiding: </span>
+            <span className="text-muted-foreground">
+              {data.food_allergies_text}
+            </span>
+          </div>
+        )}
     </div>
   );
 }
@@ -868,9 +983,9 @@ function StepBmrTdee({ data, update }: StepProps) {
     <div className="space-y-6">
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
         <p className="text-sm text-blue-700">
-          To know your BMR/TDEE, check your wellness assessment report. Enter
-          your BMR and TDEE values from your{" "}
-          <strong>Wellness Assessment Report</strong> below.
+          Enter your BMR and TDEE values from your{" "}
+          <strong>Wellness Assessment Report</strong>. These will be displayed
+          in your diet plan report.
         </p>
       </div>
       <div className="space-y-4">
@@ -1085,8 +1200,7 @@ function Step10({ data, update }: StepProps) {
         <Apple className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
         <p className="text-sm text-green-700">
           Enter your macro targets as recommended in your{" "}
-          <strong>Wellness Assessment Report</strong>. To know your nutrition
-          requirement, check your wellness assessment report.
+          <strong>Wellness Assessment Report</strong>.
         </p>
       </div>
       <p className="text-sm font-medium text-foreground">
@@ -1149,6 +1263,66 @@ function Step10({ data, update }: StepProps) {
           </div>
           <div className="text-xs text-muted-foreground">Carbs</div>
         </div>
+      </div>
+    </div>
+  );
+}
+const SUPPLEMENT_OPTIONS = [
+  "Vitamin D",
+  "Vitamin B12",
+  "Iron",
+  "Calcium",
+  "Magnesium",
+  "Omega-3",
+  "Zinc",
+  "Protein Powder",
+  "Multivitamin",
+  "Probiotics",
+  "Collagen",
+  "None",
+];
+
+function Step12({ data, errors = {}, toggleArrayItem, update }: StepProps) {
+  return (
+    <div className="space-y-5">
+      <p className="text-sm text-muted-foreground">
+        Select any supplements you currently take:
+      </p>
+      <div className="grid sm:grid-cols-2 gap-3">
+        {SUPPLEMENT_OPTIONS.map((supp, i) => (
+          <div
+            key={supp}
+            data-ocid={`supplements.checkbox.${i + 1}`}
+            className="flex items-center gap-3 p-3 rounded-xl border border-border hover:bg-secondary/50 cursor-pointer transition-colors"
+          >
+            <Checkbox
+              checked={data.supplements.includes(supp)}
+              onCheckedChange={() => toggleArrayItem?.("supplements", supp)}
+            />
+            <span className="text-sm font-medium">{supp}</span>
+          </div>
+        ))}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="other_supplements">
+          Other supplements (comma-separated)
+        </Label>
+        <Input
+          id="other_supplements"
+          data-ocid="supplements.other_input"
+          placeholder="e.g. B12, Iron, CoQ10"
+          value={data.other_supplements}
+          onChange={(e) => update("other_supplements", e.target.value)}
+        />
+        {errors.other_supplements && (
+          <p className="text-sm text-destructive">{errors.other_supplements}</p>
+        )}
+      </div>
+
+      <div className="bg-primary/5 rounded-xl p-4 text-sm text-muted-foreground">
+        🎉 You're almost done! Click <strong>Generate My Diet Plan</strong> to
+        get your personalized weekly nutrition plan.
       </div>
     </div>
   );

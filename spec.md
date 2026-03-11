@@ -1,42 +1,24 @@
-# HN Coach - Diet Plan Generator
+# HN Coach Diet Plan Generator
 
 ## Current State
-- 12-step multi-step form collects user profile, goals, dietary preferences, health conditions, sleep, BMR/TDEE
-- Step 1 has personal details (name, age, gender, weight, height, WhatsApp number)
-- Results page shows: profile summary, goal timeline, RDA tables, 7-day meal plan (Mon-Sun tables), daily wellness, foods to avoid
-- Report is saved in localStorage for previous report viewing
-- No referral system exists
+The app has a multi-step form and a detailed results/report page. The form includes a diet preference (vegetarian/non-vegetarian) step, and Step 1 does not have a WhatsApp number field. The meal plan shows 7 day tables (Mon-Sun), each with meals in chronological order. HN Tea appears 2-3 times between meals AND after dinner. Mid-morning snack shows '+2 egg whites' only for non-vegetarians. Print layout currently takes ~13 pages.
 
 ## Requested Changes (Diff)
 
 ### Add
-- Step 1: "Who referred you to HN Coach?" field for referrer's WhatsApp number
-  - Auto-fills from URL parameter `?ref=<whatsapp_number>` if present
-  - Once filled, field is locked/non-editable (readonly)
-- Referral section on results page:
-  - User's unique referral link = `<current_url>?ref=<user_whatsapp>`
-  - Share button opens WhatsApp with pre-filled message: "Hey! I just got my personalized diet plan from HN Coach. Generate yours free here: [link]"
-  - Shows referral count (tracked in localStorage keyed by user's WhatsApp number)
-  - Promotional message: "Help 2 friends download their report and get a full refund!"
-- "Get Your Personal Coach" section on results page:
-  - WhatsApp button connecting to the referrer's number
-  - Pre-filled message: "Hi! I generated my HN Coach diet plan and would like personal guidance. Please help me achieve my goals."
-  - If no referrer, show a message to contact via the referral link
-- Report: "Referred by" line in profile summary showing referrer's WhatsApp number (non-editable display)
+- WhatsApp number input field in Step 1 of the form (Personal Details), which auto-populates the referral link
+- Egg whites shown for ALL users (not just non-vegetarians)
 
 ### Modify
-- Report layout: more compact overall (tighter spacing, smaller padding, more condensed tables)
-- Print CSS (`@media print`): further reduce spacing, font sizes, margins for fewer pages
-- Professional styling: cleaner typography hierarchy, subtle borders, trust signals
+- Remove HN Tea row that appears after Dinner in each day's meal table (keep HN Tea between other meals)
+- Aggressively compress print CSS: reduce font sizes, minimize padding/margins, collapse whitespace, remove decorative elements in print, target 5-6 pages
+- WhatsApp field in Step 1 feeds into the referral link generation
 
 ### Remove
-- Nothing removed
+- Vegetarian/Non-Vegetarian diet preference question from the form entirely
+- HN Tea after Dinner row from all 7 day tables
 
 ## Implementation Plan
-1. DietForm.tsx Step 1: add referrer WhatsApp input field, read URL param on mount to auto-fill, lock field once filled
-2. Pass referrer WhatsApp through form data to DietResult
-3. DietResult.tsx: add "Referred by" in profile summary (display only)
-4. DietResult.tsx: add Referral Section with unique link, share button, referral count from localStorage
-5. DietResult.tsx: add Personal Coach section with WhatsApp CTA using referrer number
-6. CSS: compact spacing throughout report, aggressive print compression via @media print
-7. Professional polish: clean section headers, trust badges, consistent typography
+1. In DietForm.tsx: Remove the diet preference step; add WhatsApp number input to Step 1; update step count/progress accordingly
+2. In DietResult.tsx: Remove HN Tea rows that come after Dinner in each day table; show egg whites for all users regardless of diet preference
+3. In DietResult.tsx / index.css: Aggressively tighten @media print CSS - reduce font to 8-9pt, minimize all padding/margin, hide non-essential decorative elements, shrink table cells, target 5-6 pages
