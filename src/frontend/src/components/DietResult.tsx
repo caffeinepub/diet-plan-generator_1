@@ -64,17 +64,17 @@ function getMacroRDA(weight: number, bmr: number, tdee: number) {
   return [
     {
       nutrient: "Protein",
-      rda: `1.2 g × ${weight} kg = ${(1.2 * weight).toFixed(0)} g/day`,
+      rda: `${(1.2 * weight).toFixed(0)} g/day`,
       role: "Muscle repair, enzymes, immune function",
     },
     {
       nutrient: "Carbohydrates",
-      rda: `40% of TDEE = ${Math.round((0.4 * tdee) / 4)} g/day (${Math.round(0.4 * tdee)} kcal)`,
+      rda: `${Math.round((0.4 * tdee) / 4)} g/day`,
       role: "Primary energy source for brain & body",
     },
     {
       nutrient: "Dietary Fat",
-      rda: `25% of BMR = ${Math.round((0.25 * bmr) / 9)} g/day (${Math.round(0.25 * bmr)} kcal)`,
+      rda: `${Math.round((0.25 * bmr) / 9)} g/day`,
       role: "Hormone production, fat-soluble vitamins",
     },
     {
@@ -84,7 +84,7 @@ function getMacroRDA(weight: number, bmr: number, tdee: number) {
     },
     {
       nutrient: "Water",
-      rda: `1 L per 18 kg = ${(weight / 18).toFixed(1)} L/day`,
+      rda: `${(weight / 18).toFixed(1)} L/day`,
       role: "Hydration, digestion, temperature regulation",
     },
   ];
@@ -410,15 +410,6 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
           transition={{ duration: 0.5, delay: 0.6 }}
           className="bg-card rounded-2xl border border-border overflow-hidden"
         >
-          {/* Uploaded banner image */}
-          <div className="w-full">
-            <img
-              src="/assets/uploads/file_00000000b1f071fa852a880787585b1b-1.png"
-              alt="Global Nutrition Philosophy"
-              className="w-full object-cover"
-            />
-          </div>
-
           <div className="p-6 space-y-6">
             <div className="text-center">
               <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-primary/10 mb-3">

@@ -7,7 +7,6 @@ import { Progress } from "@/components/ui/progress";
 import {
   Activity,
   Apple,
-  Brain,
   ChevronLeft,
   ChevronRight,
   Droplets,
@@ -20,7 +19,6 @@ import {
   Target,
   User,
   UtensilsCrossed,
-  Zap,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
@@ -37,7 +35,7 @@ import {
 import type { FormData } from "../types/diet";
 import { defaultFormData } from "../types/diet";
 
-const TOTAL_STEPS = 14;
+const TOTAL_STEPS = 12;
 
 const STEP_META = [
   { title: "Personal Details", subtitle: "Tell us about yourself", icon: User },
@@ -51,7 +49,6 @@ const STEP_META = [
     subtitle: "How much do you want to achieve?",
     icon: Target,
   },
-  { title: "Activity Level", subtitle: "How active are you daily?", icon: Zap },
   {
     title: "Dietary Preferences",
     subtitle: "Select your dietary reference",
@@ -86,11 +83,6 @@ const STEP_META = [
     title: "Nutrition Targets",
     subtitle: "Your macro targets from wellness report",
     icon: Salad,
-  },
-  {
-    title: "Stress Level",
-    subtitle: "How would you rate your stress?",
-    icon: Brain,
   },
   {
     title: "BMR & TDEE",
@@ -150,27 +142,27 @@ export default function DietForm({ onComplete }: Props) {
         errs.target_weight_kg = "Please enter your target weight (kg)";
       }
     }
-    // Step 5 – Dietary preference required
-    if (step === 5) {
+    // Step 4 – Dietary preference required
+    if (step === 4) {
       if (data.dietary_preferences.length === 0) {
         errs.dietary_preferences = "Please select a dietary preference";
       }
     }
-    // Step 8 – Water intake required
-    if (step === 8) {
+    // Step 7 – Water intake required
+    if (step === 7) {
       if (!data.water_intake || data.water_intake <= 0) {
         errs.water_intake = "Please enter your daily water intake";
       }
     }
-    // Step 9 – Health conditions required
-    if (step === 9) {
+    // Step 8 – Health conditions required
+    if (step === 8) {
       if (data.health_conditions.length === 0) {
         errs.health_conditions =
           "Please select at least one option (or select None)";
       }
     }
-    // Step 11 – Macro targets required
-    if (step === 11) {
+    // Step 10 – Macro targets required
+    if (step === 10) {
       if (!data.protein_target || data.protein_target <= 0)
         errs.protein_target = "Please enter your protein target";
       if (!data.carbs_target || data.carbs_target <= 0)
@@ -277,17 +269,6 @@ export default function DietForm({ onComplete }: Props) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-secondary/30 to-accent/20 flex flex-col">
-      {/* Hero Banner - shown on step 1 only */}
-      {step === 1 && (
-        <div className="w-full">
-          <img
-            src="/assets/uploads/file_00000000b1f071fa852a880787585b1b-1.png"
-            alt="Global Nutrition Philosophy"
-            className="w-full object-cover max-h-64 sm:max-h-80"
-          />
-        </div>
-      )}
-
       {/* Header */}
       <header className="no-print border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-2xl mx-auto px-4 py-4">
@@ -347,29 +328,29 @@ export default function DietForm({ onComplete }: Props) {
               )}
               {step === 2 && <Step2 data={data} update={update} />}
               {step === 3 && <StepGoalTargets data={data} update={update} />}
-              {step === 4 && <Step3 data={data} update={update} />}
-              {step === 5 && (
+
+              {step === 4 && (
                 <Step4
                   data={data}
                   update={update}
                   toggleArrayItem={toggleArrayItem}
                 />
               )}
-              {step === 6 && <StepAllergies data={data} update={update} />}
-              {step === 7 && <Step6 data={data} update={update} />}
-              {step === 8 && <Step7 data={data} update={update} />}
-              {step === 9 && (
+              {step === 5 && <StepAllergies data={data} update={update} />}
+              {step === 6 && <Step6 data={data} update={update} />}
+              {step === 7 && <Step7 data={data} update={update} />}
+              {step === 8 && (
                 <Step8
                   data={data}
                   update={update}
                   toggleArrayItem={toggleArrayItem}
                 />
               )}
-              {step === 10 && <Step9 data={data} update={update} />}
-              {step === 11 && <Step10 data={data} update={update} />}
-              {step === 12 && <Step11 data={data} update={update} />}
-              {step === 13 && <StepBmrTdee data={data} update={update} />}
-              {step === 14 && (
+              {step === 9 && <Step9 data={data} update={update} />}
+              {step === 10 && <Step10 data={data} update={update} />}
+
+              {step === 11 && <StepBmrTdee data={data} update={update} />}
+              {step === 12 && (
                 <Step12
                   data={data}
                   errors={errors}
@@ -598,103 +579,49 @@ function Step2({ data, update }: StepProps) {
     </div>
   );
 }
-
-const ACTIVITY_LEVELS = [
-  {
-    value: "sedentary" as const,
-    label: "Sedentary",
-    desc: "Little or no exercise, desk job",
-    emoji: "🪑",
-  },
-  {
-    value: "lightly_active" as const,
-    label: "Lightly Active",
-    desc: "Light exercise 1-3 days/week",
-    emoji: "🚶",
-  },
-  {
-    value: "moderately_active" as const,
-    label: "Moderately Active",
-    desc: "Moderate exercise 3-5 days/week",
-    emoji: "🏋️",
-  },
-  {
-    value: "very_active" as const,
-    label: "Very Active",
-    desc: "Hard exercise 6-7 days/week",
-    emoji: "🏃",
-  },
-  {
-    value: "extra_active" as const,
-    label: "Extra Active",
-    desc: "Very hard exercise & physical job",
-    emoji: "⚡",
-  },
-];
-
-function Step3({ data, update }: StepProps) {
-  return (
-    <div className="space-y-3">
-      {ACTIVITY_LEVELS.map((a, i) => (
-        <button
-          key={a.value}
-          type="button"
-          data-ocid={`activity.item.${i + 1}`}
-          onClick={() => update("activity_level", a.value)}
-          className={`w-full p-4 rounded-xl border-2 text-left flex items-center gap-4 transition-all ${
-            data.activity_level === a.value
-              ? "border-primary bg-primary/10"
-              : "border-border hover:border-primary/40 hover:bg-secondary/50"
-          }`}
-        >
-          <span className="text-2xl">{a.emoji}</span>
-          <div>
-            <div className="font-semibold text-foreground">{a.label}</div>
-            <div className="text-sm text-muted-foreground">{a.desc}</div>
-          </div>
-          {data.activity_level === a.value && (
-            <div className="ml-auto w-5 h-5 rounded-full bg-primary flex items-center justify-center">
-              <svg
-                className="w-3 h-3 text-primary-foreground"
-                fill="currentColor"
-                viewBox="0 0 12 12"
-                aria-hidden="true"
-              >
-                <path
-                  d="M10 3L5 8.5 2 5.5"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  fill="none"
-                />
-              </svg>
-            </div>
-          )}
-        </button>
-      ))}
-    </div>
-  );
-}
-
 const DIETARY_PREFS = [
   {
-    value: "Vegetarian",
-    label: "Vegetarian",
+    value: "vegetarian",
     emoji: "🥗",
-    desc: "No meat or seafood",
+    label: "Vegetarian",
+    desc: "No meat, poultry or seafood",
   },
+  { value: "vegan", emoji: "🌱", label: "Vegan", desc: "No animal products" },
   {
-    value: "Non Vegetarian",
-    label: "Non Vegetarian",
+    value: "non_vegetarian",
     emoji: "🍗",
-    desc: "Includes meat, poultry & seafood",
+    label: "Non-Vegetarian",
+    desc: "Includes meat, poultry, seafood",
   },
   {
-    value: "Vegan",
-    label: "Vegan",
-    emoji: "🌱",
-    desc: "No animal products at all",
+    value: "eggetarian",
+    emoji: "🥚",
+    label: "Eggetarian",
+    desc: "Vegetarian + eggs",
+  },
+  {
+    value: "pescatarian",
+    emoji: "🐟",
+    label: "Pescatarian",
+    desc: "Vegetarian + seafood",
+  },
+  {
+    value: "keto",
+    emoji: "🥑",
+    label: "Ketogenic",
+    desc: "High fat, very low carb",
+  },
+  {
+    value: "paleo",
+    emoji: "🥩",
+    label: "Paleo",
+    desc: "Whole foods, no grains",
+  },
+  {
+    value: "jain",
+    emoji: "🙏",
+    label: "Jain",
+    desc: "No root vegetables, strict vegetarian",
   },
 ];
 
@@ -1246,69 +1173,19 @@ function Step10({ data, update }: StepProps) {
     </div>
   );
 }
-
-const STRESS_LEVELS = [
-  {
-    value: "low" as const,
-    label: "Low",
-    desc: "Relaxed, minimal daily stressors",
-    emoji: "😌",
-  },
-  {
-    value: "moderate" as const,
-    label: "Moderate",
-    desc: "Some stress, well-managed",
-    emoji: "😐",
-  },
-  {
-    value: "high" as const,
-    label: "High",
-    desc: "Frequently stressed",
-    emoji: "😰",
-  },
-  {
-    value: "very_high" as const,
-    label: "Very High",
-    desc: "Overwhelmed most of the time",
-    emoji: "😫",
-  },
-];
-
-function Step11({ data, update }: StepProps) {
-  return (
-    <div className="grid sm:grid-cols-2 gap-3">
-      {STRESS_LEVELS.map((s, i) => (
-        <button
-          key={s.value}
-          type="button"
-          data-ocid={`stress.item.${i + 1}`}
-          onClick={() => update("stress_level", s.value)}
-          className={`p-4 rounded-xl border-2 text-left transition-all ${
-            data.stress_level === s.value
-              ? "border-primary bg-primary/10"
-              : "border-border hover:border-primary/40 hover:bg-secondary/50"
-          }`}
-        >
-          <div className="text-2xl mb-2">{s.emoji}</div>
-          <div className="font-semibold text-foreground">{s.label}</div>
-          <div className="text-sm text-muted-foreground mt-0.5">{s.desc}</div>
-        </button>
-      ))}
-    </div>
-  );
-}
-
 const SUPPLEMENT_OPTIONS = [
-  "Protein Powder",
-  "Creatine",
-  "Multivitamin",
-  "Omega-3",
   "Vitamin D",
-  "Magnesium",
-  "Zinc",
-  "Pre-workout",
+  "Vitamin B12",
+  "Iron",
   "Calcium",
-  "Digestion Enhancer",
+  "Magnesium",
+  "Omega-3",
+  "Zinc",
+  "Protein Powder",
+  "Multivitamin",
+  "Probiotics",
+  "Collagen",
+  "None",
 ];
 
 function Step12({ data, errors = {}, toggleArrayItem, update }: StepProps) {
