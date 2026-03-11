@@ -158,9 +158,14 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
             <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center">
               <Leaf className="w-3.5 h-3.5 text-primary-foreground" />
             </div>
-            <span className="font-display font-bold text-foreground">
-              NutriPlan
-            </span>
+            <div>
+              <span className="font-display font-bold text-foreground">
+                HN Coach
+              </span>
+              <div className="text-xs text-muted-foreground leading-none">
+                Diet & Nutrition Plan
+              </div>
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <Button
@@ -555,7 +560,12 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
               </TabsList>
               {plan.weekly_plan.map((dayPlan, i) => (
                 <TabsContent key={DAYS[i]} value={String(i)}>
-                  <DayPlanView dayPlan={dayPlan} dayName={DAYS[i]} />
+                  <DayPlanView
+                    dayPlan={dayPlan}
+                    dayName={DAYS[i]}
+                    wakeUpTime={formData.wake_up_time}
+                    mealGap={formData.meal_gap}
+                  />
                 </TabsContent>
               ))}
             </Tabs>
@@ -567,7 +577,12 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
                 <h3 className="font-display font-bold text-lg text-foreground mb-3 border-b pb-2">
                   {DAYS[i]}
                 </h3>
-                <DayPlanView dayPlan={dayPlan} dayName={DAYS[i]} />
+                <DayPlanView
+                  dayPlan={dayPlan}
+                  dayName={DAYS[i]}
+                  wakeUpTime={formData.wake_up_time}
+                  mealGap={formData.meal_gap}
+                />
               </div>
             ))}
           </div>
@@ -663,7 +678,11 @@ function SummaryField({ label, value }: { label: string; value: string }) {
   );
 }
 
-function MealCard({ meal, label }: { meal: Meal; label: string }) {
+function MealCard({
+  meal,
+  label,
+  timeLabel,
+}: { meal: Meal; label: string; timeLabel?: string }) {
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -681,6 +700,11 @@ function MealCard({ meal, label }: { meal: Meal; label: string }) {
             <div className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
               {label}
             </div>
+            {timeLabel && (
+              <div className="text-xs text-primary font-semibold">
+                {timeLabel}
+              </div>
+            )}
             <div className="font-semibold text-foreground text-sm">
               {meal.name}
             </div>
@@ -722,10 +746,51 @@ function MealCard({ meal, label }: { meal: Meal; label: string }) {
   );
 }
 
+function addMinutes(time: string, mins: number): string {
+  const [h, m] = time.split(":").map(Number);
+  const total = h * 60 + m + mins;
+  const nh = Math.floor(total / 60) % 24;
+  const nm = total % 60;
+  const ampm = nh >= 12 ? "PM" : "AM";
+  const hour12 = nh % 12 === 0 ? 12 : nh % 12;
+  return `${hour12}:${String(nm).padStart(2, "0")} ${ampm}`;
+}
+
+const MEAL_SCHEDULE = {
+  3: [
+    { key: "breakfast", label: "Breakfast", emoji: "🌅", offset: 180 },
+    { key: "midSnack", label: "Mid Morning Snack", emoji: "🍎", offset: 360 },
+    { key: "lunch", label: "Lunch", emoji: "🍽️", offset: 540 },
+    { key: "eveningSnack", label: "Evening Snack", emoji: "🥗", offset: 720 },
+    { key: "dinner", label: "Dinner", emoji: "🌙", offset: 900 },
+  ],
+  4: [
+    { key: "breakfast", label: "Breakfast", emoji: "🌅", offset: 180 },
+    { key: "lunch", label: "Lunch", emoji: "🍽️", offset: 420 },
+    { key: "eveningSnack", label: "Evening Snack", emoji: "🥗", offset: 660 },
+    { key: "dinner", label: "Dinner", emoji: "🌙", offset: 900 },
+  ],
+  5: [
+    { key: "breakfast", label: "Breakfast", emoji: "🌅", offset: 180 },
+    { key: "lunch", label: "Lunch", emoji: "🍽️", offset: 480 },
+    { key: "dinner", label: "Dinner", emoji: "🌙", offset: 780 },
+  ],
+} as Record<
+  number,
+  { key: string; label: string; emoji: string; offset: number }[]
+>;
+
 function DayPlanView({
   dayPlan,
   dayName,
-}: { dayPlan: DayPlan; dayName: string }) {
+  wakeUpTime,
+  mealGap,
+}: {
+  dayPlan: DayPlan;
+  dayName: string;
+  wakeUpTime?: string;
+  mealGap?: number;
+}) {
   const dayTotal = [
     dayPlan.breakfast,
     dayPlan.lunch,
@@ -741,20 +806,64 @@ function DayPlanView({
     { calories: 0, protein: 0, carbs: 0, fats: 0 },
   );
 
+  const schedule =
+    wakeUpTime && mealGap && MEAL_SCHEDULE[mealGap]
+      ? MEAL_SCHEDULE[mealGap]
+      : null;
+  const timeMap: Record<string, string> = {};
+  if (schedule && wakeUpTime) {
+    for (const item of schedule) {
+      timeMap[item.key] = addMinutes(wakeUpTime, item.offset);
+    }
+  }
+
   return (
     <div className="space-y-3">
       <div className="hidden print:block text-sm font-semibold text-muted-foreground mb-2">
         {dayName}
       </div>
 
-      <MealCard meal={dayPlan.breakfast} label="Breakfast" />
-      <MealCard meal={dayPlan.lunch} label="Lunch" />
-      <MealCard meal={dayPlan.dinner} label="Dinner" />
+      {schedule && wakeUpTime && (
+        <div className="mb-4 p-3 rounded-2xl bg-gradient-to-r from-primary/10 via-accent/10 to-secondary/20 border border-primary/20">
+          <div className="text-xs font-bold uppercase tracking-widest text-primary mb-3 flex items-center gap-1.5">
+            <span>🕐</span> Today's Meal Schedule
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {schedule.map((item) => (
+              <div
+                key={item.key}
+                className="flex flex-col items-center bg-card/80 backdrop-blur-sm border border-border rounded-xl px-3 py-2 shadow-sm min-w-[80px]"
+              >
+                <span className="text-lg mb-0.5">{item.emoji}</span>
+                <span className="text-[10px] font-semibold text-muted-foreground text-center leading-tight">
+                  {item.label}
+                </span>
+                <span className="text-xs font-bold text-primary mt-1">
+                  {timeMap[item.key]}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <MealCard
+        meal={dayPlan.breakfast}
+        label="Breakfast"
+        timeLabel={timeMap.breakfast}
+      />
+      <MealCard meal={dayPlan.lunch} label="Lunch" timeLabel={timeMap.lunch} />
+      <MealCard
+        meal={dayPlan.dinner}
+        label="Dinner"
+        timeLabel={timeMap.dinner}
+      />
       {dayPlan.snacks.map((snack, i) => (
         <MealCard
           key={snack.name + String(i)}
           meal={snack}
           label={dayPlan.snacks.length > 1 ? `Snack ${i + 1}` : "Snack"}
+          timeLabel={i === 0 ? timeMap.midSnack : timeMap.eveningSnack}
         />
       ))}
 

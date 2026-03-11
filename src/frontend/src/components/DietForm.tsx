@@ -295,9 +295,14 @@ export default function DietForm({ onComplete }: Props) {
             <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
               <Leaf className="w-4 h-4 text-primary-foreground" />
             </div>
-            <span className="font-display font-bold text-lg text-foreground">
-              NutriPlan
-            </span>
+            <div>
+              <span className="font-display font-bold text-lg text-foreground">
+                HN Coach
+              </span>
+              <div className="text-xs text-muted-foreground leading-none">
+                Diet & Nutrition Plan
+              </div>
+            </div>
             <Badge variant="secondary" className="ml-auto">
               Step {step} of {TOTAL_STEPS}
             </Badge>
