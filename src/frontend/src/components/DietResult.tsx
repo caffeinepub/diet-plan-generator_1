@@ -1,21 +1,19 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  Activity,
   CheckCircle2,
   ChevronDown,
   ChevronUp,
   Droplets,
-  Flame,
   Globe,
   Heart,
   Leaf,
   Pill,
   Printer,
   RefreshCw,
+  Target,
   User,
   UtensilsCrossed,
 } from "lucide-react";
@@ -63,16 +61,40 @@ interface Props {
   onStartOver: () => void;
 }
 
+function getMacroRDA(weight: number, bmr: number, tdee: number) {
+  return [
+    {
+      nutrient: "Protein",
+      rda: `1.2 g × ${weight} kg = ${(1.2 * weight).toFixed(0)} g/day`,
+      role: "Muscle repair, enzymes, immune function",
+    },
+    {
+      nutrient: "Carbohydrates",
+      rda: `40% of TDEE = ${Math.round((0.4 * tdee) / 4)} g/day (${Math.round(0.4 * tdee)} kcal)`,
+      role: "Primary energy source for brain & body",
+    },
+    {
+      nutrient: "Dietary Fat",
+      rda: `25% of BMR = ${Math.round((0.25 * bmr) / 9)} g/day (${Math.round(0.25 * bmr)} kcal)`,
+      role: "Hormone production, fat-soluble vitamins",
+    },
+    {
+      nutrient: "Dietary Fibre",
+      rda: "25–40 g/day",
+      role: "Gut health, blood sugar regulation",
+    },
+    {
+      nutrient: "Water",
+      rda: `1 L per 18 kg = ${(weight / 18).toFixed(1)} L/day`,
+      role: "Hydration, digestion, temperature regulation",
+    },
+  ];
+}
+
 export default function DietResult({ plan, formData, onStartOver }: Props) {
   function handlePrint() {
     window.print();
   }
-
-  const totalMacroGrams =
-    plan.macros.protein + plan.macros.carbs + plan.macros.fats;
-  const proteinPct = Math.round((plan.macros.protein / totalMacroGrams) * 100);
-  const carbsPct = Math.round((plan.macros.carbs / totalMacroGrams) * 100);
-  const fatsPct = Math.round((plan.macros.fats / totalMacroGrams) * 100);
 
   const allSupplements = [
     ...formData.supplements,
@@ -84,17 +106,15 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
       : []),
   ];
 
-  const allAllergies = [
-    ...formData.food_allergies,
-    ...(formData.other_allergies
-      ? formData.other_allergies
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean)
-      : []),
-  ];
+  const allAllergies = formData.food_allergies_text
+    ? formData.food_allergies_text
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean)
+    : formData.food_allergies.length > 0
+      ? formData.food_allergies
+      : [];
 
-  // Calculate sleep duration
   let sleepDurationText = "—";
   if (formData.bed_time && formData.wake_up_time) {
     const [bh, bm] = formData.bed_time.split(":").map(Number);
@@ -104,6 +124,27 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
     const hours = Math.floor(diff / 60);
     const mins = diff % 60;
     sleepDurationText = `${hours}h${mins > 0 ? ` ${mins}m` : ""}`;
+  }
+
+  const isLoss = formData.goal === "weight_loss";
+  const isGain = formData.goal === "muscle_gain";
+  const targetKg = formData.target_weight_kg || 0;
+  const targetBellyInches = formData.target_belly_inches || 0;
+  const showTimeline = (isLoss || isGain) && targetKg > 0;
+
+  const bmr = formData.bmr_manual > 0 ? formData.bmr_manual : plan.bmr;
+  const tdee = formData.tdee_manual > 0 ? formData.tdee_manual : plan.tdee;
+
+  const macroRDA = getMacroRDA(formData.weight, bmr, tdee);
+
+  function calcMonths(kgPerMonth: number): string {
+    if (!targetKg || kgPerMonth <= 0) return "—";
+    const months = targetKg / kgPerMonth;
+    if (months < 1) return "< 1 month";
+    const m = Math.floor(months);
+    const weeks = Math.round((months - m) * 4);
+    if (weeks === 0) return `${m} month${m > 1 ? "s" : ""}`;
+    return `${m} month${m > 1 ? "s" : ""} ${weeks} week${weeks > 1 ? "s" : ""}`;
   }
 
   return (
@@ -141,7 +182,7 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
               className="gap-2 no-print"
             >
               <RefreshCw className="w-4 h-4" />
-              <span className="hidden sm:inline">Start Over</span>
+              <span className="hidden sm:inline">Generate New Report</span>
             </Button>
           </div>
         </div>
@@ -178,7 +219,7 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
           </div>
         </motion.div>
 
-        {/* ── USER RESPONSES SUMMARY ── */}
+        {/* USER RESPONSES SUMMARY */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -217,6 +258,29 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
               label="Food Allergies"
               value={allAllergies.length > 0 ? allAllergies.join(", ") : "None"}
             />
+            {formData.target_weight_kg > 0 && (
+              <SummaryField
+                label={
+                  formData.goal === "weight_loss"
+                    ? "Target Weight Loss"
+                    : formData.goal === "muscle_gain"
+                      ? "Target Weight Gain"
+                      : ""
+                }
+                value={
+                  formData.goal === "weight_loss" ||
+                  formData.goal === "muscle_gain"
+                    ? `${formData.target_weight_kg} kg${formData.goal === "weight_loss" && formData.target_belly_inches > 0 ? ` · ${formData.target_belly_inches}" belly` : ""}`
+                    : ""
+                }
+              />
+            )}
+            {(formData.bmr_manual > 0 || formData.tdee_manual > 0) && (
+              <SummaryField
+                label="BMR / TDEE (from report)"
+                value={`${formData.bmr_manual > 0 ? `${formData.bmr_manual} kcal` : "—"} / ${formData.tdee_manual > 0 ? `${formData.tdee_manual} kcal` : "—"}`}
+              />
+            )}
             <SummaryField
               label="Meal Gap"
               value={`${formData.meal_gap} hours`}
@@ -262,112 +326,78 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
           </div>
         </motion.div>
 
-        {/* Summary Cards */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4"
-        >
-          <SummaryCard
-            icon={<Activity className="w-5 h-5" />}
-            label="BMR"
-            value={`${plan.bmr}`}
-            unit="kcal"
-            sublabel="Basal Metabolic Rate"
-            color="blue"
-          />
-          <SummaryCard
-            icon={<Flame className="w-5 h-5" />}
-            label="TDEE"
-            value={`${plan.tdee}`}
-            unit="kcal"
-            sublabel="Total Daily Energy"
-            color="orange"
-          />
-          <SummaryCard
-            icon={<UtensilsCrossed className="w-5 h-5" />}
-            label="Daily Target"
-            value={`${plan.daily_calories}`}
-            unit="kcal"
-            sublabel="Your calorie goal"
-            color="green"
-          />
-          <SummaryCard
-            icon={<Droplets className="w-5 h-5" />}
-            label="Hydration"
-            value={`${plan.hydration_recommendation}`}
-            unit="liters"
-            sublabel="Daily water target"
-            color="cyan"
-          />
-        </motion.div>
-
-        {/* Macros Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="bg-card rounded-2xl border border-border p-6"
-        >
-          <h2 className="text-xl font-display font-bold text-foreground mb-5 flex items-center gap-2">
-            <Heart className="w-5 h-5 text-primary" />
-            Macronutrient Breakdown
-          </h2>
-          <div className="space-y-4">
-            <MacroBar
-              label="Protein"
-              grams={plan.macros.protein}
-              pct={proteinPct}
-              color="bg-chart-1"
-              colorText="text-green-600"
-            />
-            <MacroBar
-              label="Carbohydrates"
-              grams={plan.macros.carbs}
-              pct={carbsPct}
-              color="bg-chart-2"
-              colorText="text-blue-600"
-            />
-            <MacroBar
-              label="Fats"
-              grams={plan.macros.fats}
-              pct={fatsPct}
-              color="bg-chart-3"
-              colorText="text-amber-600"
-            />
-          </div>
-          <Separator className="my-4" />
-          <div className="grid grid-cols-3 gap-4 text-center text-sm">
-            <div>
-              <div className="text-2xl font-display font-bold text-foreground">
-                {plan.macros.protein}g
-              </div>
-              <div className="text-muted-foreground">Protein</div>
-              <div className="text-xs text-green-600 font-medium">
-                {proteinPct}%
-              </div>
+        {/* GOAL TIMELINE */}
+        {showTimeline && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.15 }}
+            className="bg-card rounded-2xl border border-border p-6"
+            data-ocid="result.goal_timeline.panel"
+          >
+            <h2 className="text-xl font-display font-bold text-foreground mb-2 flex items-center gap-2">
+              <Target className="w-5 h-5 text-primary" />
+              {isLoss ? "Weight Loss" : "Weight Gain"} Timeline
+            </h2>
+            <p className="text-sm text-muted-foreground mb-5">
+              {isLoss
+                ? `Your target: lose ${targetKg} kg${targetBellyInches > 0 ? ` + ${targetBellyInches} inches from belly fat` : ""}`
+                : `Your target: gain ${targetKg} kg`}
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {[
+                {
+                  rate: 2,
+                  label: "2 kg/month",
+                  color: "text-red-600",
+                  bg: "bg-red-50 border-red-200",
+                },
+                {
+                  rate: 3,
+                  label: "3 kg/month",
+                  color: "text-orange-600",
+                  bg: "bg-orange-50 border-orange-200",
+                },
+                {
+                  rate: 4,
+                  label: "4 kg/month",
+                  color: "text-amber-600",
+                  bg: "bg-amber-50 border-amber-200",
+                },
+                {
+                  rate: 5,
+                  label: "5 kg/month",
+                  color: "text-green-600",
+                  bg: "bg-green-50 border-green-200",
+                },
+              ].map((item) => (
+                <div
+                  key={item.rate}
+                  className={`rounded-xl border p-4 text-center ${item.bg}`}
+                  data-ocid={`result.timeline.item.${item.rate / 2}`}
+                >
+                  <div className={`text-lg font-bold ${item.color}`}>
+                    {calcMonths(item.rate)}
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1 font-medium">
+                    {item.label}
+                  </div>
+                </div>
+              ))}
             </div>
-            <div>
-              <div className="text-2xl font-display font-bold text-foreground">
-                {plan.macros.carbs}g
+            {isLoss && targetBellyInches > 0 && (
+              <div className="mt-4 bg-primary/5 rounded-xl p-4 text-sm text-muted-foreground">
+                <span className="font-medium text-foreground">
+                  Belly fat target:
+                </span>{" "}
+                {targetBellyInches} inches reduction. Generally, by losing 2–3
+                kg you can expect to lose approximately 1 inch from belly fat.
+                Consistent caloric deficit, strength training, and quality sleep
+                accelerate results.
               </div>
-              <div className="text-muted-foreground">Carbs</div>
-              <div className="text-xs text-blue-600 font-medium">
-                {carbsPct}%
-              </div>
-            </div>
-            <div>
-              <div className="text-2xl font-display font-bold text-foreground">
-                {plan.macros.fats}g
-              </div>
-              <div className="text-muted-foreground">Fats</div>
-              <div className="text-xs text-amber-600 font-medium">
-                {fatsPct}%
-              </div>
-            </div>
-          </div>
-        </motion.div>
+            )}
+          </motion.div>
+        )}
 
         {/* Weekly Meal Plan */}
         <motion.div
@@ -381,7 +411,6 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
             Weekly Meal Plan
           </h2>
 
-          {/* Tabbed view for screen */}
           <div className="no-print">
             <Tabs defaultValue="0">
               <TabsList className="grid grid-cols-7 mb-6 h-auto">
@@ -404,7 +433,6 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
             </Tabs>
           </div>
 
-          {/* Print-only: expanded accordion */}
           <div className="hidden print:block space-y-6">
             {plan.weekly_plan.map((dayPlan, i) => (
               <div key={DAYS[i]} className="page-break-inside-avoid">
@@ -416,13 +444,6 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
             ))}
           </div>
         </motion.div>
-
-        {/* Mobile accordion for days */}
-        <div className="sm:hidden no-print -mt-4">
-          <p className="text-xs text-muted-foreground text-center mb-2">
-            Tip: Use the tabs above to browse each day
-          </p>
-        </div>
 
         {/* Health Tips */}
         <motion.div
@@ -518,19 +539,19 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
           </div>
         </motion.div>
 
-        {/* ── GLOBAL NUTRITION PHILOSOPHY ── */}
+        {/* GLOBAL NUTRITION PHILOSOPHY */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.6 }}
           className="bg-card rounded-2xl border border-border overflow-hidden"
         >
-          {/* Image */}
+          {/* Uploaded banner image */}
           <div className="w-full">
             <img
-              src="/assets/generated/nutrition-philosophy.dim_800x500.jpg"
+              src="/assets/uploads/file_00000000b1f071fa852a880787585b1b-1.png"
               alt="Global Nutrition Philosophy"
-              className="w-full h-56 sm:h-72 object-cover"
+              className="w-full object-cover"
             />
           </div>
 
@@ -572,7 +593,7 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
                     </tr>
                   </thead>
                   <tbody>
-                    {MACRO_RDA.map((row, i) => (
+                    {macroRDA.map((row, i) => (
                       <tr
                         key={row.nutrient}
                         className={i % 2 === 0 ? "bg-secondary/30" : ""}
@@ -647,7 +668,7 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
           </div>
         </motion.div>
 
-        {/* Start Over */}
+        {/* Generate New Report */}
         <div className="text-center pb-8 no-print">
           <Button
             data-ocid="result.start_over_button"
@@ -660,19 +681,6 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
           </Button>
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="no-print border-t border-border py-6 text-center text-sm text-muted-foreground">
-        © {new Date().getFullYear()}. Built with ❤️ using{" "}
-        <a
-          href={`https://caffeine.ai?utm_source=caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(window.location.hostname)}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-primary hover:underline"
-        >
-          caffeine.ai
-        </a>
-      </footer>
     </div>
   );
 }
@@ -687,78 +695,6 @@ function SummaryField({ label, value }: { label: string; value: string }) {
       </div>
       <div className="text-sm font-medium text-foreground bg-secondary/40 rounded-lg px-3 py-2">
         {value}
-      </div>
-    </div>
-  );
-}
-
-function SummaryCard({
-  icon,
-  label,
-  value,
-  unit,
-  sublabel,
-  color,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  unit: string;
-  sublabel: string;
-  color: "green" | "blue" | "orange" | "cyan";
-}) {
-  const colorMap = {
-    green: "bg-green-50 text-green-600 border-green-200",
-    blue: "bg-blue-50 text-blue-600 border-blue-200",
-    orange: "bg-orange-50 text-orange-600 border-orange-200",
-    cyan: "bg-cyan-50 text-cyan-600 border-cyan-200",
-  };
-
-  return (
-    <div className={`rounded-2xl border p-4 ${colorMap[color]}`}>
-      <div className="flex items-center gap-2 mb-2">
-        {icon}
-        <span className="text-xs font-semibold uppercase tracking-wide">
-          {label}
-        </span>
-      </div>
-      <div className="text-3xl font-display font-bold">
-        {value}
-        <span className="text-base font-normal ml-1">{unit}</span>
-      </div>
-      <div className="text-xs mt-1 opacity-70">{sublabel}</div>
-    </div>
-  );
-}
-
-function MacroBar({
-  label,
-  grams,
-  pct,
-  color,
-  colorText,
-}: {
-  label: string;
-  grams: number;
-  pct: number;
-  color: string;
-  colorText: string;
-}) {
-  return (
-    <div className="space-y-1.5">
-      <div className="flex items-center justify-between text-sm">
-        <span className="font-medium text-foreground">{label}</span>
-        <span className={`font-semibold ${colorText}`}>
-          {grams}g &middot; {pct}%
-        </span>
-      </div>
-      <div className="h-3 bg-muted rounded-full overflow-hidden">
-        <motion.div
-          initial={{ width: 0 }}
-          animate={{ width: `${pct}%` }}
-          transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
-          className={`h-full rounded-full ${color}`}
-        />
       </div>
     </div>
   );
@@ -874,34 +810,6 @@ function DayPlanView({
 
 // ── Nutrition RDA Data ────────────────────────────────────────────────────────
 
-const MACRO_RDA = [
-  {
-    nutrient: "Protein",
-    rda: "0.8–1.0 g/kg body weight",
-    role: "Muscle repair, enzymes, immune function",
-  },
-  {
-    nutrient: "Carbohydrates",
-    rda: "55–60% of total calories",
-    role: "Primary energy source for brain & body",
-  },
-  {
-    nutrient: "Dietary Fat",
-    rda: "20–30% of total calories",
-    role: "Hormone production, fat-soluble vitamins",
-  },
-  {
-    nutrient: "Dietary Fibre",
-    rda: "25–40 g/day",
-    role: "Gut health, blood sugar regulation",
-  },
-  {
-    nutrient: "Water",
-    rda: "2.5–3.0 L/day",
-    role: "Hydration, digestion, temperature regulation",
-  },
-];
-
 const MICRO_RDA = [
   {
     nutrient: "Vitamin A",
@@ -1002,5 +910,15 @@ const MICRO_RDA = [
     nutrient: "Omega-3 Fatty Acids",
     rda: "250 mg EPA+DHA/day",
     role: "Heart health, brain function, inflammation",
+  },
+  {
+    nutrient: "Collagen",
+    rda: "2.5–15 g/day",
+    role: "Skin elasticity, joint health, connective tissue repair",
+  },
+  {
+    nutrient: "Nitric Oxide (precursors)",
+    rda: "L-Arginine 3–6 g/day or dietary nitrates 300–500 mg/day",
+    role: "Blood vessel dilation, circulation, exercise performance",
   },
 ];

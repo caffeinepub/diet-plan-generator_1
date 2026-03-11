@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import {
+  Activity,
   Apple,
   Brain,
   ChevronLeft,
@@ -36,13 +37,18 @@ import {
 import type { FormData } from "../types/diet";
 import { defaultFormData } from "../types/diet";
 
-const TOTAL_STEPS = 12;
+const TOTAL_STEPS = 14;
 
 const STEP_META = [
   { title: "Personal Details", subtitle: "Tell us about yourself", icon: User },
   {
     title: "Health Goal",
     subtitle: "What do you want to achieve?",
+    icon: Target,
+  },
+  {
+    title: "Goal Targets",
+    subtitle: "How much do you want to achieve?",
     icon: Target,
   },
   { title: "Activity Level", subtitle: "How active are you daily?", icon: Zap },
@@ -86,6 +92,11 @@ const STEP_META = [
     subtitle: "How would you rate your stress?",
     icon: Brain,
   },
+  {
+    title: "BMR & TDEE",
+    subtitle: "Enter your metabolic rate values",
+    icon: Activity,
+  },
   { title: "Supplements", subtitle: "What do you currently take?", icon: Pill },
 ];
 
@@ -108,12 +119,10 @@ export default function DietForm({ onComplete }: Props) {
 
   function toggleArrayItem(key: keyof FormData, item: string) {
     const arr = data[key] as string[];
-    // If selecting "None", clear everything else and just set ["None"]
     if (item === "None") {
       update(key as any, arr.includes("None") ? [] : (["None"] as any));
       return;
     }
-    // If selecting any other item, remove "None" if present
     const withoutNone = arr.filter((x) => x !== "None");
     const next = withoutNone.includes(item)
       ? withoutNone.filter((x) => x !== item)
@@ -159,51 +168,57 @@ export default function DietForm({ onComplete }: Props) {
       const plan = generateDietPlan(data, profileId);
 
       if (actor) {
-        const allAllergies = [
-          ...data.food_allergies,
-          ...(data.other_allergies
-            ? data.other_allergies
+        try {
+          const allAllergies = data.food_allergies_text
+            ? data.food_allergies_text
                 .split(",")
                 .map((s) => s.trim())
                 .filter(Boolean)
-            : []),
-        ];
-        const allSupplements = [
-          ...data.supplements,
-          ...(data.other_supplements
-            ? data.other_supplements
-                .split(",")
-                .map((s) => s.trim())
-                .filter(Boolean)
-            : []),
-        ];
+            : [];
+          const allSupplements = [
+            ...data.supplements,
+            ...(data.other_supplements
+              ? data.other_supplements
+                  .split(",")
+                  .map((s) => s.trim())
+                  .filter(Boolean)
+              : []),
+          ];
 
-        const profile = {
-          id: profileId,
-          name: data.name,
-          age: BigInt(data.age),
-          gender: mapToGender(data.gender),
-          height: data.height,
-          weight: data.weight,
-          goal: mapToGoal(data.goal),
-          activity_level: mapToActivityLevel(data.activity_level),
-          dietary_preferences: data.dietary_preferences,
-          food_allergies: allAllergies,
-          meals_per_day: BigInt(data.meals_per_day),
-          water_intake: data.water_intake,
-          health_conditions: data.health_conditions,
-          sleep_hours: data.sleep_hours,
-          stress_level: mapToStressLevel(data.stress_level),
-          supplements: allSupplements,
-        };
+          const profile = {
+            id: profileId,
+            name: data.name,
+            age: BigInt(data.age),
+            gender: mapToGender(data.gender),
+            height: data.height,
+            weight: data.weight,
+            goal: mapToGoal(data.goal),
+            activity_level: mapToActivityLevel(data.activity_level),
+            dietary_preferences: data.dietary_preferences,
+            food_allergies: allAllergies,
+            meals_per_day: BigInt(data.meals_per_day),
+            water_intake: data.water_intake,
+            health_conditions: data.health_conditions,
+            sleep_hours: data.sleep_hours,
+            stress_level: mapToStressLevel(data.stress_level),
+            supplements: allSupplements,
+          };
 
-        await Promise.all([actor.addProfile(profile), actor.addDietPlan(plan)]);
+          await Promise.all([
+            actor.addProfile(profile),
+            actor.addDietPlan(plan),
+          ]);
+        } catch (backendErr) {
+          console.warn("Backend save failed (non-blocking):", backendErr);
+        }
       }
 
       onComplete(plan, data);
     } catch (err) {
       console.error(err);
-      toast.error("Something went wrong. Please try again.");
+      toast.error(
+        "Something went wrong generating your plan. Please try again.",
+      );
     } finally {
       setIsGenerating(false);
     }
@@ -227,6 +242,17 @@ export default function DietForm({ onComplete }: Props) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-secondary/30 to-accent/20 flex flex-col">
+      {/* Hero Banner - shown on step 1 only */}
+      {step === 1 && (
+        <div className="w-full">
+          <img
+            src="/assets/uploads/file_00000000b1f071fa852a880787585b1b-1.png"
+            alt="Global Nutrition Philosophy"
+            className="w-full object-cover max-h-64 sm:max-h-80"
+          />
+        </div>
+      )}
+
       {/* Header */}
       <header className="no-print border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-2xl mx-auto px-4 py-4">
@@ -280,35 +306,30 @@ export default function DietForm({ onComplete }: Props) {
                 <Step1 data={data} errors={errors} update={update} />
               )}
               {step === 2 && <Step2 data={data} update={update} />}
-              {step === 3 && <Step3 data={data} update={update} />}
-              {step === 4 && (
+              {step === 3 && <StepGoalTargets data={data} update={update} />}
+              {step === 4 && <Step3 data={data} update={update} />}
+              {step === 5 && (
                 <Step4
                   data={data}
                   update={update}
                   toggleArrayItem={toggleArrayItem}
                 />
               )}
-              {step === 5 && (
-                <Step5
-                  data={data}
-                  errors={errors}
-                  toggleArrayItem={toggleArrayItem}
-                  update={update}
-                />
-              )}
-              {step === 6 && <Step6 data={data} update={update} />}
-              {step === 7 && <Step7 data={data} update={update} />}
-              {step === 8 && (
+              {step === 6 && <StepAllergies data={data} update={update} />}
+              {step === 7 && <Step6 data={data} update={update} />}
+              {step === 8 && <Step7 data={data} update={update} />}
+              {step === 9 && (
                 <Step8
                   data={data}
                   update={update}
                   toggleArrayItem={toggleArrayItem}
                 />
               )}
-              {step === 9 && <Step9 data={data} update={update} />}
-              {step === 10 && <Step10 data={data} update={update} />}
-              {step === 11 && <Step11 data={data} update={update} />}
-              {step === 12 && (
+              {step === 10 && <Step9 data={data} update={update} />}
+              {step === 11 && <Step10 data={data} update={update} />}
+              {step === 12 && <Step11 data={data} update={update} />}
+              {step === 13 && <StepBmrTdee data={data} update={update} />}
+              {step === 14 && (
                 <Step12
                   data={data}
                   errors={errors}
@@ -364,19 +385,6 @@ export default function DietForm({ onComplete }: Props) {
           </div>
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="no-print border-t border-border py-4 text-center text-sm text-muted-foreground">
-        © {new Date().getFullYear()}. Built with ❤️ using{" "}
-        <a
-          href={`https://caffeine.ai?utm_source=caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(window.location.hostname)}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-primary hover:underline"
-        >
-          caffeine.ai
-        </a>
-      </footer>
     </div>
   );
 }
@@ -618,7 +626,6 @@ function Step3({ data, update }: StepProps) {
   );
 }
 
-// Step 4 - Dietary Preferences: only 3 options, single select
 const DIETARY_PREFS = [
   {
     value: "Vegetarian",
@@ -691,76 +698,243 @@ function Step4({ data, update }: StepProps) {
   );
 }
 
-// None is first so it appears at the top
-const COMMON_ALLERGENS = [
-  "None",
-  "Nuts",
-  "Shellfish",
-  "Eggs",
-  "Soy",
-  "Wheat/Gluten",
-  "Fish",
-  "Milk",
-  "Sesame",
-];
-
-function Step5({ data, errors = {}, toggleArrayItem, update }: StepProps) {
+function StepAllergies({ data, update }: StepProps) {
   return (
     <div className="space-y-5">
-      <div className="space-y-3">
-        <p className="text-sm text-muted-foreground">
-          Select all foods you are allergic to:
+      <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+        <p className="text-sm text-amber-700">
+          Type any foods you are allergic to or need to avoid. Separate multiple
+          items with commas.
         </p>
-        <div className="grid sm:grid-cols-2 gap-3">
-          {COMMON_ALLERGENS.map((allergen, i) => (
-            <div
-              key={allergen}
-              data-ocid={`allergies.checkbox.${i + 1}`}
-              onClick={() => toggleArrayItem?.("food_allergies", allergen)}
-              onKeyDown={(e) =>
-                (e.key === "Enter" || e.key === " ") &&
-                toggleArrayItem?.("food_allergies", allergen)
-              }
-              className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${
-                allergen === "None"
-                  ? data.food_allergies.includes("None")
-                    ? "border-primary bg-primary/10"
-                    : "border-border hover:bg-secondary/50"
-                  : "border-border hover:bg-secondary/50"
-              }`}
-            >
-              <Checkbox
-                checked={data.food_allergies.includes(allergen)}
-                onCheckedChange={() =>
-                  toggleArrayItem?.("food_allergies", allergen)
-                }
-              />
-              <span className="text-sm font-medium">{allergen}</span>
-            </div>
-          ))}
-        </div>
       </div>
-
       <div className="space-y-2">
-        <Label htmlFor="other_allergies">
-          Other allergies (comma-separated)
+        <Label htmlFor="food_allergies_text">
+          Food Allergies / Foods to Avoid
         </Label>
         <Input
-          id="other_allergies"
-          data-ocid="allergies.other_input"
-          placeholder="e.g. Peanuts, Mustard"
-          value={data.other_allergies}
-          onChange={(e) => update("other_allergies", e.target.value)}
+          id="food_allergies_text"
+          data-ocid="allergies.input"
+          placeholder="e.g. Peanuts, Shellfish, Milk, Gluten — or type None"
+          value={data.food_allergies_text}
+          onChange={(e) => update("food_allergies_text", e.target.value)}
         />
-        {errors.other_allergies && (
-          <p className="text-sm text-destructive">{errors.other_allergies}</p>
-        )}
+        <p className="text-xs text-muted-foreground">
+          Leave blank or type "None" if you have no food allergies.
+        </p>
       </div>
+      {data.food_allergies_text &&
+        data.food_allergies_text.toLowerCase() !== "none" && (
+          <div className="bg-primary/5 rounded-xl p-4 text-sm">
+            <span className="font-medium text-foreground">Avoiding: </span>
+            <span className="text-muted-foreground">
+              {data.food_allergies_text}
+            </span>
+          </div>
+        )}
     </div>
   );
 }
 
-// Step 6 - Meal Frequency: meal gap only
+function StepGoalTargets({ data, update }: StepProps) {
+  const isLoss = data.goal === "weight_loss";
+  const isGain = data.goal === "muscle_gain";
+
+  return (
+    <div className="space-y-6">
+      {isLoss && (
+        <>
+          <div className="bg-orange-50 border border-orange-200 rounded-xl p-4">
+            <p className="text-sm text-orange-700">
+              Tell us your weight loss targets so we can calculate your goal
+              timeline.
+            </p>
+          </div>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="target_weight_kg">
+                How many kgs do you want to lose?
+              </Label>
+              <div className="relative">
+                <Input
+                  id="target_weight_kg"
+                  data-ocid="goal_targets.weight_input"
+                  type="number"
+                  min={1}
+                  max={100}
+                  placeholder="e.g. 10"
+                  value={data.target_weight_kg || ""}
+                  onChange={(e) =>
+                    update("target_weight_kg", Number(e.target.value))
+                  }
+                  className="pr-10"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                  kg
+                </span>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="target_belly_inches">
+                How many inches do you want to lose from belly fat?
+              </Label>
+              <div className="relative">
+                <Input
+                  id="target_belly_inches"
+                  data-ocid="goal_targets.belly_input"
+                  type="number"
+                  min={0}
+                  max={30}
+                  placeholder="e.g. 4"
+                  value={data.target_belly_inches || ""}
+                  onChange={(e) =>
+                    update("target_belly_inches", Number(e.target.value))
+                  }
+                  className="pr-16"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                  inches
+                </span>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {isGain && (
+        <>
+          <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+            <p className="text-sm text-green-700">
+              Tell us your weight gain target so we can calculate your goal
+              timeline.
+            </p>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="target_weight_kg">
+              How many kgs do you want to gain?
+            </Label>
+            <div className="relative">
+              <Input
+                id="target_weight_kg"
+                data-ocid="goal_targets.weight_input"
+                type="number"
+                min={1}
+                max={50}
+                placeholder="e.g. 5"
+                value={data.target_weight_kg || ""}
+                onChange={(e) =>
+                  update("target_weight_kg", Number(e.target.value))
+                }
+                className="pr-10"
+              />
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                kg
+              </span>
+            </div>
+          </div>
+        </>
+      )}
+
+      {!isLoss && !isGain && (
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 text-center">
+          <div className="text-3xl mb-3">⚖️</div>
+          <p className="text-sm text-blue-700 font-medium">
+            Your goal is{" "}
+            <strong>
+              {data.goal === "maintenance"
+                ? "Maintenance"
+                : "Body Recomposition"}
+            </strong>
+            .
+          </p>
+          <p className="text-sm text-blue-600 mt-1">
+            No specific weight target needed — click Next to continue.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function StepBmrTdee({ data, update }: StepProps) {
+  return (
+    <div className="space-y-6">
+      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+        <p className="text-sm text-blue-700">
+          Enter your BMR and TDEE values from your{" "}
+          <strong>Wellness Assessment Report</strong>. These will be displayed
+          in your diet plan report.
+        </p>
+      </div>
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="bmr_manual">
+            BMR — Basal Metabolic Rate (kcal/day)
+          </Label>
+          <div className="relative">
+            <Input
+              id="bmr_manual"
+              data-ocid="bmr_tdee.bmr_input"
+              type="number"
+              min={800}
+              max={5000}
+              placeholder="e.g. 1650"
+              value={data.bmr_manual || ""}
+              onChange={(e) => update("bmr_manual", Number(e.target.value))}
+              className="pr-16"
+            />
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+              kcal
+            </span>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Calories your body burns at complete rest.
+          </p>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="tdee_manual">
+            TDEE — Total Daily Energy Expenditure (kcal/day)
+          </Label>
+          <div className="relative">
+            <Input
+              id="tdee_manual"
+              data-ocid="bmr_tdee.tdee_input"
+              type="number"
+              min={1000}
+              max={8000}
+              placeholder="e.g. 2200"
+              value={data.tdee_manual || ""}
+              onChange={(e) => update("tdee_manual", Number(e.target.value))}
+              className="pr-16"
+            />
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+              kcal
+            </span>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Total calories burned including your daily activities.
+          </p>
+        </div>
+      </div>
+      {(data.bmr_manual > 0 || data.tdee_manual > 0) && (
+        <div className="bg-primary/5 rounded-xl p-4 grid grid-cols-2 gap-3 text-center">
+          <div>
+            <div className="text-xl font-bold text-blue-600">
+              {data.bmr_manual || "—"}
+            </div>
+            <div className="text-xs text-muted-foreground">BMR (kcal)</div>
+          </div>
+          <div>
+            <div className="text-xl font-bold text-orange-600">
+              {data.tdee_manual || "—"}
+            </div>
+            <div className="text-xs text-muted-foreground">TDEE (kcal)</div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 const MEAL_GAP_OPTIONS = [
   { value: 3, label: "3 Hours Gap", desc: "Eat every 3 hours", emoji: "⏰" },
   { value: 4, label: "4 Hours Gap", desc: "Eat every 4 hours", emoji: "🕐" },
@@ -803,7 +977,6 @@ function Step6({ data, update }: StepProps) {
   );
 }
 
-// Step 7 - Water Intake: input based on wellness assessment report
 function Step7({ data, update }: StepProps) {
   return (
     <div className="space-y-6">
@@ -855,7 +1028,6 @@ function Step7({ data, update }: StepProps) {
   );
 }
 
-// Step 8 - Present Health Condition
 const HEALTH_CONDITIONS = [
   "None",
   "Uric Acid",
@@ -899,7 +1071,6 @@ function Step8({ data, toggleArrayItem }: StepProps) {
   );
 }
 
-// Step 9 - Sleep Schedule (bed/wake time only)
 function Step9({ data, update }: StepProps) {
   return (
     <div className="space-y-6">
@@ -950,7 +1121,6 @@ function Step9({ data, update }: StepProps) {
   );
 }
 
-// Step 10 - Nutrition Targets (protein, fat, carbs)
 function Step10({ data, update }: StepProps) {
   return (
     <div className="space-y-6">
