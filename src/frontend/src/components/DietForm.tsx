@@ -586,42 +586,11 @@ const DIETARY_PREFS = [
     label: "Vegetarian",
     desc: "No meat, poultry or seafood",
   },
-  { value: "vegan", emoji: "🌱", label: "Vegan", desc: "No animal products" },
   {
     value: "non_vegetarian",
     emoji: "🍗",
     label: "Non-Vegetarian",
     desc: "Includes meat, poultry, seafood",
-  },
-  {
-    value: "eggetarian",
-    emoji: "🥚",
-    label: "Eggetarian",
-    desc: "Vegetarian + eggs",
-  },
-  {
-    value: "pescatarian",
-    emoji: "🐟",
-    label: "Pescatarian",
-    desc: "Vegetarian + seafood",
-  },
-  {
-    value: "keto",
-    emoji: "🥑",
-    label: "Ketogenic",
-    desc: "High fat, very low carb",
-  },
-  {
-    value: "paleo",
-    emoji: "🥩",
-    label: "Paleo",
-    desc: "Whole foods, no grains",
-  },
-  {
-    value: "jain",
-    emoji: "🙏",
-    label: "Jain",
-    desc: "No root vegetables, strict vegetarian",
   },
 ];
 

@@ -556,6 +556,8 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
                     dayName={DAYS[i]}
                     wakeUpTime={formData.wake_up_time}
                     mealGap={formData.meal_gap}
+                    bodyWeight={formData.weight}
+                    dietPref={formData.dietary_preferences[0] || "vegetarian"}
                   />
                 </TabsContent>
               ))}
@@ -573,6 +575,8 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
                   dayName={DAYS[i]}
                   wakeUpTime={formData.wake_up_time}
                   mealGap={formData.meal_gap}
+                  bodyWeight={formData.weight}
+                  dietPref={formData.dietary_preferences[0] || "vegetarian"}
                 />
               </div>
             ))}
@@ -771,16 +775,161 @@ const MEAL_SCHEDULE = {
   { key: string; label: string; emoji: string; offset: number }[]
 >;
 
+const EVENING_SNACKS = [
+  {
+    name: "Roasted Chana (Bengal Gram)",
+    cal: 120,
+    desc: "High protein, high fibre, satisfying crunch",
+  },
+  {
+    name: "Roasted Popcorn (air-popped, no butter)",
+    cal: 90,
+    desc: "Light, whole grain, low calorie",
+  },
+  {
+    name: "Makhana (Fox Nuts) – 30g roasted",
+    cal: 110,
+    desc: "Low fat, rich in magnesium & calcium",
+  },
+  {
+    name: "Tomato Soup (no cream)",
+    cal: 80,
+    desc: "Antioxidant-rich, warm and filling",
+  },
+  {
+    name: "Roasted Peanuts – 20g",
+    cal: 115,
+    desc: "Healthy fats, protein-packed",
+  },
+  {
+    name: "Mixed Vegetable Clear Soup",
+    cal: 70,
+    desc: "Low calorie, micronutrient-rich",
+  },
+  {
+    name: "Sprout Chaat (small bowl)",
+    cal: 130,
+    desc: "High protein, gut-friendly probiotics",
+  },
+];
+
+function MidMorningSnackCard({
+  bodyWeight,
+  dietPref,
+  timeLabel,
+}: { bodyWeight: number; dietPref: string; timeLabel?: string }) {
+  const grams = Math.round(bodyWeight * 10);
+  const isNonVeg = dietPref === "non_vegetarian";
+  return (
+    <div className="bg-green-50 dark:bg-green-950/30 rounded-xl border border-green-200 dark:border-green-800 overflow-hidden">
+      <div className="p-4">
+        <div className="flex items-start gap-3">
+          <div className="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900/50 flex items-center justify-center shrink-0">
+            <span className="text-base">🍎</span>
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-xs text-green-700 dark:text-green-400 font-medium uppercase tracking-wide">
+              Mid Morning Snack
+            </div>
+            {timeLabel && (
+              <div className="text-xs text-primary font-semibold">
+                {timeLabel}
+              </div>
+            )}
+            <div className="font-semibold text-foreground text-sm mt-0.5">
+              Fruits & Sprouts Salad
+            </div>
+          </div>
+        </div>
+        <div className="mt-3 rounded-lg overflow-hidden border border-green-200 dark:border-green-800">
+          <img
+            src="/assets/generated/fruits-sprouts-salad.dim_600x400.jpg"
+            alt="Fruits and sprouts salad"
+            className="w-full h-40 object-cover"
+          />
+        </div>
+        <div className="mt-3 p-3 bg-green-100 dark:bg-green-900/40 rounded-lg">
+          <p className="text-sm font-semibold text-green-800 dark:text-green-200">
+            Eat{" "}
+            <span className="text-green-600 dark:text-green-400 font-bold">
+              {grams}g (1%)
+            </span>{" "}
+            of fruits and sprouts mixed with raw vegetables.
+          </p>
+          <p className="text-xs text-green-700 dark:text-green-300 mt-1">
+            Includes 4–5 different colours of fruits and vegetables for maximum
+            micronutrients.
+          </p>
+          {isNonVeg && (
+            <p className="text-xs text-green-700 dark:text-green-300 mt-1 font-medium">
+              + 2 Egg Whites (boiled or poached)
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function EveningSnackCard({
+  dayIndex,
+  timeLabel,
+}: { dayIndex: number; timeLabel?: string }) {
+  const snack = EVENING_SNACKS[dayIndex % EVENING_SNACKS.length];
+  return (
+    <div className="bg-amber-50 dark:bg-amber-950/30 rounded-xl border border-amber-200 dark:border-amber-800 overflow-hidden">
+      <div className="p-4">
+        <div className="flex items-start gap-3">
+          <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center shrink-0">
+            <span className="text-base">🫘</span>
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-xs text-amber-700 dark:text-amber-400 font-medium uppercase tracking-wide">
+              Evening Snack
+            </div>
+            {timeLabel && (
+              <div className="text-xs text-primary font-semibold">
+                {timeLabel}
+              </div>
+            )}
+            <div className="font-semibold text-foreground text-sm mt-0.5">
+              {snack.name}
+            </div>
+            <div className="text-xs text-muted-foreground mt-0.5">
+              {snack.cal} kcal · {snack.desc}
+            </div>
+          </div>
+        </div>
+        <div className="mt-3 p-3 bg-amber-100 dark:bg-amber-900/40 rounded-lg">
+          <p className="text-xs font-semibold text-amber-800 dark:text-amber-200">
+            Indian snack under 150 kcal — freshly prepared, eaten hot/warm.
+          </p>
+          <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
+            +{" "}
+            <span className="font-semibold">
+              Hot Afresh (2 spoons) — every day
+            </span>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function DayPlanView({
   dayPlan,
   dayName,
   wakeUpTime,
   mealGap,
+  bodyWeight,
+  dietPref,
 }: {
   dayPlan: DayPlan;
   dayName: string;
   wakeUpTime?: string;
   mealGap?: number;
+  bodyWeight?: number;
+  dietPref?: string;
 }) {
   const dayTotal = [
     dayPlan.breakfast,
@@ -849,14 +998,32 @@ function DayPlanView({
         label="Dinner"
         timeLabel={timeMap.dinner}
       />
-      {dayPlan.snacks.map((snack, i) => (
-        <MealCard
-          key={snack.name + String(i)}
-          meal={snack}
-          label={dayPlan.snacks.length > 1 ? `Snack ${i + 1}` : "Snack"}
-          timeLabel={i === 0 ? timeMap.midSnack : timeMap.eveningSnack}
-        />
-      ))}
+      {dayPlan.snacks.map((_, i) => {
+        const dayIdx = DAYS.indexOf(dayName);
+        if (i === 0 && dayPlan.snacks.length > 1) {
+          // Mid morning snack
+          return (
+            <MidMorningSnackCard
+              key="mid-morning"
+              bodyWeight={bodyWeight || 70}
+              dietPref={dietPref || "vegetarian"}
+              timeLabel={timeMap.midSnack}
+            />
+          );
+        }
+        if (i === 1 || (i === 0 && dayPlan.snacks.length === 1)) {
+          // Evening snack
+          const idx = dayIdx >= 0 ? dayIdx * 2 + i : i;
+          return (
+            <EveningSnackCard
+              key="evening"
+              dayIndex={idx}
+              timeLabel={i === 0 ? timeMap.eveningSnack : timeMap.eveningSnack}
+            />
+          );
+        }
+        return null;
+      })}
 
       <div className="flex items-center justify-between p-3 bg-primary/5 rounded-xl border border-primary/20 text-sm">
         <span className="font-semibold text-foreground">Daily Total</span>
