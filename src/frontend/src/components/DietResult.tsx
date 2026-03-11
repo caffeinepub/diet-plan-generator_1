@@ -18,19 +18,8 @@ import {
 } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
-import type { DayPlan, DietPlan, Meal } from "../backend.d";
+import type { DietPlan, Meal } from "../backend.d";
 import type { FormData } from "../types/diet";
-
-const DAYS = [
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-  "Sunday",
-];
-const DAY_SHORT = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 const GOAL_LABELS: Record<string, string> = {
   weight_loss: "Weight Loss",
@@ -90,6 +79,100 @@ function getMacroRDA(weight: number, bmr: number, tdee: number) {
   ];
 }
 
+// ── Lunch / Dinner data ───────────────────────────────────────────────────────
+
+interface MealOption {
+  dal: string;
+  cookedVeg: string;
+  salad: string[];
+}
+
+const MEAL_OPTIONS: MealOption[] = [
+  {
+    dal: "Dal Tadka",
+    cookedVeg: "Aloo Gobi Gravy",
+    salad: ["Cucumber", "Tomato", "Carrot", "Onion", "Beetroot"],
+  },
+  {
+    dal: "Moong Dal",
+    cookedVeg: "Palak Paneer Gravy",
+    salad: ["Radish", "Capsicum", "Carrot", "Tomato", "Raw Mango"],
+  },
+  {
+    dal: "Chana Dal",
+    cookedVeg: "Mixed Veg Curry",
+    salad: ["Cucumber", "Tomato", "Lettuce", "Corn", "Onion"],
+  },
+  {
+    dal: "Rajma Curry",
+    cookedVeg: "Seasonal Veg Gravy",
+    salad: ["Carrot", "Beetroot", "Cabbage", "Tomato", "Pomegranate"],
+  },
+  {
+    dal: "Masoor Dal",
+    cookedVeg: "Bhindi Masala Gravy",
+    salad: ["Cucumber", "Onion", "Tomato", "Mint", "Lemon slices"],
+  },
+  {
+    dal: "Dal Makhani",
+    cookedVeg: "Paneer Bhurji Gravy",
+    salad: ["Watermelon", "Carrot", "Tomato", "Radish", "Coriander"],
+  },
+  {
+    dal: "Toor Dal",
+    cookedVeg: "Lauki Gravy",
+    salad: ["Cucumber", "Tomato", "Carrot", "Capsicum", "Spring Onion"],
+  },
+];
+
+const BREAKFAST_OPTIONS = [
+  { name: "Oats Porridge", desc: "with banana & nuts", cal: 350 },
+  { name: "Moong Dal Chilla", desc: "with mint chutney", cal: 300 },
+  { name: "Poha", desc: "with peanuts & vegetables", cal: 320 },
+  { name: "Idli (3 pcs) + Sambar", desc: "+ Coconut chutney", cal: 340 },
+  { name: "Upma", desc: "with mixed vegetables", cal: 310 },
+  { name: "Whole Wheat Paratha (2)", desc: "+ Curd", cal: 280 },
+  { name: "Vegetable Daliya", desc: "with seeds", cal: 330 },
+];
+
+const EVENING_SNACKS = [
+  {
+    name: "Roasted Chana (Bengal Gram)",
+    cal: 120,
+    desc: "High protein, high fibre, satisfying crunch",
+  },
+  {
+    name: "Roasted Popcorn (air-popped, no butter)",
+    cal: 90,
+    desc: "Light, whole grain, low calorie",
+  },
+  {
+    name: "Makhana (Fox Nuts) – 30g roasted",
+    cal: 110,
+    desc: "Low fat, rich in magnesium & calcium",
+  },
+  {
+    name: "Tomato Soup (no cream)",
+    cal: 80,
+    desc: "Antioxidant-rich, warm and filling",
+  },
+  {
+    name: "Roasted Peanuts – 20g",
+    cal: 115,
+    desc: "Healthy fats, protein-packed",
+  },
+  {
+    name: "Mixed Vegetable Clear Soup",
+    cal: 70,
+    desc: "Low calorie, micronutrient-rich",
+  },
+  {
+    name: "Sprout Chaat (small bowl)",
+    cal: 130,
+    desc: "High protein, gut-friendly probiotics",
+  },
+];
+
 export default function DietResult({ plan, formData, onStartOver }: Props) {
   function handlePrint() {
     window.print();
@@ -145,6 +228,22 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
     if (weeks === 0) return `${m} month${m > 1 ? "s" : ""}`;
     return `${m} month${m > 1 ? "s" : ""} ${weeks} week${weeks > 1 ? "s" : ""}`;
   }
+
+  // Compute meal schedule times
+  const schedule =
+    formData.wake_up_time &&
+    formData.meal_gap &&
+    MEAL_SCHEDULE[formData.meal_gap]
+      ? MEAL_SCHEDULE[formData.meal_gap]
+      : null;
+  const timeMap: Record<string, string> = {};
+  if (schedule && formData.wake_up_time) {
+    for (const item of schedule) {
+      timeMap[item.key] = addMinutes(formData.wake_up_time, item.offset);
+    }
+  }
+
+  const dietPref = formData.dietary_preferences[0] || "vegetarian";
 
   return (
     <div
@@ -274,7 +373,12 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
                 value={
                   formData.goal === "weight_loss" ||
                   formData.goal === "muscle_gain"
-                    ? `${formData.target_weight_kg} kg${formData.goal === "weight_loss" && formData.target_belly_inches > 0 ? ` · ${formData.target_belly_inches}" belly` : ""}`
+                    ? `${formData.target_weight_kg} kg${
+                        formData.goal === "weight_loss" &&
+                        formData.target_belly_inches > 0
+                          ? ` · ${formData.target_belly_inches}" belly`
+                          : ""
+                      }`
                     : ""
                 }
               />
@@ -282,7 +386,13 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
             {(formData.bmr_manual > 0 || formData.tdee_manual > 0) && (
               <SummaryField
                 label="BMR / TDEE (from report)"
-                value={`${formData.bmr_manual > 0 ? `${formData.bmr_manual} kcal` : "—"} / ${formData.tdee_manual > 0 ? `${formData.tdee_manual} kcal` : "—"}`}
+                value={`${
+                  formData.bmr_manual > 0 ? `${formData.bmr_manual} kcal` : "—"
+                } / ${
+                  formData.tdee_manual > 0
+                    ? `${formData.tdee_manual} kcal`
+                    : "—"
+                }`}
               />
             )}
             <SummaryField
@@ -345,7 +455,11 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
             </h2>
             <p className="text-sm text-muted-foreground mb-5">
               {isLoss
-                ? `Your target: lose ${targetKg} kg${targetBellyInches > 0 ? ` + ${targetBellyInches} inches from belly fat` : ""}`
+                ? `Your target: lose ${targetKg} kg${
+                    targetBellyInches > 0
+                      ? ` + ${targetBellyInches} inches from belly fat`
+                      : ""
+                  }`
                 : `Your target: gain ${targetKg} kg`}
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -523,64 +637,220 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
           </div>
         </motion.div>
 
-        {/* Weekly Meal Plan */}
+        {/* ── Meal Options Plan ── */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
           className="bg-card rounded-2xl border border-border p-6"
         >
-          <h2 className="text-xl font-display font-bold text-foreground mb-5 flex items-center gap-2">
+          <h2 className="text-xl font-display font-bold text-foreground mb-2 flex items-center gap-2">
             <UtensilsCrossed className="w-5 h-5 text-primary" />
-            Weekly Meal Plan
+            Meal Options
           </h2>
+          <p className="text-sm text-muted-foreground mb-5">
+            Choose any option from each meal category. Mix and match to keep
+            your diet varied and enjoyable.
+          </p>
 
-          <div className="no-print">
-            <Tabs defaultValue="0">
-              <TabsList className="grid grid-cols-7 mb-6 h-auto">
-                {DAYS.map((_day, i) => (
-                  <TabsTrigger
-                    key={DAYS[i]}
-                    value={String(i)}
-                    data-ocid={`result.day.tab.${i + 1}`}
-                    className="text-xs px-1 py-2"
-                  >
-                    {DAY_SHORT[i]}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-              {plan.weekly_plan.map((dayPlan, i) => (
-                <TabsContent key={DAYS[i]} value={String(i)}>
-                  <DayPlanView
-                    dayPlan={dayPlan}
-                    dayName={DAYS[i]}
-                    wakeUpTime={formData.wake_up_time}
-                    mealGap={formData.meal_gap}
-                    bodyWeight={formData.weight}
-                    dietPref={formData.dietary_preferences[0] || "vegetarian"}
-                  />
-                </TabsContent>
-              ))}
-            </Tabs>
-          </div>
-
-          <div className="hidden print:block space-y-6">
-            {plan.weekly_plan.map((dayPlan, i) => (
-              <div key={DAYS[i]} className="page-break-inside-avoid">
-                <h3 className="font-display font-bold text-lg text-foreground mb-3 border-b pb-2">
-                  {DAYS[i]}
-                </h3>
-                <DayPlanView
-                  dayPlan={dayPlan}
-                  dayName={DAYS[i]}
-                  wakeUpTime={formData.wake_up_time}
-                  mealGap={formData.meal_gap}
-                  bodyWeight={formData.weight}
-                  dietPref={formData.dietary_preferences[0] || "vegetarian"}
-                />
+          {/* Meal Schedule */}
+          {schedule && formData.wake_up_time && (
+            <div className="mb-6 p-3 rounded-2xl bg-gradient-to-r from-primary/10 via-accent/10 to-secondary/20 border border-primary/20">
+              <div className="text-xs font-bold uppercase tracking-widest text-primary mb-3 flex items-center gap-1.5">
+                <span>🕐</span> Your Daily Meal Schedule
               </div>
-            ))}
-          </div>
+              <div className="flex flex-wrap gap-2">
+                {schedule.map((item) => (
+                  <div
+                    key={item.key}
+                    className="flex flex-col items-center bg-card/80 backdrop-blur-sm border border-border rounded-xl px-3 py-2 shadow-sm min-w-[80px]"
+                  >
+                    <span className="text-lg mb-0.5">{item.emoji}</span>
+                    <span className="text-[10px] font-semibold text-muted-foreground text-center leading-tight">
+                      {item.label}
+                    </span>
+                    <span className="text-xs font-bold text-primary mt-1">
+                      {timeMap[item.key]}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <Tabs defaultValue="breakfast">
+            <TabsList className="grid grid-cols-4 mb-6 h-auto">
+              <TabsTrigger
+                value="breakfast"
+                data-ocid="result.meal_option.tab"
+                className="text-xs sm:text-sm py-2"
+              >
+                🌅 Breakfast
+              </TabsTrigger>
+              <TabsTrigger
+                value="lunch"
+                data-ocid="result.meal_option.tab"
+                className="text-xs sm:text-sm py-2"
+              >
+                🍽️ Lunch
+              </TabsTrigger>
+              <TabsTrigger
+                value="dinner"
+                data-ocid="result.meal_option.tab"
+                className="text-xs sm:text-sm py-2"
+              >
+                🌙 Dinner
+              </TabsTrigger>
+              <TabsTrigger
+                value="snacks"
+                data-ocid="result.meal_option.tab"
+                className="text-xs sm:text-sm py-2"
+              >
+                🍎 Snacks
+              </TabsTrigger>
+            </TabsList>
+
+            {/* BREAKFAST */}
+            <TabsContent value="breakfast">
+              <div className="grid sm:grid-cols-2 gap-4">
+                {BREAKFAST_OPTIONS.map((opt, i) => {
+                  const backendBreakfast = plan.weekly_plan[i]?.breakfast;
+                  return (
+                    <div
+                      key={opt.name}
+                      data-ocid={`result.option.item.${i + 1}`}
+                      className="bg-secondary/30 rounded-xl border border-border p-4"
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge className="bg-primary/10 text-primary border-primary/20 text-xs">
+                          Option {i + 1}
+                        </Badge>
+                        {backendBreakfast && (
+                          <span className="text-xs text-muted-foreground">
+                            {backendBreakfast.calories} kcal
+                          </span>
+                        )}
+                      </div>
+                      {backendBreakfast ? (
+                        <>
+                          <div className="font-semibold text-foreground text-sm">
+                            {backendBreakfast.name}
+                          </div>
+                          <div className="text-xs text-muted-foreground mt-1">
+                            P {backendBreakfast.protein}g · C{" "}
+                            {backendBreakfast.carbs}g · F{" "}
+                            {backendBreakfast.fats}g
+                          </div>
+                          <div className="flex flex-wrap gap-1 mt-2">
+                            {backendBreakfast.ingredients.map((ing) => (
+                              <Badge
+                                key={ing}
+                                variant="outline"
+                                className="text-xs"
+                              >
+                                {ing}
+                              </Badge>
+                            ))}
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="font-semibold text-foreground text-sm">
+                            {opt.name}
+                          </div>
+                          <div className="text-xs text-muted-foreground mt-0.5">
+                            {opt.desc}
+                          </div>
+                          <div className="text-xs font-medium text-primary mt-1">
+                            ~{opt.cal} kcal
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </TabsContent>
+
+            {/* LUNCH */}
+            <TabsContent value="lunch">
+              <div className="grid sm:grid-cols-2 gap-4">
+                {MEAL_OPTIONS.map((opt, i) => (
+                  <StructuredMealCard
+                    key={opt.dal}
+                    index={i + 1}
+                    option={opt}
+                    type="lunch"
+                  />
+                ))}
+              </div>
+            </TabsContent>
+
+            {/* DINNER */}
+            <TabsContent value="dinner">
+              <div className="grid sm:grid-cols-2 gap-4">
+                {MEAL_OPTIONS.map((opt, i) => (
+                  <StructuredMealCard
+                    key={opt.dal}
+                    index={i + 1}
+                    option={opt}
+                    type="dinner"
+                  />
+                ))}
+              </div>
+            </TabsContent>
+
+            {/* SNACKS */}
+            <TabsContent value="snacks">
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-sm font-bold text-foreground mb-3 uppercase tracking-wide">
+                    Mid-Morning Snack
+                  </h3>
+                  <MidMorningSnackCard
+                    bodyWeight={formData.weight}
+                    dietPref={dietPref}
+                    timeLabel={timeMap.midSnack}
+                  />
+                </div>
+                <Separator />
+                <div>
+                  <h3 className="text-sm font-bold text-foreground mb-3 uppercase tracking-wide">
+                    Evening Snack Options
+                  </h3>
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    {EVENING_SNACKS.map((snack, i) => (
+                      <div
+                        key={snack.name}
+                        data-ocid={`result.option.item.${i + 1}`}
+                        className="bg-amber-50 dark:bg-amber-950/30 rounded-xl border border-amber-200 dark:border-amber-800 p-4"
+                      >
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge className="bg-amber-100 text-amber-700 border-amber-200 text-xs">
+                            Option {i + 1}
+                          </Badge>
+                          <span className="text-xs text-muted-foreground">
+                            {snack.cal} kcal
+                          </span>
+                        </div>
+                        <div className="font-semibold text-foreground text-sm">
+                          {snack.name}
+                        </div>
+                        <div className="text-xs text-muted-foreground mt-0.5">
+                          {snack.desc}
+                        </div>
+                        <div className="mt-2 p-2 bg-amber-100 dark:bg-amber-900/40 rounded-lg">
+                          <p className="text-xs font-semibold text-amber-800 dark:text-amber-200">
+                            Hot Afresh (2 spoons) — every day
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
         </motion.div>
 
         {/* Health Tips */}
@@ -669,6 +939,94 @@ function SummaryField({ label, value }: { label: string; value: string }) {
       <div className="text-sm font-medium text-foreground bg-secondary/40 rounded-lg px-3 py-2">
         {value}
       </div>
+    </div>
+  );
+}
+
+function StructuredMealCard({
+  index,
+  option,
+  type,
+}: {
+  index: number;
+  option: MealOption;
+  type: "lunch" | "dinner";
+}) {
+  const isLunch = type === "lunch";
+  const riceG = isLunch ? 150 : 120;
+  const dalG = isLunch ? 100 : 80;
+  const vegG = isLunch ? 100 : 80;
+  const saladG = isLunch ? 300 : 240;
+  const dahiG = isLunch ? 100 : 80;
+
+  return (
+    <div
+      data-ocid={`result.option.item.${index}`}
+      className="bg-secondary/30 rounded-xl border border-border p-4"
+    >
+      <div className="flex items-center gap-2 mb-3">
+        <Badge className="bg-primary/10 text-primary border-primary/20 text-xs">
+          Option {index}
+        </Badge>
+        <span className="text-xs font-semibold text-muted-foreground">
+          {option.dal} {isLunch ? "Lunch" : "Dinner"}
+        </span>
+      </div>
+      <ul className="space-y-1.5 text-sm">
+        <li className="flex items-start gap-2">
+          <span>🍚</span>
+          <span>
+            <span className="font-medium text-foreground">Rice {riceG}g</span>
+            <span className="text-muted-foreground"> / </span>
+            <span className="font-medium text-foreground">
+              🫓 Chapati 2 pcs
+            </span>
+          </span>
+        </li>
+        <li className="flex items-start gap-2">
+          <span>🫘</span>
+          <span>
+            <span className="font-medium text-foreground">Dal:</span>{" "}
+            <span className="text-foreground">{option.dal}</span>{" "}
+            <span className="text-muted-foreground">— {dalG}g</span>
+          </span>
+        </li>
+        <li className="flex items-start gap-2">
+          <span>🥘</span>
+          <span>
+            <span className="font-medium text-foreground">
+              Cooked Veg (gravy):
+            </span>{" "}
+            <span className="text-foreground">{option.cookedVeg}</span>{" "}
+            <span className="text-muted-foreground">— {vegG}g</span>
+          </span>
+        </li>
+        <li className="flex items-start gap-2">
+          <span>🥗</span>
+          <span>
+            <span className="font-medium text-foreground">
+              Salad {saladG}g:
+            </span>{" "}
+            <span className="text-muted-foreground">
+              {option.salad.join(", ")}
+            </span>
+          </span>
+        </li>
+        <li className="flex items-start gap-2">
+          <span>🥛</span>
+          <span>
+            <span className="font-medium text-foreground">Dahi</span>{" "}
+            <span className="text-muted-foreground">— {dahiG}g</span>
+          </span>
+        </li>
+      </ul>
+      {!isLunch && (
+        <div className="mt-2 px-2 py-1 bg-primary/5 rounded-lg">
+          <p className="text-xs text-muted-foreground">
+            Portions are 20% less than lunch for lighter evening digestion.
+          </p>
+        </div>
+      )}
     </div>
   );
 }
@@ -775,44 +1133,6 @@ const MEAL_SCHEDULE = {
   { key: string; label: string; emoji: string; offset: number }[]
 >;
 
-const EVENING_SNACKS = [
-  {
-    name: "Roasted Chana (Bengal Gram)",
-    cal: 120,
-    desc: "High protein, high fibre, satisfying crunch",
-  },
-  {
-    name: "Roasted Popcorn (air-popped, no butter)",
-    cal: 90,
-    desc: "Light, whole grain, low calorie",
-  },
-  {
-    name: "Makhana (Fox Nuts) – 30g roasted",
-    cal: 110,
-    desc: "Low fat, rich in magnesium & calcium",
-  },
-  {
-    name: "Tomato Soup (no cream)",
-    cal: 80,
-    desc: "Antioxidant-rich, warm and filling",
-  },
-  {
-    name: "Roasted Peanuts – 20g",
-    cal: 115,
-    desc: "Healthy fats, protein-packed",
-  },
-  {
-    name: "Mixed Vegetable Clear Soup",
-    cal: 70,
-    desc: "Low calorie, micronutrient-rich",
-  },
-  {
-    name: "Sprout Chaat (small bowl)",
-    cal: 130,
-    desc: "High protein, gut-friendly probiotics",
-  },
-];
-
 function MidMorningSnackCard({
   bodyWeight,
   dietPref,
@@ -910,128 +1230,6 @@ function EveningSnackCard({
               Hot Afresh (2 spoons) — every day
             </span>
           </p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function DayPlanView({
-  dayPlan,
-  dayName,
-  wakeUpTime,
-  mealGap,
-  bodyWeight,
-  dietPref,
-}: {
-  dayPlan: DayPlan;
-  dayName: string;
-  wakeUpTime?: string;
-  mealGap?: number;
-  bodyWeight?: number;
-  dietPref?: string;
-}) {
-  const dayTotal = [
-    dayPlan.breakfast,
-    dayPlan.lunch,
-    dayPlan.dinner,
-    ...dayPlan.snacks,
-  ].reduce(
-    (acc, m) => ({
-      calories: acc.calories + m.calories,
-      protein: acc.protein + m.protein,
-      carbs: acc.carbs + m.carbs,
-      fats: acc.fats + m.fats,
-    }),
-    { calories: 0, protein: 0, carbs: 0, fats: 0 },
-  );
-
-  const schedule =
-    wakeUpTime && mealGap && MEAL_SCHEDULE[mealGap]
-      ? MEAL_SCHEDULE[mealGap]
-      : null;
-  const timeMap: Record<string, string> = {};
-  if (schedule && wakeUpTime) {
-    for (const item of schedule) {
-      timeMap[item.key] = addMinutes(wakeUpTime, item.offset);
-    }
-  }
-
-  return (
-    <div className="space-y-3">
-      <div className="hidden print:block text-sm font-semibold text-muted-foreground mb-2">
-        {dayName}
-      </div>
-
-      {schedule && wakeUpTime && (
-        <div className="mb-4 p-3 rounded-2xl bg-gradient-to-r from-primary/10 via-accent/10 to-secondary/20 border border-primary/20">
-          <div className="text-xs font-bold uppercase tracking-widest text-primary mb-3 flex items-center gap-1.5">
-            <span>🕐</span> Today's Meal Schedule
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {schedule.map((item) => (
-              <div
-                key={item.key}
-                className="flex flex-col items-center bg-card/80 backdrop-blur-sm border border-border rounded-xl px-3 py-2 shadow-sm min-w-[80px]"
-              >
-                <span className="text-lg mb-0.5">{item.emoji}</span>
-                <span className="text-[10px] font-semibold text-muted-foreground text-center leading-tight">
-                  {item.label}
-                </span>
-                <span className="text-xs font-bold text-primary mt-1">
-                  {timeMap[item.key]}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      <MealCard
-        meal={dayPlan.breakfast}
-        label="Breakfast"
-        timeLabel={timeMap.breakfast}
-      />
-      <MealCard meal={dayPlan.lunch} label="Lunch" timeLabel={timeMap.lunch} />
-      <MealCard
-        meal={dayPlan.dinner}
-        label="Dinner"
-        timeLabel={timeMap.dinner}
-      />
-      {dayPlan.snacks.map((_, i) => {
-        const dayIdx = DAYS.indexOf(dayName);
-        if (i === 0 && dayPlan.snacks.length > 1) {
-          // Mid morning snack
-          return (
-            <MidMorningSnackCard
-              key="mid-morning"
-              bodyWeight={bodyWeight || 70}
-              dietPref={dietPref || "vegetarian"}
-              timeLabel={timeMap.midSnack}
-            />
-          );
-        }
-        if (i === 1 || (i === 0 && dayPlan.snacks.length === 1)) {
-          // Evening snack
-          const idx = dayIdx >= 0 ? dayIdx * 2 + i : i;
-          return (
-            <EveningSnackCard
-              key="evening"
-              dayIndex={idx}
-              timeLabel={i === 0 ? timeMap.eveningSnack : timeMap.eveningSnack}
-            />
-          );
-        }
-        return null;
-      })}
-
-      <div className="flex items-center justify-between p-3 bg-primary/5 rounded-xl border border-primary/20 text-sm">
-        <span className="font-semibold text-foreground">Daily Total</span>
-        <div className="flex gap-3 text-xs font-medium">
-          <span className="text-foreground">{dayTotal.calories} kcal</span>
-          <span className="text-green-600">P {dayTotal.protein}g</span>
-          <span className="text-blue-600">C {dayTotal.carbs}g</span>
-          <span className="text-amber-600">F {dayTotal.fats}g</span>
         </div>
       </div>
     </div>
@@ -1152,3 +1350,6 @@ const MICRO_RDA = [
     role: "Blood vessel dilation, circulation, exercise performance",
   },
 ];
+
+// Keep EveningSnackCard exported-accessible (used in print view if needed)
+export { MealCard, MidMorningSnackCard, EveningSnackCard };
