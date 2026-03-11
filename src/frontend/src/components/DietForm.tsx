@@ -141,6 +141,41 @@ export default function DietForm({ onComplete }: Props) {
       if (data.weight < 30 || data.weight > 300)
         errs.weight = "Weight must be between 30 and 300 kg";
     }
+    // Step 3 – Goal targets
+    if (step === 3) {
+      if (
+        (data.goal === "weight_loss" || data.goal === "muscle_gain") &&
+        (data.target_weight_kg <= 0 || Number.isNaN(data.target_weight_kg))
+      ) {
+        errs.target_weight_kg = "Please enter your target weight (kg)";
+      }
+    }
+    // Step 5 – Dietary preference required
+    if (step === 5) {
+      if (data.dietary_preferences.length === 0) {
+        errs.dietary_preferences = "Please select a dietary preference";
+      }
+    }
+    // Step 8 – Water intake required
+    if (step === 8) {
+      if (!data.water_intake || data.water_intake <= 0) {
+        errs.water_intake = "Please enter your daily water intake";
+      }
+    }
+    // Step 9 – Health conditions required
+    if (step === 9) {
+      if (data.health_conditions.length === 0) {
+        errs.health_conditions =
+          "Please select at least one option (or select None)";
+      }
+    }
+    // Step 11 – Macro targets required
+    if (step === 11) {
+      if (!data.protein_target || data.protein_target <= 0)
+        errs.protein_target = "Please enter your protein target";
+      if (!data.carbs_target || data.carbs_target <= 0)
+        errs.carbs_target = "Please enter your carbs target";
+    }
     setErrors(errs);
     return Object.keys(errs).length === 0;
   }
@@ -339,6 +374,17 @@ export default function DietForm({ onComplete }: Props) {
               )}
             </motion.div>
           </AnimatePresence>
+
+          {/* Error messages */}
+          {Object.keys(errors).length > 0 && (
+            <div className="mt-4 bg-destructive/10 border border-destructive/20 rounded-xl px-4 py-3 space-y-1">
+              {Object.values(errors).map((err) => (
+                <p key={err} className="text-sm text-destructive font-medium">
+                  {err}
+                </p>
+              ))}
+            </div>
+          )}
 
           {/* Navigation */}
           <div className="flex items-center justify-between mt-6 no-print">

@@ -6,7 +6,6 @@ import {
   CheckCircle2,
   ChevronDown,
   ChevronUp,
-  Droplets,
   Globe,
   Heart,
   Leaf,
@@ -399,146 +398,6 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
           </motion.div>
         )}
 
-        {/* Weekly Meal Plan */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="bg-card rounded-2xl border border-border p-6"
-        >
-          <h2 className="text-xl font-display font-bold text-foreground mb-5 flex items-center gap-2">
-            <UtensilsCrossed className="w-5 h-5 text-primary" />
-            Weekly Meal Plan
-          </h2>
-
-          <div className="no-print">
-            <Tabs defaultValue="0">
-              <TabsList className="grid grid-cols-7 mb-6 h-auto">
-                {DAYS.map((_day, i) => (
-                  <TabsTrigger
-                    key={DAYS[i]}
-                    value={String(i)}
-                    data-ocid={`result.day.tab.${i + 1}`}
-                    className="text-xs px-1 py-2"
-                  >
-                    {DAY_SHORT[i]}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-              {plan.weekly_plan.map((dayPlan, i) => (
-                <TabsContent key={DAYS[i]} value={String(i)}>
-                  <DayPlanView dayPlan={dayPlan} dayName={DAYS[i]} />
-                </TabsContent>
-              ))}
-            </Tabs>
-          </div>
-
-          <div className="hidden print:block space-y-6">
-            {plan.weekly_plan.map((dayPlan, i) => (
-              <div key={DAYS[i]} className="page-break-inside-avoid">
-                <h3 className="font-display font-bold text-lg text-foreground mb-3 border-b pb-2">
-                  {DAYS[i]}
-                </h3>
-                <DayPlanView dayPlan={dayPlan} dayName={DAYS[i]} />
-              </div>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Health Tips */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          className="bg-card rounded-2xl border border-border p-6"
-        >
-          <h2 className="text-xl font-display font-bold text-foreground mb-5 flex items-center gap-2">
-            <Heart className="w-5 h-5 text-primary" />
-            Personalized Health Tips
-          </h2>
-          <div className="space-y-3">
-            {plan.health_tips.map((tip, i) => (
-              <motion.div
-                key={tip.slice(0, 30)}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.5 + i * 0.06 }}
-                className="flex gap-3 p-3 rounded-xl bg-secondary/40"
-              >
-                <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                <p className="text-sm text-foreground leading-relaxed">{tip}</p>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Supplements Note */}
-        {allSupplements.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
-            className="bg-card rounded-2xl border border-border p-6"
-          >
-            <h2 className="text-xl font-display font-bold text-foreground mb-4 flex items-center gap-2">
-              <Pill className="w-5 h-5 text-primary" />
-              Your Supplements
-            </h2>
-            <div className="flex flex-wrap gap-2 mb-4">
-              {allSupplements.map((s) => (
-                <Badge
-                  key={s}
-                  variant="secondary"
-                  className="bg-primary/10 text-primary border-primary/20"
-                >
-                  {s}
-                </Badge>
-              ))}
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Your supplement stack has been considered in generating your meal
-              plan. Take supplements as directed and consult a healthcare
-              provider for personalized supplement advice.
-            </p>
-          </motion.div>
-        )}
-
-        {/* Hydration Reminder */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.55 }}
-          className="bg-gradient-to-r from-primary/10 to-secondary/40 rounded-2xl border border-primary/20 p-6"
-        >
-          <div className="flex items-center gap-3 mb-3">
-            <Droplets className="w-6 h-6 text-primary" />
-            <h2 className="text-xl font-display font-bold text-foreground">
-              Hydration Goal
-            </h2>
-          </div>
-          <p className="text-foreground">
-            Aim to drink{" "}
-            <span className="text-2xl font-display font-bold text-primary">
-              {plan.hydration_recommendation}L
-            </span>{" "}
-            of water daily. Spread intake throughout the day — start with a
-            glass first thing in the morning.
-          </p>
-          <div className="mt-3 flex gap-2 flex-wrap">
-            {["Morning", "Pre-lunch", "Afternoon", "Pre-dinner", "Evening"].map(
-              (time) => (
-                <Badge
-                  key={time}
-                  variant="outline"
-                  className="text-xs border-primary/30 text-primary"
-                >
-                  💧 {time}
-                </Badge>
-              ),
-            )}
-          </div>
-        </motion.div>
-
         {/* GLOBAL NUTRITION PHILOSOPHY */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -667,6 +526,110 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
             </div>
           </div>
         </motion.div>
+
+        {/* Weekly Meal Plan */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="bg-card rounded-2xl border border-border p-6"
+        >
+          <h2 className="text-xl font-display font-bold text-foreground mb-5 flex items-center gap-2">
+            <UtensilsCrossed className="w-5 h-5 text-primary" />
+            Weekly Meal Plan
+          </h2>
+
+          <div className="no-print">
+            <Tabs defaultValue="0">
+              <TabsList className="grid grid-cols-7 mb-6 h-auto">
+                {DAYS.map((_day, i) => (
+                  <TabsTrigger
+                    key={DAYS[i]}
+                    value={String(i)}
+                    data-ocid={`result.day.tab.${i + 1}`}
+                    className="text-xs px-1 py-2"
+                  >
+                    {DAY_SHORT[i]}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+              {plan.weekly_plan.map((dayPlan, i) => (
+                <TabsContent key={DAYS[i]} value={String(i)}>
+                  <DayPlanView dayPlan={dayPlan} dayName={DAYS[i]} />
+                </TabsContent>
+              ))}
+            </Tabs>
+          </div>
+
+          <div className="hidden print:block space-y-6">
+            {plan.weekly_plan.map((dayPlan, i) => (
+              <div key={DAYS[i]} className="page-break-inside-avoid">
+                <h3 className="font-display font-bold text-lg text-foreground mb-3 border-b pb-2">
+                  {DAYS[i]}
+                </h3>
+                <DayPlanView dayPlan={dayPlan} dayName={DAYS[i]} />
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Health Tips */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          className="bg-card rounded-2xl border border-border p-6"
+        >
+          <h2 className="text-xl font-display font-bold text-foreground mb-5 flex items-center gap-2">
+            <Heart className="w-5 h-5 text-primary" />
+            Personalized Health Tips
+          </h2>
+          <div className="space-y-3">
+            {plan.health_tips.map((tip, i) => (
+              <motion.div
+                key={tip.slice(0, 30)}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.5 + i * 0.06 }}
+                className="flex gap-3 p-3 rounded-xl bg-secondary/40"
+              >
+                <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                <p className="text-sm text-foreground leading-relaxed">{tip}</p>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Supplements Note */}
+        {allSupplements.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+            className="bg-card rounded-2xl border border-border p-6"
+          >
+            <h2 className="text-xl font-display font-bold text-foreground mb-4 flex items-center gap-2">
+              <Pill className="w-5 h-5 text-primary" />
+              Your Supplements
+            </h2>
+            <div className="flex flex-wrap gap-2 mb-4">
+              {allSupplements.map((s) => (
+                <Badge
+                  key={s}
+                  variant="secondary"
+                  className="bg-primary/10 text-primary border-primary/20"
+                >
+                  {s}
+                </Badge>
+              ))}
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Your supplement stack has been considered in generating your meal
+              plan. Take supplements as directed and consult a healthcare
+              provider for personalized supplement advice.
+            </p>
+          </motion.div>
+        )}
 
         {/* Generate New Report */}
         <div className="text-center pb-8 no-print">
