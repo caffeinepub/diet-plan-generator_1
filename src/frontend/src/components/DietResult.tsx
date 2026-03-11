@@ -14,19 +14,23 @@ import {
   CheckCircle2,
   ChevronDown,
   ChevronUp,
+  Copy,
   Globe,
   Heart,
   Leaf,
+  Lock,
+  MessageCircle,
   Pill,
   Printer,
   RefreshCw,
+  Share2,
   Target,
   User,
   UtensilsCrossed,
   XCircle,
 } from "lucide-react";
 import { motion } from "motion/react";
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import type { DietPlan, Meal } from "../backend.d";
 import type { FormData } from "../types/diet";
 
@@ -377,6 +381,31 @@ const CONDITION_AVOID_FOODS: Record<
 };
 
 export default function DietResult({ plan, formData, onStartOver }: Props) {
+  const [referralCount, setReferralCount] = useState(0);
+  const [copied, setCopied] = useState(false);
+
+  const userWa = formData.referrer_whatsapp || "";
+  // Build referral link using user's own WhatsApp (they become the referrer for their friends)
+  // But for the "Personal Coach" we use the referrer's number
+  const referralLink = userWa
+    ? `${window.location.origin}${window.location.pathname}?ref=${userWa}`
+    : "";
+
+  useEffect(() => {
+    if (userWa) {
+      const key = `hncoach_referrals_${userWa}`;
+      setReferralCount(Number.parseInt(localStorage.getItem(key) || "0"));
+    }
+  }, [userWa]);
+
+  function handleCopyLink() {
+    if (!referralLink) return;
+    navigator.clipboard.writeText(referralLink).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }
+
   function handlePrint() {
     window.print();
   }
@@ -458,6 +487,34 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
       data-ocid="result.page"
       className="result-page min-h-screen bg-background"
     >
+      {/* Print-only professional header */}
+      <div className="print-only-header hidden print:flex items-center justify-between border-b-2 border-primary pb-3 mb-4 px-2">
+        <div className="flex items-center gap-2">
+          <div className="font-bold text-lg text-primary">HN Coach</div>
+          <div className="text-xs text-muted-foreground">
+            Diet & Nutrition Plan
+          </div>
+        </div>
+        <div className="text-center">
+          <div className="font-bold text-sm text-foreground">
+            CONFIDENTIAL DIET REPORT
+          </div>
+          <div className="text-xs text-muted-foreground">
+            Generated for {formData.name}
+          </div>
+        </div>
+        <div className="text-right text-xs text-muted-foreground">
+          <div>
+            {new Date().toLocaleDateString("en-IN", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </div>
+          <div className="text-[10px] mt-0.5">Evidence-Based Nutrition</div>
+        </div>
+      </div>
+
       {/* Header */}
       <header className="no-print sticky top-0 z-10 border-b border-border bg-card/90 backdrop-blur-sm">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
@@ -499,7 +556,7 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-4 py-8 space-y-8">
+      <main className="max-w-5xl mx-auto px-4 py-5 space-y-5">
         {/* Hero Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -644,6 +701,20 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
                 label="Supplements"
                 value={allSupplements.join(", ")}
               />
+            )}
+            {formData.referrer_whatsapp && (
+              <div className="space-y-1">
+                <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Referred By
+                </div>
+                <div className="text-sm font-medium bg-green-50 border border-green-200 text-green-800 rounded-lg px-3 py-2 flex items-center gap-2">
+                  <Lock className="w-3.5 h-3.5 text-green-600 shrink-0" />
+                  +91 {formData.referrer_whatsapp}
+                  <span className="ml-auto text-xs bg-green-200 text-green-800 rounded-full px-2 py-0.5 font-semibold">
+                    Verified
+                  </span>
+                </div>
+              </div>
             )}
           </div>
         </motion.div>
@@ -910,6 +981,36 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
                 details: ReactNode;
               }[] = [];
 
+              // HN Drink note at the top
+              mealRows.push({
+                key: "hnDrink",
+                emoji: "💪",
+                meal: "HN Drink Note",
+                time: "Pre-workout",
+                details: (
+                  <div className="font-medium text-green-800 dark:text-green-200">
+                    Before exercise, drink <strong>HN Drink</strong> for energy
+                    and performance.
+                  </div>
+                ),
+                rowStyle: "bg-green-50 dark:bg-green-950/40",
+              } as any);
+
+              // HN Digestion before Breakfast
+              mealRows.push({
+                key: "hnDigestionBreakfast",
+                emoji: "💊",
+                meal: "HN Digestion",
+                time: "Before Breakfast",
+                details: (
+                  <div className="font-medium text-purple-800 dark:text-purple-200">
+                    Take <strong>HN Digestion</strong> before breakfast for
+                    optimal nutrient absorption.
+                  </div>
+                ),
+                rowStyle: "bg-purple-50 dark:bg-purple-950/40",
+              } as any);
+
               // Breakfast always present
               mealRows.push({
                 key: "breakfast",
@@ -958,6 +1059,35 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
                 });
               }
 
+              // HN Tea after mid-morning snack
+              mealRows.push({
+                key: "hnTea1",
+                emoji: "🍵",
+                meal: "HN Tea",
+                time: "Between meals",
+                details: (
+                  <div className="font-medium text-amber-800 dark:text-amber-200">
+                    <strong>HN Tea</strong> — 1 cup (2–3 times daily for
+                    metabolism and wellness)
+                  </div>
+                ),
+                rowStyle: "bg-amber-50 dark:bg-amber-950/40",
+              } as any);
+
+              // HN Digestion before Lunch
+              mealRows.push({
+                key: "hnDigestionLunch",
+                emoji: "💊",
+                meal: "HN Digestion",
+                time: "Before Lunch",
+                details: (
+                  <div className="font-medium text-purple-800 dark:text-purple-200">
+                    Take <strong>HN Digestion</strong> before lunch.
+                  </div>
+                ),
+                rowStyle: "bg-purple-50 dark:bg-purple-950/40",
+              } as any);
+
               // Lunch always present
               mealRows.push({
                 key: "lunch",
@@ -967,7 +1097,7 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
                 details: (
                   <div>
                     <div className="font-medium text-foreground">
-                      🍚 Rice 150g / 🫓 Chapati 2 pcs
+                      🍚 Rice 100g / 🫓 Chapati 2 pcs
                     </div>
                     <div className="text-xs text-muted-foreground mt-1">
                       Dal: {opt.dal} (100g) · Cooked Veg: {opt.cookedVeg} (100g)
@@ -976,6 +1106,20 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
                   </div>
                 ),
               });
+
+              // HN Tea after lunch
+              mealRows.push({
+                key: "hnTea2",
+                emoji: "🍵",
+                meal: "HN Tea",
+                time: "After Lunch",
+                details: (
+                  <div className="font-medium text-amber-800 dark:text-amber-200">
+                    <strong>HN Tea</strong> — 1 cup after lunch
+                  </div>
+                ),
+                rowStyle: "bg-amber-50 dark:bg-amber-950/40",
+              } as any);
 
               // Evening snack (3hr and 4hr gap)
               if (
@@ -1005,6 +1149,20 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
                 });
               }
 
+              // HN Digestion before Dinner
+              mealRows.push({
+                key: "hnDigestionDinner",
+                emoji: "💊",
+                meal: "HN Digestion",
+                time: "Before Dinner",
+                details: (
+                  <div className="font-medium text-purple-800 dark:text-purple-200">
+                    Take <strong>HN Digestion</strong> before dinner.
+                  </div>
+                ),
+                rowStyle: "bg-purple-50 dark:bg-purple-950/40",
+              } as any);
+
               // Dinner always present
               mealRows.push({
                 key: "dinner",
@@ -1014,7 +1172,7 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
                 details: (
                   <div>
                     <div className="font-medium text-foreground">
-                      🍚 Rice 120g / 🫓 Chapati 2 pcs
+                      🍚 Rice 100g / 🫓 Chapati 2 pcs
                     </div>
                     <div className="text-xs text-muted-foreground mt-1">
                       Dal: {opt.dal} (80g) · Cooked Veg: {opt.cookedVeg} (80g) ·
@@ -1023,6 +1181,20 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
                   </div>
                 ),
               });
+
+              // HN Tea after dinner
+              mealRows.push({
+                key: "hnTea3",
+                emoji: "🍵",
+                meal: "HN Tea",
+                time: "Evening",
+                details: (
+                  <div className="font-medium text-amber-800 dark:text-amber-200">
+                    <strong>HN Tea</strong> — 1 cup in the evening after dinner
+                  </div>
+                ),
+                rowStyle: "bg-amber-50 dark:bg-amber-950/40",
+              } as any);
 
               return (
                 <div
@@ -1058,7 +1230,10 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
                           <tr
                             key={row.key}
                             className={
-                              ri % 2 === 0 ? "bg-background" : "bg-secondary/20"
+                              (row as any).rowStyle ||
+                              (ri % 2 === 0
+                                ? "bg-background"
+                                : "bg-secondary/20")
                             }
                           >
                             <td className="px-4 py-3 font-semibold text-foreground whitespace-nowrap">
@@ -1183,6 +1358,119 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
               </div>
             </div>
           </div>
+        </motion.div>
+
+        {/* ── Referral Section ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.44 }}
+          className="bg-card rounded-2xl border border-emerald-200 p-5 no-print"
+          data-ocid="result.referral.section"
+        >
+          {/* Promo Banner */}
+          <div className="bg-gradient-to-r from-emerald-500 to-green-600 rounded-xl p-4 mb-5 text-white text-center">
+            <div className="text-2xl mb-1">🎁</div>
+            <div className="font-bold text-lg leading-tight">
+              Refer & Earn Full Refund!
+            </div>
+            <div className="text-sm text-emerald-100 mt-1">
+              Help <strong>2 friends</strong> download their HN Coach report and
+              get a <strong>100% full refund</strong>.
+            </div>
+          </div>
+
+          <h2 className="text-base font-bold text-foreground mb-4 flex items-center gap-2">
+            <Share2 className="w-4 h-4 text-emerald-600" />
+            Your Referral Link
+          </h2>
+
+          {formData.referrer_whatsapp ? (
+            <div className="space-y-4">
+              <div className="flex gap-2">
+                <input
+                  readOnly
+                  value={referralLink}
+                  className="flex-1 text-xs rounded-lg border border-border bg-secondary/40 px-3 py-2 font-mono text-foreground truncate"
+                  data-ocid="result.referral.input"
+                />
+                <button
+                  type="button"
+                  data-ocid="result.referral.button"
+                  onClick={handleCopyLink}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-border bg-secondary hover:bg-secondary/80 text-sm font-semibold text-foreground transition-colors shrink-0"
+                >
+                  <Copy className="w-3.5 h-3.5" />
+                  {copied ? "Copied!" : "Copy"}
+                </button>
+              </div>
+              <a
+                href={`https://wa.me/?text=${encodeURIComponent(`Hey! I just got my personalized diet plan from HN Coach. Generate yours free here: ${referralLink}`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-ocid="result.referral.primary_button"
+                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-[#25D366] hover:bg-[#1ebe5a] text-white font-semibold text-sm transition-colors"
+              >
+                <MessageCircle className="w-4 h-4" />
+                Share on WhatsApp
+              </a>
+              <div className="flex items-center justify-between p-3 rounded-xl bg-emerald-50 border border-emerald-200">
+                <span className="text-sm text-emerald-800 font-medium">
+                  Friends referred via your link
+                </span>
+                <span className="text-2xl font-bold text-emerald-700">
+                  {referralCount}
+                </span>
+              </div>
+              {referralCount >= 2 && (
+                <div className="p-3 rounded-xl bg-green-100 border border-green-300 text-green-800 text-sm font-semibold text-center">
+                  🎉 Congratulations! You&apos;ve referred {referralCount}{" "}
+                  friends. You qualify for a full refund!
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-sm text-amber-800">
+              <strong>To generate your referral link:</strong> Fill in your
+              WhatsApp number in Step 1 of the form. Your unique referral link
+              will appear here so friends can register under you.
+            </div>
+          )}
+        </motion.div>
+
+        {/* ── Personal Coach Section ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.46 }}
+          className="bg-card rounded-2xl border border-border p-5 no-print"
+          data-ocid="result.personal_coach.section"
+        >
+          <h2 className="text-base font-bold text-foreground mb-1 flex items-center gap-2">
+            <MessageCircle className="w-4 h-4 text-emerald-600" />
+            Get Your Personal Coach
+          </h2>
+          <p className="text-sm text-muted-foreground mb-4">
+            Your HN Coach referrer will guide you <strong>24×7</strong> on your
+            nutrition and wellness journey.
+          </p>
+          {formData.referrer_whatsapp ? (
+            <a
+              href={`https://wa.me/91${formData.referrer_whatsapp}?text=${encodeURIComponent("Hi! I generated my HN Coach diet plan and would like personal guidance. Please help me achieve my goals.")}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-ocid="result.personal_coach.primary_button"
+              className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-[#25D366] hover:bg-[#1ebe5a] text-white font-semibold transition-colors"
+            >
+              <MessageCircle className="w-5 h-5" />
+              Chat with My Coach on WhatsApp
+            </a>
+          ) : (
+            <div className="p-4 rounded-xl bg-secondary/50 border border-border text-sm text-muted-foreground text-center">
+              Ask the friend who referred you to HN Coach for personal coaching
+              guidance.
+            </div>
+          )}
         </motion.div>
 
         {/* Foods to Avoid */}
@@ -1342,7 +1630,7 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
         )}
 
         {/* Footer / Generate New Report */}
-        <div className="text-center pb-8 no-print">
+        <div className="text-center pb-4 no-print">
           <Button
             data-ocid="result.start_over_button"
             variant="outline"
@@ -1352,6 +1640,26 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
             <RefreshCw className="w-4 h-4" />
             Create a New Plan
           </Button>
+        </div>
+
+        {/* Trust signal */}
+        <div className="border-t border-border pt-4 pb-6 text-center space-y-1">
+          <p className="text-xs text-muted-foreground max-w-xl mx-auto">
+            🔒 This report is generated based on your personal health data and
+            follows evidence-based nutrition guidelines aligned with Indian RDA
+            standards.
+          </p>
+          <p className="text-xs text-muted-foreground">
+            © {new Date().getFullYear()}.{" "}
+            <a
+              href={`https://caffeine.ai?utm_source=caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(typeof window !== "undefined" ? window.location.hostname : "")}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-foreground transition-colors"
+            >
+              Built with love using caffeine.ai
+            </a>
+          </p>
         </div>
       </main>
     </div>

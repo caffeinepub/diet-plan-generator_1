@@ -13,6 +13,7 @@ import {
   Heart,
   Leaf,
   Loader2,
+  Lock,
   Moon,
   Pill,
   Salad,
@@ -21,7 +22,7 @@ import {
   UtensilsCrossed,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import type { DietPlan } from "../backend.d";
 import { useActor } from "../hooks/useActor";
@@ -35,7 +36,7 @@ import {
 import type { FormData } from "../types/diet";
 import { defaultFormData } from "../types/diet";
 
-const TOTAL_STEPS = 12;
+const TOTAL_STEPS = 11;
 
 const STEP_META = [
   { title: "Personal Details", subtitle: "Tell us about yourself", icon: User },
@@ -63,11 +64,6 @@ const STEP_META = [
     title: "Meal Frequency",
     subtitle: "Select your meal gap preference",
     icon: UtensilsCrossed,
-  },
-  {
-    title: "Water Intake",
-    subtitle: "Your daily hydration requirement",
-    icon: Droplets,
   },
   {
     title: "Present Health Condition",
@@ -111,6 +107,22 @@ export default function DietForm({ onComplete, onViewPreviousReport }: Props) {
     }
   });
   const { actor } = useActor();
+
+  // Track referral from URL param on mount
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const refParam = urlParams.get("ref");
+    if (refParam && /^[6-9]\d{9}$/.test(refParam)) {
+      setData((prev) => ({ ...prev, referrer_whatsapp: refParam }));
+      // Increment referrer count (once per session)
+      const key = `hncoach_referrals_${refParam}`;
+      const current = Number.parseInt(localStorage.getItem(key) || "0");
+      if (!sessionStorage.getItem(`counted_${refParam}`)) {
+        localStorage.setItem(key, String(current + 1));
+        sessionStorage.setItem(`counted_${refParam}`, "1");
+      }
+    }
+  }, []);
 
   function update<K extends keyof FormData>(key: K, value: FormData[K]) {
     setData((prev) => ({ ...prev, [key]: value }));
@@ -156,21 +168,15 @@ export default function DietForm({ onComplete, onViewPreviousReport }: Props) {
         errs.dietary_preferences = "Please select a dietary preference";
       }
     }
-    // Step 7 – Water intake required
+    // Step 7 – Health conditions required
     if (step === 7) {
-      if (!data.water_intake || data.water_intake <= 0) {
-        errs.water_intake = "Please enter your daily water intake";
-      }
-    }
-    // Step 8 – Health conditions required
-    if (step === 8) {
       if (data.health_conditions.length === 0) {
         errs.health_conditions =
           "Please select at least one option (or select None)";
       }
     }
-    // Step 10 – Macro targets required
-    if (step === 10) {
+    // Step 9 – Macro targets required
+    if (step === 9) {
       if (!data.protein_target || data.protein_target <= 0)
         errs.protein_target = "Please enter your protein target";
       if (!data.carbs_target || data.carbs_target <= 0)
@@ -346,19 +352,18 @@ export default function DietForm({ onComplete, onViewPreviousReport }: Props) {
               )}
               {step === 5 && <StepAllergies data={data} update={update} />}
               {step === 6 && <Step6 data={data} update={update} />}
-              {step === 7 && <Step7 data={data} update={update} />}
-              {step === 8 && (
+              {step === 7 && (
                 <Step8
                   data={data}
                   update={update}
                   toggleArrayItem={toggleArrayItem}
                 />
               )}
-              {step === 9 && <Step9 data={data} update={update} />}
-              {step === 10 && <Step10 data={data} update={update} />}
+              {step === 8 && <Step9 data={data} update={update} />}
+              {step === 9 && <Step10 data={data} update={update} />}
 
-              {step === 11 && <StepBmrTdee data={data} update={update} />}
-              {step === 12 && (
+              {step === 10 && <StepBmrTdee data={data} update={update} />}
+              {step === 11 && (
                 <Step12
                   data={data}
                   errors={errors}
@@ -452,6 +457,116 @@ interface StepProps {
   toggleArrayItem?: (key: keyof FormData, item: string) => void;
 }
 
+function HeightInput({ data, errors = {}, update }: StepProps) {
+  const [unit, setUnit] = useState<"cm" | "feet">("cm");
+  const [feet, setFeet] = useState<number>(5);
+  const [inches, setInches] = useState<number>(6);
+
+  function handleUnitChange(newUnit: "cm" | "feet") {
+    setUnit(newUnit);
+    if (newUnit === "feet") {
+      // Convert current cm to feet/inches
+      const totalInches = data.height / 2.54;
+      const f = Math.floor(totalInches / 12);
+      const i = Math.round(totalInches % 12);
+      setFeet(f || 5);
+      setInches(i || 6);
+    } else {
+      // Convert feet/inches to cm
+      const cm = Math.round(feet * 30.48 + inches * 2.54);
+      update("height", cm);
+    }
+  }
+
+  function handleFeetChange(val: number) {
+    setFeet(val);
+    const cm = Math.round(val * 30.48 + inches * 2.54);
+    update("height", cm);
+  }
+
+  function handleInchesChange(val: number) {
+    setInches(val);
+    const cm = Math.round(feet * 30.48 + val * 2.54);
+    update("height", cm);
+  }
+
+  return (
+    <div className="space-y-2">
+      <Label>Height</Label>
+      <div className="flex gap-2 mb-2">
+        <button
+          type="button"
+          data-ocid="height.unit.select"
+          onClick={() => handleUnitChange("cm")}
+          className={`px-3 py-1.5 rounded-lg border text-sm font-medium transition-all ${unit === "cm" ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:border-primary/50"}`}
+        >
+          cm
+        </button>
+        <button
+          type="button"
+          data-ocid="height.unit.select"
+          onClick={() => handleUnitChange("feet")}
+          className={`px-3 py-1.5 rounded-lg border text-sm font-medium transition-all ${unit === "feet" ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:border-primary/50"}`}
+        >
+          Feet &amp; Inches
+        </button>
+      </div>
+      {unit === "cm" ? (
+        <Input
+          id="height"
+          data-ocid="height.cm.input"
+          type="number"
+          min={100}
+          max={250}
+          placeholder="e.g. 170"
+          value={data.height || ""}
+          onChange={(e) => update("height", Number(e.target.value))}
+          className={errors.height ? "border-destructive" : ""}
+        />
+      ) : (
+        <div className="flex gap-2">
+          <div className="flex-1">
+            <Input
+              data-ocid="height.feet.input"
+              type="number"
+              min={3}
+              max={8}
+              placeholder="Feet"
+              value={feet}
+              onChange={(e) => handleFeetChange(Number(e.target.value))}
+              className={errors.height ? "border-destructive" : ""}
+            />
+            <span className="text-xs text-muted-foreground mt-1 block">
+              feet
+            </span>
+          </div>
+          <div className="flex-1">
+            <Input
+              data-ocid="height.inches.input"
+              type="number"
+              min={0}
+              max={11}
+              placeholder="Inches"
+              value={inches}
+              onChange={(e) => handleInchesChange(Number(e.target.value))}
+              className={errors.height ? "border-destructive" : ""}
+            />
+            <span className="text-xs text-muted-foreground mt-1 block">
+              inches
+            </span>
+          </div>
+        </div>
+      )}
+      {unit === "feet" && data.height > 0 && (
+        <p className="text-xs text-muted-foreground">≈ {data.height} cm</p>
+      )}
+      {errors.height && (
+        <p className="text-sm text-destructive">{errors.height}</p>
+      )}
+    </div>
+  );
+}
+
 function Step1({ data, errors = {}, update }: StepProps) {
   return (
     <div className="space-y-5">
@@ -513,22 +628,7 @@ function Step1({ data, errors = {}, update }: StepProps) {
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="height">Height (cm)</Label>
-          <Input
-            id="height"
-            data-ocid="personal.height_input"
-            type="number"
-            min={100}
-            max={250}
-            value={data.height}
-            onChange={(e) => update("height", Number(e.target.value))}
-            className={errors.height ? "border-destructive" : ""}
-          />
-          {errors.height && (
-            <p className="text-sm text-destructive">{errors.height}</p>
-          )}
-        </div>
+        <HeightInput data={data} errors={errors} update={update} />
 
         <div className="space-y-2">
           <Label htmlFor="weight">Weight (kg)</Label>
@@ -546,6 +646,60 @@ function Step1({ data, errors = {}, update }: StepProps) {
             <p className="text-sm text-destructive">{errors.weight}</p>
           )}
         </div>
+      </div>
+
+      {/* Referrer WhatsApp */}
+      <div className="space-y-2">
+        <Label
+          htmlFor="referrer_whatsapp"
+          className="flex items-center gap-1.5"
+        >
+          Who referred you to HN Coach?
+          <span className="text-xs text-muted-foreground font-normal">
+            (Optional)
+          </span>
+        </Label>
+        <div className="relative">
+          <Input
+            id="referrer_whatsapp"
+            data-ocid="personal.referrer_whatsapp_input"
+            type="tel"
+            placeholder="Referrer's WhatsApp number (10 digits)"
+            value={data.referrer_whatsapp}
+            readOnly={!!data.referrer_whatsapp}
+            onChange={(e) => {
+              if (!data.referrer_whatsapp) {
+                update(
+                  "referrer_whatsapp",
+                  e.target.value.replace(/\D/g, "").slice(0, 10),
+                );
+              }
+            }}
+            className={
+              data.referrer_whatsapp
+                ? "pr-24 bg-green-50 border-green-300 text-green-800"
+                : ""
+            }
+          />
+          {data.referrer_whatsapp && (
+            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 bg-green-100 border border-green-300 rounded-md px-2 py-0.5">
+              <Lock className="w-3 h-3 text-green-600" />
+              <span className="text-xs font-semibold text-green-700">
+                Verified
+              </span>
+            </div>
+          )}
+        </div>
+        {data.referrer_whatsapp && (
+          <p className="text-xs text-green-700 flex items-center gap-1">
+            ✅ Referred by +91 {data.referrer_whatsapp}
+          </p>
+        )}
+        {!data.referrer_whatsapp && (
+          <p className="text-xs text-muted-foreground">
+            Enter the WhatsApp number of the person who invited you.
+          </p>
+        )}
       </div>
     </div>
   );
@@ -942,57 +1096,6 @@ function Step6({ data, update }: StepProps) {
           </button>
         ))}
       </div>
-    </div>
-  );
-}
-
-function Step7({ data, update }: StepProps) {
-  return (
-    <div className="space-y-6">
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-        <p className="text-sm text-blue-700">
-          Please enter your daily water intake requirement as mentioned in your{" "}
-          <strong>Wellness Assessment Report</strong>.
-        </p>
-      </div>
-
-      <div className="space-y-3">
-        <Label htmlFor="water_intake">
-          Daily Water Intake Requirement (Litres)
-        </Label>
-        <div className="relative">
-          <Input
-            id="water_intake"
-            data-ocid="water.input"
-            type="number"
-            min={0.5}
-            max={10}
-            step={0.1}
-            placeholder="e.g. 2.5"
-            value={data.water_intake || ""}
-            onChange={(e) => update("water_intake", Number(e.target.value))}
-            className="pr-12"
-          />
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-medium text-muted-foreground">
-            L/day
-          </span>
-        </div>
-        <p className="text-xs text-muted-foreground">
-          Enter the recommended water intake from your wellness assessment
-          report (in litres).
-        </p>
-      </div>
-
-      {data.water_intake > 0 && (
-        <div className="bg-primary/5 rounded-xl p-4 flex items-center gap-3">
-          <Droplets className="w-5 h-5 text-primary" />
-          <span className="text-sm font-medium text-foreground">
-            Target:{" "}
-            <strong className="text-primary">{data.water_intake} L</strong> of
-            water per day
-          </span>
-        </div>
-      )}
     </div>
   );
 }

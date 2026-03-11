@@ -7,6 +7,7 @@ export interface FormData {
   gender: "male" | "female";
   height: number;
   weight: number;
+  referrer_whatsapp: string; // Who referred you to HN Coach
   // Step 2 - Health Goal
   goal: "weight_loss" | "muscle_gain" | "maintenance" | "body_recomposition";
   // Step 3 - Goal Targets (conditional on goal)
@@ -59,6 +60,7 @@ export const defaultFormData: FormData = {
   gender: "male",
   height: 170,
   weight: 70,
+  referrer_whatsapp: "",
   goal: "maintenance",
   target_weight_kg: 0,
   target_belly_inches: 0,

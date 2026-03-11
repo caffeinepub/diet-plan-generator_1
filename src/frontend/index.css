@@ -115,8 +115,17 @@
 
 /* Print styles */
 @media print {
+  @page {
+    margin: 0.3in;
+    size: A4;
+  }
+
   .no-print {
     display: none !important;
+  }
+
+  .print-only-header {
+    display: flex !important;
   }
 
   .print-show-all [role="tabpanel"] {
@@ -124,8 +133,9 @@
   }
 
   body {
-    font-size: 12pt;
+    font-size: 10pt;
     background: white;
+    color: #111;
   }
 
   .result-page {
@@ -137,18 +147,33 @@
     page-break-inside: avoid;
   }
 
+  /* Section cards */
+  .rounded-2xl, .rounded-xl {
+    border-radius: 6px !important;
+    page-break-inside: avoid;
+  }
+
+  /* Tighter section padding for print */
+  .bg-card, [data-ocid*="section"], [data-ocid*="panel"] {
+    padding: 8px !important;
+    margin-bottom: 8px !important;
+    page-break-inside: avoid;
+  }
+
   /* Fix schedule section blank on print */
   [data-print-schedule] {
     background: #f0fdf4 !important;
     border: 1px solid #86efac !important;
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
+    display: block !important;
   }
   [data-print-schedule-item] {
     background: #ffffff !important;
     border: 1px solid #e5e7eb !important;
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
+    display: inline-flex !important;
   }
 
   /* Ensure cards and sections render */
@@ -156,20 +181,53 @@
     background: #ffffff !important;
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
+    border: 1px solid #e5e7eb !important;
   }
 
   /* Ensure tables print correctly */
   table {
     border-collapse: collapse !important;
     width: 100% !important;
+    font-size: 9pt !important;
+    page-break-inside: avoid;
   }
   th, td {
     border: 1px solid #d1d5db !important;
-    padding: 4px 6px !important;
+    padding: 3px 5px !important;
   }
   th {
     background: #f3f4f6 !important;
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
+    font-size: 8pt !important;
+  }
+
+  /* Day plan tables */
+  [data-ocid*="day_plan"] {
+    page-break-inside: avoid;
+    margin-bottom: 6px !important;
+  }
+
+  /* Spacing reductions */
+  .space-y-8 > * + * {
+    margin-top: 10px !important;
+  }
+  .space-y-6 > * + * {
+    margin-top: 8px !important;
+  }
+  .gap-4 {
+    gap: 6px !important;
+  }
+  .gap-6 {
+    gap: 8px !important;
+  }
+
+  /* Section headings */
+  h2 {
+    font-size: 11pt !important;
+    margin-bottom: 4px !important;
+  }
+  h3 {
+    font-size: 10pt !important;
   }
 }
