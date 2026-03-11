@@ -94,14 +94,22 @@ const STEP_META = [
 
 interface Props {
   onComplete: (plan: DietPlan, data: FormData) => void;
+  onViewPreviousReport?: () => void;
 }
 
-export default function DietForm({ onComplete }: Props) {
+export default function DietForm({ onComplete, onViewPreviousReport }: Props) {
   const [step, setStep] = useState(1);
   const [direction, setDirection] = useState(1);
   const [data, setData] = useState<FormData>(defaultFormData);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isGenerating, setIsGenerating] = useState(false);
+  const [hasPreviousReport] = useState(() => {
+    try {
+      return !!localStorage.getItem("hn_coach_last_report");
+    } catch (_) {
+      return false;
+    }
+  });
   const { actor } = useActor();
 
   function update<K extends keyof FormData>(key: K, value: FormData[K]) {
@@ -360,6 +368,20 @@ export default function DietForm({ onComplete }: Props) {
               )}
             </motion.div>
           </AnimatePresence>
+
+          {/* View Previous Report */}
+          {step === 1 && hasPreviousReport && onViewPreviousReport && (
+            <div className="mt-4 text-center">
+              <button
+                type="button"
+                data-ocid="home.view_previous_report_button"
+                onClick={onViewPreviousReport}
+                className="inline-flex items-center gap-2 text-sm text-primary hover:text-primary/80 font-medium underline underline-offset-4 transition-colors"
+              >
+                <span>📋</span> View Previous Report
+              </button>
+            </div>
+          )}
 
           {/* Error messages */}
           {Object.keys(errors).length > 0 && (

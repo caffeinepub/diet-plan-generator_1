@@ -5,6 +5,8 @@ import DietForm from "./components/DietForm";
 import DietResult from "./components/DietResult";
 import type { FormData } from "./types/diet";
 
+const LS_KEY = "hn_coach_last_report";
+
 type AppView = "form" | "result";
 
 export default function App() {
@@ -16,6 +18,9 @@ export default function App() {
     setDietPlan(plan);
     setFormData(data);
     setView("result");
+    try {
+      localStorage.setItem(LS_KEY, JSON.stringify({ plan, formData: data }));
+    } catch (_) {}
   }
 
   function handleStartOver() {
@@ -24,11 +29,26 @@ export default function App() {
     setView("form");
   }
 
+  function handleViewPreviousReport() {
+    try {
+      const saved = localStorage.getItem(LS_KEY);
+      if (saved) {
+        const { plan, formData: savedFormData } = JSON.parse(saved);
+        setDietPlan(plan);
+        setFormData(savedFormData);
+        setView("result");
+      }
+    } catch (_) {}
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Toaster richColors position="top-right" />
       {view === "form" ? (
-        <DietForm onComplete={handlePlanGenerated} />
+        <DietForm
+          onComplete={handlePlanGenerated}
+          onViewPreviousReport={handleViewPreviousReport}
+        />
       ) : (
         dietPlan &&
         formData && (
