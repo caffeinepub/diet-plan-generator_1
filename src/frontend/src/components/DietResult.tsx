@@ -41,7 +41,7 @@ const GOAL_LABELS: Record<string, string> = {
   body_recomposition: "Body Recomposition",
 };
 
-const ACTIVITY_LABELS: Record<string, string> = {
+const _ACTIVITY_LABELS: Record<string, string> = {
   sedentary: "Sedentary",
   lightly_active: "Lightly Active",
   moderately_active: "Moderately Active",
@@ -49,7 +49,7 @@ const ACTIVITY_LABELS: Record<string, string> = {
   extra_active: "Extra Active",
 };
 
-const STRESS_LABELS: Record<string, string> = {
+const _STRESS_LABELS: Record<string, string> = {
   low: "Low",
   moderate: "Moderate",
   high: "High",
@@ -420,7 +420,7 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
       : []),
   ];
 
-  const allAllergies = formData.food_allergies_text
+  const _allAllergies = formData.food_allergies_text
     ? formData.food_allergies_text
         .split(",")
         .map((s) => s.trim())
@@ -574,16 +574,6 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
             <Badge className="bg-primary/10 text-primary border-primary/20 text-sm">
               {GOAL_LABELS[formData.goal]}
             </Badge>
-            <Badge variant="outline" className="text-sm">
-              {ACTIVITY_LABELS[formData.activity_level] ||
-                formData.activity_level}
-            </Badge>
-            {formData.dietary_preferences.length > 0 &&
-              formData.dietary_preferences[0] !== "None/Omnivore" && (
-                <Badge variant="outline" className="text-sm">
-                  {formData.dietary_preferences[0]}
-                </Badge>
-              )}
           </div>
         </motion.div>
 
@@ -611,21 +601,7 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
             <SummaryField label="Height" value={`${formData.height} cm`} />
             <SummaryField label="Weight" value={`${formData.weight} kg`} />
             <SummaryField label="Goal" value={GOAL_LABELS[formData.goal]} />
-            <SummaryField
-              label="Activity Level"
-              value={
-                ACTIVITY_LABELS[formData.activity_level] ||
-                formData.activity_level
-              }
-            />
-            <SummaryField
-              label="Dietary Preference"
-              value={formData.dietary_preferences[0] || "Not selected"}
-            />
-            <SummaryField
-              label="Food Allergies"
-              value={allAllergies.length > 0 ? allAllergies.join(", ") : "None"}
-            />
+
             {formData.target_weight_kg > 0 && (
               <SummaryField
                 label={
@@ -665,10 +641,6 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
               value={`${formData.meal_gap} hours`}
             />
             <SummaryField
-              label="Water Intake"
-              value={`${formData.water_intake} L/day`}
-            />
-            <SummaryField
               label="Health Conditions"
               value={
                 formData.health_conditions.length > 0
@@ -690,12 +662,6 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
                 value={`P: ${formData.protein_target}g · F: ${formData.fat_target}g · C: ${formData.carbs_target}g`}
               />
             )}
-            <SummaryField
-              label="Stress Level"
-              value={
-                STRESS_LABELS[formData.stress_level] || formData.stress_level
-              }
-            />
             {allSupplements.length > 0 && (
               <SummaryField
                 label="Supplements"
@@ -914,6 +880,28 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
               </p>
             </div>
           </div>
+        </motion.div>
+
+        {/* ── Motivational Quote ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.28 }}
+          className="relative text-center py-6 px-8"
+        >
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-16 rounded-full bg-primary opacity-60" />
+          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-16 rounded-full bg-primary opacity-60" />
+          <span className="text-4xl text-primary/30 font-display leading-none select-none absolute -top-2 left-8">
+            "
+          </span>
+          <p className="text-base sm:text-lg italic font-medium text-foreground/80 leading-relaxed max-w-3xl mx-auto px-6">
+            7 days to practice, 14 days to feel the change, 21 days to build the
+            habit, 90 days to transform your life.{" "}
+            <span className="not-italic">🚀</span>
+          </p>
+          <span className="text-4xl text-primary/30 font-display leading-none select-none absolute -bottom-4 right-8">
+            "
+          </span>
         </motion.div>
 
         {/* ── 7-Day Meal Plan ── */}
@@ -1611,36 +1599,12 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
           )}
         </motion.div>
 
-        {/* Footer / Generate New Report */}
-        <div className="text-center pb-4 no-print">
-          <Button
-            data-ocid="result.start_over_button"
-            variant="outline"
-            onClick={onStartOver}
-            className="gap-2"
-          >
-            <RefreshCw className="w-4 h-4" />
-            Create a New Plan
-          </Button>
-        </div>
-
         {/* Trust signal */}
         <div className="border-t border-border pt-4 pb-6 text-center space-y-1">
           <p className="text-xs text-muted-foreground max-w-xl mx-auto">
             🔒 This report is generated based on your personal health data and
             follows evidence-based nutrition guidelines aligned with Indian RDA
             standards.
-          </p>
-          <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()}.{" "}
-            <a
-              href={`https://caffeine.ai?utm_source=caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(typeof window !== "undefined" ? window.location.hostname : "")}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline hover:text-foreground transition-colors"
-            >
-              Built with love using caffeine.ai
-            </a>
           </p>
         </div>
       </main>
