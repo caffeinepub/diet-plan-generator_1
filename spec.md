@@ -1,24 +1,33 @@
-# HN Coach Diet Plan Generator
+# HN Coach – Diet & Nutrition Plan
 
 ## Current State
-The app has a multi-step form and a detailed results/report page. The form includes a diet preference (vegetarian/non-vegetarian) step, and Step 1 does not have a WhatsApp number field. The meal plan shows 7 day tables (Mon-Sun), each with meals in chronological order. HN Tea appears 2-3 times between meals AND after dinner. Mid-morning snack shows '+2 egg whites' only for non-vegetarians. Print layout currently takes ~13 pages.
+- 7-day meal plan rendered as 7 separate full-width tables (one per day), each with rows for HN Digestion, main meals, HN Tea
+- HN Digestion and HN Tea rows have no visual distinction from main meal rows (same size/style)
+- Step 1 form has a generic illustration banner
+- No logo photo used; HN Coach branding uses a teal leaf icon
 
 ## Requested Changes (Diff)
 
 ### Add
-- WhatsApp number input field in Step 1 of the form (Personal Details), which auto-populates the referral link
-- Egg whites shown for ALL users (not just non-vegetarians)
+- Logo: use uploaded user photo `/assets/uploads/IMG-20260226-WA0000-2.jpg` as the HN Coach logo in the header (both screen and print), replacing the teal leaf icon
+- Fit India Movement banner on Step 1 of the form using generated image `/assets/generated/fit-india-banner.dim_800x200.jpg`
 
 ### Modify
-- Remove HN Tea row that appears after Dinner in each day's meal table (keep HN Tea between other meals)
-- Aggressively compress print CSS: reduce font sizes, minimize padding/margins, collapse whitespace, remove decorative elements in print, target 5-6 pages
-- WhatsApp field in Step 1 feeds into the referral link generation
+- **HN Digestion & HN Tea rows**: render these rows visually smaller and distinct -- smaller font (text-xs), muted gray/light background (bg-gray-50), italic text, pill/badge style label, clearly distinguishable from main meal rows (Breakfast, Lunch, Dinner, Snacks)
+- **7-day diet plan layout**: redesign to show all 7 days in a compact, organized banner/grid view inspired by the uploaded 1200-calorie diet plan reference image. Use a compact table with Day as rows and meal types (HN Digestion, Breakfast, Mid-Morning Snack, Lunch, Evening Snack, Dinner) as columns. Each cell shows the key food items concisely. This takes far less space than 7 separate full tables. HN Digestion and HN Tea cells styled differently (smaller, muted). The motivational quote banner stays above this compact plan.
 
 ### Remove
-- Vegetarian/Non-Vegetarian diet preference question from the form entirely
-- HN Tea after Dinner row from all 7 day tables
+- Nothing removed
 
 ## Implementation Plan
-1. In DietForm.tsx: Remove the diet preference step; add WhatsApp number input to Step 1; update step count/progress accordingly
-2. In DietResult.tsx: Remove HN Tea rows that come after Dinner in each day table; show egg whites for all users regardless of diet preference
-3. In DietResult.tsx / index.css: Aggressively tighten @media print CSS - reduce font to 8-9pt, minimize all padding/margin, hide non-essential decorative elements, shrink table cells, target 5-6 pages
+1. Replace header logo icon with the user's uploaded photo (`/assets/uploads/IMG-20260226-WA0000-2.jpg`) in DietResult.tsx header and print header. Use rounded-full img tag, ~40px
+2. In DietForm.tsx Step 1, add Fit India banner image at the top using `/assets/generated/fit-india-banner.dim_800x200.jpg`
+3. In DietResult.tsx, refactor the 7-day meal plan section from 7 separate tables to a single compact banner-style table:
+   - Rows = Days (Monday to Sunday)
+   - Columns = Meal types: HN Digestion (before meals note), Breakfast, Mid-Morning Snack, Lunch, Evening Snack, Dinner
+   - Each cell shows food items in compact text
+   - HN Tea shown as a small note/row or footnote below the table
+   - Sunday lunch cell highlighted as Reward Meal
+   - Colored column headers (teal for main meals, gray for supplements)
+4. Style HN Digestion column cells and HN Tea rows/footnote with: text-xs, italic, muted background, pill styling
+5. Ensure compact table fits well in print layout

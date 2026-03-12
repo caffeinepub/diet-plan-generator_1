@@ -116,7 +116,7 @@
 /* Print styles */
 @media print {
   @page {
-    margin: 15mm 20mm;
+    margin: 8mm 10mm;
     size: A4;
   }
 
@@ -129,10 +129,10 @@
   }
 
   body {
-    font-size: 10pt !important;
+    font-size: 8.5pt !important;
     background: white !important;
     color: #111 !important;
-    line-height: 1.5 !important;
+    line-height: 1.3 !important;
   }
 
   * {
@@ -144,16 +144,16 @@
     padding: 0 !important;
   }
 
-  /* Cards and sections */
+  /* Cards and sections - very compact */
   .rounded-2xl, .rounded-xl, .rounded-lg {
-    border-radius: 4px !important;
+    border-radius: 3px !important;
     border: 1px solid #e0e0e0 !important;
     background: white !important;
   }
 
-  .bg-card, [class*="p-6"], [class*="p-8"] {
-    padding: 8px 12px !important;
-    margin-bottom: 10px !important;
+  .bg-card, [class*="p-6"], [class*="p-8"], [class*="p-5"] {
+    padding: 4px 8px !important;
+    margin-bottom: 6px !important;
   }
 
   /* Schedule section */
@@ -161,66 +161,103 @@
     background: #fafafa !important;
     border: 1px solid #ddd !important;
     display: block !important;
-    padding: 6px 10px !important;
+    padding: 4px 8px !important;
   }
   [data-print-schedule-item] {
     background: white !important;
     border: 1px solid #ddd !important;
     display: inline-flex !important;
-    padding: 3px 8px !important;
-    font-size: 9pt !important;
+    padding: 2px 6px !important;
+    font-size: 7.5pt !important;
   }
 
-  /* Tables professional */
+  /* Tables - very compact */
   table {
     border-collapse: collapse !important;
     width: 100% !important;
-    font-size: 9pt !important;
+    font-size: 7.5pt !important;
     page-break-inside: avoid;
-    margin: 0 0 10px 0 !important;
+    margin: 0 0 6px 0 !important;
   }
   th, td {
     border: 1px solid #ddd !important;
-    padding: 6px 10px !important;
-    font-size: 9pt !important;
-    line-height: 1.4 !important;
+    padding: 2px 5px !important;
+    font-size: 7.5pt !important;
+    line-height: 1.2 !important;
   }
   th {
     background: #f5f5f5 !important;
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
     font-weight: 600 !important;
-    font-size: 9.5pt !important;
+    font-size: 8pt !important;
   }
 
-  /* Day plan tables */
+  /* Day plan tables - avoid page break inside each day */
   [data-ocid*="day_plan"] {
     page-break-inside: avoid;
-    margin-bottom: 10px !important;
+    margin-bottom: 6px !important;
   }
 
-  /* Headings */
-  h1 { font-size: 16pt !important; margin: 0 0 8px 0 !important; }
-  h2 { font-size: 13pt !important; margin: 0 0 6px 0 !important; }
-  h3 { font-size: 11pt !important; margin: 0 0 4px 0 !important; }
-  h4 { font-size: 10pt !important; margin: 0 0 4px 0 !important; }
+  /* Headings - compact */
+  h1 { font-size: 13pt !important; margin: 0 0 4px 0 !important; }
+  h2 { font-size: 10pt !important; margin: 0 0 3px 0 !important; }
+  h3 { font-size: 9pt !important; margin: 0 0 2px 0 !important; }
+  h4 { font-size: 8.5pt !important; margin: 0 0 2px 0 !important; }
 
-  /* Section spacing */
-  .space-y-8 > * + * { margin-top: 12px !important; }
-  .space-y-6 > * + * { margin-top: 10px !important; }
-  .space-y-5 > * + * { margin-top: 8px !important; }
-  .space-y-4 > * + * { margin-top: 6px !important; }
-  .gap-4 { gap: 8px !important; }
-  .gap-6 { gap: 10px !important; }
+  /* Section spacing - very tight */
+  .space-y-8 > * + * { margin-top: 6px !important; }
+  .space-y-6 > * + * { margin-top: 4px !important; }
+  .space-y-5 > * + * { margin-top: 4px !important; }
+  .space-y-4 > * + * { margin-top: 3px !important; }
+  .gap-4 { gap: 4px !important; }
+  .gap-6 { gap: 6px !important; }
 
-  /* Images */
-  img { max-height: 60px !important; width: auto !important; }
+  /* Two-column grid for profile + macro side by side */
+  .print-two-col {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+
+  /* Daily wellness cards: 2x2 grid */
+  .wellness-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 4px !important;
+  }
+
+  /* Images - very small in print */
+  img { max-height: 40px !important; width: auto !important; }
 
   /* Print header */
   .print-only-header {
-    font-size: 9pt !important;
-    padding: 4px 0 !important;
-    margin-bottom: 10px !important;
+    font-size: 8pt !important;
+    padding: 3px 0 !important;
+    margin-bottom: 6px !important;
     border-bottom: 1px solid #ddd !important;
   }
+
+  /* Hide decorative/background elements */
+  .bg-gradient-to-br, .bg-gradient-to-r {
+    background: white !important;
+  }
+
+  /* Compact padding for all sections */
+  .p-4 { padding: 3px 6px !important; }
+  .p-3 { padding: 2px 5px !important; }
+  .mb-4, .mb-6, .mb-8 { margin-bottom: 4px !important; }
+  .mt-4, .mt-6, .mt-8 { margin-top: 4px !important; }
+
+  /* Make motivational quote compact */
+  .motivational-quote {
+    padding: 4px 8px !important;
+    font-size: 8pt !important;
+  }
+
+  /* Referral and coach sections - hide in print */
+  .referral-section {
+    display: none !important;
+  }
 }
+

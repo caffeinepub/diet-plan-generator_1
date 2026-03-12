@@ -264,7 +264,7 @@ export default function DietForm({ onComplete, onViewPreviousReport }: Props) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-secondary/30 to-accent/20 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50/60 to-teal-50/40 dark:from-background dark:via-secondary/30 dark:to-accent/20 flex flex-col">
       {/* Header */}
       <header className="no-print border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-2xl mx-auto px-4 py-4">
@@ -317,7 +317,7 @@ export default function DietForm({ onComplete, onViewPreviousReport }: Props) {
               animate="center"
               exit="exit"
               transition={{ duration: 0.25, ease: "easeInOut" }}
-              className="bg-card rounded-2xl border border-border p-6 sm:p-8 shadow-green"
+              className="bg-card/95 backdrop-blur-sm rounded-2xl border border-border/80 p-6 sm:p-8 shadow-lg shadow-green-100/50 dark:shadow-none"
             >
               {step === 1 && (
                 <Step1 data={data} errors={errors} update={update} />
@@ -536,6 +536,20 @@ function HeightInput({ data, errors = {}, update }: StepProps) {
 function Step1({ data, errors = {}, update }: StepProps) {
   return (
     <div className="space-y-5">
+      <div className="mb-4 rounded-xl overflow-hidden">
+        <img
+          src="/assets/generated/fit-india-banner.dim_800x200.jpg"
+          alt="Fit India Movement - Supporting Wellness for All"
+          className="w-full object-cover h-36"
+        />
+        <div className="bg-gradient-to-r from-orange-50 via-white to-green-50 border border-orange-100 rounded-b-xl px-4 py-2 text-center text-sm font-medium text-gray-700">
+          🇮🇳 HN Coach proudly supports{" "}
+          <span className="text-orange-600 font-semibold">
+            Fit India Movement
+          </span>{" "}
+          — Wellness for Every Indian
+        </div>
+      </div>
       <div className="space-y-2">
         <Label htmlFor="name">Full Name</Label>
         <Input
@@ -721,24 +735,33 @@ const GOALS = [
 
 function Step2({ data, update }: StepProps) {
   return (
-    <div className="grid sm:grid-cols-2 gap-3">
-      {GOALS.map((g, i) => (
-        <button
-          key={g.value}
-          type="button"
-          data-ocid={`goal.item.${i + 1}`}
-          onClick={() => update("goal", g.value)}
-          className={`p-4 rounded-xl border-2 text-left transition-all ${
-            data.goal === g.value
-              ? "border-primary bg-primary/10"
-              : "border-border hover:border-primary/40 hover:bg-secondary/50"
-          }`}
-        >
-          <div className="text-2xl mb-2">{g.emoji}</div>
-          <div className="font-semibold text-foreground">{g.label}</div>
-          <div className="text-sm text-muted-foreground mt-0.5">{g.desc}</div>
-        </button>
-      ))}
+    <div className="space-y-4">
+      <div className="rounded-xl overflow-hidden mb-4 -mt-2">
+        <img
+          src="/assets/generated/form-health-goal.dim_400x200.png"
+          alt="Step illustration"
+          className="w-full h-32 object-cover object-center"
+        />
+      </div>
+      <div className="grid sm:grid-cols-2 gap-3">
+        {GOALS.map((g, i) => (
+          <button
+            key={g.value}
+            type="button"
+            data-ocid={`goal.item.${i + 1}`}
+            onClick={() => update("goal", g.value)}
+            className={`p-4 rounded-xl border-2 text-left transition-all ${
+              data.goal === g.value
+                ? "border-primary bg-primary/10"
+                : "border-border hover:border-primary/40 hover:bg-secondary/50"
+            }`}
+          >
+            <div className="text-2xl mb-2">{g.emoji}</div>
+            <div className="font-semibold text-foreground">{g.label}</div>
+            <div className="text-sm text-muted-foreground mt-0.5">{g.desc}</div>
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
@@ -749,6 +772,13 @@ function StepGoalTargets({ data, update }: StepProps) {
 
   return (
     <div className="space-y-6">
+      <div className="rounded-xl overflow-hidden mb-4 -mt-2">
+        <img
+          src="/assets/generated/form-goal-targets.dim_400x200.png"
+          alt="Step illustration"
+          className="w-full h-32 object-cover object-center"
+        />
+      </div>
       {isLoss && (
         <>
           <div className="bg-orange-50 border border-orange-200 rounded-xl p-4">
@@ -866,6 +896,13 @@ function StepGoalTargets({ data, update }: StepProps) {
 function StepBmrTdee({ data, update }: StepProps) {
   return (
     <div className="space-y-6">
+      <div className="rounded-xl overflow-hidden mb-4 -mt-2">
+        <img
+          src="/assets/generated/form-bmr.dim_400x200.png"
+          alt="Step illustration"
+          className="w-full h-32 object-cover object-center"
+        />
+      </div>
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
         <p className="text-sm text-blue-700">
           To know your BMR/TDEE, check your wellness assessment report. Enter
@@ -952,6 +989,13 @@ const MEAL_GAP_OPTIONS = [
 function Step6({ data, update }: StepProps) {
   return (
     <div className="space-y-4">
+      <div className="rounded-xl overflow-hidden mb-4 -mt-2">
+        <img
+          src="/assets/generated/form-meal-frequency.dim_400x200.png"
+          alt="Step illustration"
+          className="w-full h-32 object-cover object-center"
+        />
+      </div>
       <p className="text-sm text-muted-foreground">
         Select how long you prefer to wait between meals:
       </p>
@@ -1003,6 +1047,13 @@ const HEALTH_CONDITIONS = [
 function Step8({ data, toggleArrayItem }: StepProps) {
   return (
     <div className="space-y-4">
+      <div className="rounded-xl overflow-hidden mb-4 -mt-2">
+        <img
+          src="/assets/generated/form-health-condition.dim_400x200.png"
+          alt="Step illustration"
+          className="w-full h-32 object-cover object-center"
+        />
+      </div>
       <p className="text-sm font-medium text-foreground">
         Select your present health conditions:
       </p>
@@ -1031,6 +1082,13 @@ function Step8({ data, toggleArrayItem }: StepProps) {
 function Step9({ data, update }: StepProps) {
   return (
     <div className="space-y-6">
+      <div className="rounded-xl overflow-hidden mb-4 -mt-2">
+        <img
+          src="/assets/generated/form-sleep-schedule.dim_400x200.png"
+          alt="Step illustration"
+          className="w-full h-32 object-cover object-center"
+        />
+      </div>
       <div className="space-y-4">
         <p className="text-sm font-medium text-foreground">Sleep timings</p>
         <div className="grid grid-cols-2 gap-4">
@@ -1081,6 +1139,13 @@ function Step9({ data, update }: StepProps) {
 function Step10({ data, update }: StepProps) {
   return (
     <div className="space-y-6">
+      <div className="rounded-xl overflow-hidden mb-4 -mt-2">
+        <img
+          src="/assets/generated/form-nutrition.dim_400x200.png"
+          alt="Step illustration"
+          className="w-full h-32 object-cover object-center"
+        />
+      </div>
       <div className="flex items-start gap-2 bg-green-50 border border-green-200 rounded-xl p-4">
         <Apple className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
         <p className="text-sm text-green-700">

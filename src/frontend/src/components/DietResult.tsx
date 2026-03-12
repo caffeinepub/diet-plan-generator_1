@@ -329,13 +329,10 @@ const CONDITION_AVOID_FOODS: Record<
       food: "Saturated Fats (ghee in excess, red meat)",
       reason: "Increases total cholesterol",
     },
-    {
-      food: "Full-Fat Dairy (cream, cheese)",
-      reason: "High in saturated fats",
-    },
-    { food: "Fried & Processed Foods", reason: "Trans fat content" },
+    { food: "Fried Fast Food", reason: "High in trans & saturated fats" },
+    { food: "Full-Fat Dairy in excess", reason: "High saturated fat content" },
   ],
-  PCOS: [
+  "PCOS / Hormonal Imbalance": [
     {
       food: "Refined Carbohydrates",
       reason: "Spikes insulin, worsens hormonal imbalance",
@@ -385,8 +382,6 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
   const [copied, setCopied] = useState(false);
 
   const userWa = formData.user_whatsapp || formData.referrer_whatsapp || "";
-  // Build referral link using user's own WhatsApp (they become the referrer for their friends)
-  // But for the "Personal Coach" we use the referrer's number
   const referralLink = userWa
     ? `${window.location.origin}${window.location.pathname}?ref=${userWa}`
     : "";
@@ -485,25 +480,34 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
   return (
     <div
       data-ocid="result.page"
-      className="result-page min-h-screen bg-background"
+      className="result-page min-h-screen bg-slate-50"
     >
       {/* Print-only professional header */}
-      <div className="print-only-header hidden print:flex items-center justify-between border-b-2 border-primary pb-3 mb-4 px-2">
+      <div className="print-only-header hidden print:flex items-center justify-between border-b-2 border-teal-600 pb-3 mb-4 px-2">
         <div className="flex items-center gap-2">
-          <div className="font-bold text-lg text-primary">HN Coach</div>
-          <div className="text-xs text-muted-foreground">
-            Diet & Nutrition Plan
+          <div className="flex items-center gap-2">
+            <img
+              src="/assets/uploads/IMG-20260226-WA0000-2.jpg"
+              className="w-8 h-8 rounded-full object-cover border border-teal-300"
+              alt="HN Coach"
+            />
+            <div>
+              <div className="font-bold text-lg text-teal-700">HN Coach</div>
+              <div className="text-xs text-gray-500">
+                Diet &amp; Nutrition Plan
+              </div>
+            </div>
           </div>
         </div>
         <div className="text-center">
-          <div className="font-bold text-sm text-foreground">
+          <div className="font-bold text-sm text-gray-800">
             CONFIDENTIAL DIET REPORT
           </div>
-          <div className="text-xs text-muted-foreground">
+          <div className="text-xs text-gray-500">
             Generated for {formData.name}
           </div>
         </div>
-        <div className="text-right text-xs text-muted-foreground">
+        <div className="text-right text-xs text-gray-500">
           <div>
             {new Date().toLocaleDateString("en-IN", {
               year: "numeric",
@@ -516,17 +520,17 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
       </div>
 
       {/* Header */}
-      <header className="no-print sticky top-0 z-10 border-b border-border bg-card/90 backdrop-blur-sm">
+      <header className="no-print sticky top-0 z-10 border-b border-teal-100 bg-white/95 backdrop-blur-sm shadow-sm">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center">
-              <Leaf className="w-3.5 h-3.5 text-primary-foreground" />
-            </div>
+            <img
+              src="/assets/uploads/IMG-20260226-WA0000-2.jpg"
+              className="w-9 h-9 rounded-full object-cover border-2 border-teal-200"
+              alt="HN Coach"
+            />
             <div>
-              <span className="font-display font-bold text-foreground">
-                HN Coach
-              </span>
-              <div className="text-xs text-muted-foreground leading-none">
+              <span className="font-bold text-gray-900">HN Coach</span>
+              <div className="text-xs text-gray-500 leading-none">
                 Diet &amp; Nutrition Plan
               </div>
             </div>
@@ -537,7 +541,7 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
               variant="outline"
               size="sm"
               onClick={handlePrint}
-              className="gap-2 no-print"
+              className="gap-2 no-print border-teal-200 text-teal-700 hover:bg-teal-50"
             >
               <Printer className="w-4 h-4" />
               <span className="hidden sm:inline">Print Plan</span>
@@ -562,246 +566,250 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-center"
+          className="text-center py-4"
         >
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
-            <UtensilsCrossed className="w-7 h-7 text-primary" />
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-teal-50 border border-teal-200 mb-4">
+            <UtensilsCrossed className="w-7 h-7 text-teal-600" />
           </div>
-          <h1 className="text-3xl sm:text-4xl font-display font-bold text-foreground">
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">
             {formData.name}&apos;s Diet Plan
           </h1>
           <div className="flex items-center justify-center gap-2 mt-3 flex-wrap">
-            <Badge className="bg-primary/10 text-primary border-primary/20 text-sm">
+            <span className="inline-flex items-center gap-1.5 bg-teal-50 text-teal-700 border border-teal-200 rounded-full px-4 py-1.5 text-sm font-semibold">
               {GOAL_LABELS[formData.goal]}
-            </Badge>
+            </span>
           </div>
         </motion.div>
 
-        {/* USER RESPONSES SUMMARY */}
+        {/* ── PERSONAL DETAILS ── */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.05 }}
-          className="bg-card rounded-2xl border border-border p-6"
         >
-          <h2 className="text-xl font-display font-bold text-foreground mb-5 flex items-center gap-2">
-            <User className="w-5 h-5 text-primary" />
-            Your Profile Summary
-          </h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <SummaryField label="Name" value={formData.name} />
-            <SummaryField label="Age" value={`${formData.age} years`} />
-            <SummaryField
-              label="Gender"
-              value={
-                formData.gender.charAt(0).toUpperCase() +
-                formData.gender.slice(1)
-              }
-            />
-            <SummaryField label="Height" value={`${formData.height} cm`} />
-            <SummaryField label="Weight" value={`${formData.weight} kg`} />
-            <SummaryField label="Goal" value={GOAL_LABELS[formData.goal]} />
-
-            {formData.target_weight_kg > 0 && (
-              <SummaryField
-                label={
-                  formData.goal === "weight_loss"
-                    ? "Target Weight Loss"
-                    : formData.goal === "muscle_gain"
-                      ? "Target Weight Gain"
-                      : ""
-                }
-                value={
-                  formData.goal === "weight_loss" ||
-                  formData.goal === "muscle_gain"
-                    ? `${formData.target_weight_kg} kg${
-                        formData.goal === "weight_loss" &&
-                        formData.target_belly_inches > 0
-                          ? ` · ${formData.target_belly_inches}" belly`
-                          : ""
-                      }`
-                    : ""
-                }
-              />
-            )}
-            {(formData.bmr_manual > 0 || formData.tdee_manual > 0) && (
-              <SummaryField
-                label="BMR / TDEE (from report)"
-                value={`${
-                  formData.bmr_manual > 0 ? `${formData.bmr_manual} kcal` : "—"
-                } / ${
-                  formData.tdee_manual > 0
-                    ? `${formData.tdee_manual} kcal`
-                    : "—"
-                }`}
-              />
-            )}
-            <SummaryField
-              label="Meal Gap"
-              value={`${formData.meal_gap} hours`}
-            />
-            <SummaryField
-              label="Health Conditions"
-              value={
-                formData.health_conditions.length > 0
-                  ? formData.health_conditions.join(", ")
-                  : "None"
-              }
-            />
-            <SummaryField label="Bed Time" value={formData.bed_time || "—"} />
-            <SummaryField
-              label="Wake Up Time"
-              value={formData.wake_up_time || "—"}
-            />
-            <SummaryField label="Sleep Duration" value={sleepDurationText} />
-            {(formData.protein_target > 0 ||
-              formData.fat_target > 0 ||
-              formData.carbs_target > 0) && (
-              <SummaryField
-                label="Macro Targets"
-                value={`P: ${formData.protein_target}g · F: ${formData.fat_target}g · C: ${formData.carbs_target}g`}
-              />
-            )}
-            {allSupplements.length > 0 && (
-              <SummaryField
-                label="Supplements"
-                value={allSupplements.join(", ")}
-              />
-            )}
-            {formData.referrer_whatsapp && (
-              <div className="space-y-1">
-                <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                  Referred By
-                </div>
-                <div className="text-sm font-medium bg-green-50 border border-green-200 text-green-800 rounded-lg px-3 py-2 flex items-center gap-2">
-                  <Lock className="w-3.5 h-3.5 text-green-600 shrink-0" />
-                  +91 {formData.referrer_whatsapp}
-                  <span className="ml-auto text-xs bg-green-200 text-green-800 rounded-full px-2 py-0.5 font-semibold">
-                    Verified
-                  </span>
-                </div>
+          <ReportCard
+            title="Personal Details"
+            icon={<User className="w-4 h-4" />}
+          >
+            <div className="grid sm:grid-cols-2 gap-x-8">
+              <div>
+                <ReportField label="Name" value={formData.name} />
+                <ReportField label="Age" value={`${formData.age} years`} />
+                <ReportField
+                  label="Gender"
+                  value={
+                    formData.gender.charAt(0).toUpperCase() +
+                    formData.gender.slice(1)
+                  }
+                />
+                <ReportField label="Height" value={`${formData.height} cm`} />
+                <ReportField label="Weight" value={`${formData.weight} kg`} />
               </div>
-            )}
-          </div>
+              <div>
+                <ReportField label="Goal" value={GOAL_LABELS[formData.goal]} />
+                {formData.target_weight_kg > 0 && (
+                  <ReportField
+                    label={
+                      formData.goal === "weight_loss"
+                        ? "Target Loss"
+                        : formData.goal === "muscle_gain"
+                          ? "Target Gain"
+                          : "Target"
+                    }
+                    value={
+                      formData.goal === "weight_loss" ||
+                      formData.goal === "muscle_gain"
+                        ? `${formData.target_weight_kg} kg${
+                            formData.goal === "weight_loss" &&
+                            formData.target_belly_inches > 0
+                              ? ` · ${formData.target_belly_inches}" belly`
+                              : ""
+                          }`
+                        : ""
+                    }
+                  />
+                )}
+                {(formData.bmr_manual > 0 || formData.tdee_manual > 0) && (
+                  <ReportField
+                    label="BMR / TDEE"
+                    value={`${
+                      formData.bmr_manual > 0
+                        ? `${formData.bmr_manual} kcal`
+                        : "—"
+                    } / ${
+                      formData.tdee_manual > 0
+                        ? `${formData.tdee_manual} kcal`
+                        : "—"
+                    }`}
+                  />
+                )}
+                <ReportField
+                  label="Meal Gap"
+                  value={`${formData.meal_gap} hours`}
+                />
+                <ReportField
+                  label="Health"
+                  value={
+                    formData.health_conditions.length > 0
+                      ? formData.health_conditions.join(", ")
+                      : "None"
+                  }
+                />
+                <ReportField
+                  label="Bed Time"
+                  value={formData.bed_time || "—"}
+                />
+                <ReportField
+                  label="Wake Up"
+                  value={formData.wake_up_time || "—"}
+                />
+                <ReportField label="Sleep" value={sleepDurationText} />
+                {(formData.protein_target > 0 ||
+                  formData.fat_target > 0 ||
+                  formData.carbs_target > 0) && (
+                  <ReportField
+                    label="Macros"
+                    value={`P: ${formData.protein_target}g · F: ${formData.fat_target}g · C: ${formData.carbs_target}g`}
+                  />
+                )}
+                {allSupplements.length > 0 && (
+                  <ReportField
+                    label="Supplements"
+                    value={allSupplements.join(", ")}
+                  />
+                )}
+                {formData.referrer_whatsapp && (
+                  <div className="flex items-center gap-3 border-b border-gray-100 py-2 last:border-b-0">
+                    <span className="bg-teal-50 text-teal-700 text-xs font-semibold uppercase rounded-full px-3 py-1 min-w-[100px] text-center shrink-0">
+                      Referred By
+                    </span>
+                    <span className="flex items-center gap-1.5 text-gray-800 font-medium text-sm">
+                      <Lock className="w-3.5 h-3.5 text-teal-600 shrink-0" />
+                      +91 {formData.referrer_whatsapp}
+                      <span className="ml-1 text-xs bg-teal-100 text-teal-800 rounded-full px-2 py-0.5 font-semibold">
+                        Verified ✓
+                      </span>
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </ReportCard>
         </motion.div>
 
-        {/* GOAL TIMELINE */}
+        {/* ── GOAL TIMELINE ── */}
         {showTimeline && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.15 }}
-            className="bg-card rounded-2xl border border-border p-6"
             data-ocid="result.goal_timeline.panel"
           >
-            <h2 className="text-xl font-display font-bold text-foreground mb-2 flex items-center gap-2">
-              <Target className="w-5 h-5 text-primary" />
-              {isLoss ? "Weight Loss" : "Weight Gain"} Timeline
-            </h2>
-            <p className="text-sm text-muted-foreground mb-5">
-              {isLoss
-                ? `Your target: lose ${targetKg} kg${
-                    targetBellyInches > 0
-                      ? ` + ${targetBellyInches} inches from belly fat`
-                      : ""
-                  }`
-                : `Your target: gain ${targetKg} kg`}
-            </p>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {[
-                {
-                  rate: 2,
-                  label: "2 kg/month",
-                  color: "text-red-600",
-                  bg: "bg-red-50 border-red-200",
-                },
-                {
-                  rate: 3,
-                  label: "3 kg/month",
-                  color: "text-orange-600",
-                  bg: "bg-orange-50 border-orange-200",
-                },
-                {
-                  rate: 4,
-                  label: "4 kg/month",
-                  color: "text-amber-600",
-                  bg: "bg-amber-50 border-amber-200",
-                },
-                {
-                  rate: 5,
-                  label: "5 kg/month",
-                  color: "text-green-600",
-                  bg: "bg-green-50 border-green-200",
-                },
-              ].map((item) => (
-                <div
-                  key={item.rate}
-                  className={`rounded-xl border p-4 text-center ${item.bg}`}
-                  data-ocid={`result.timeline.item.${item.rate / 2}`}
-                >
-                  <div className={`text-lg font-bold ${item.color}`}>
-                    {calcMonths(item.rate)}
+            <ReportCard
+              title={isLoss ? "Weight Loss Timeline" : "Weight Gain Timeline"}
+              icon={<Target className="w-4 h-4" />}
+            >
+              <p className="text-sm text-gray-500 mb-4">
+                {isLoss
+                  ? `Your target: lose ${targetKg} kg${
+                      targetBellyInches > 0
+                        ? ` + ${targetBellyInches} inches from belly fat`
+                        : ""
+                    }`
+                  : `Your target: gain ${targetKg} kg`}
+              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {[
+                  {
+                    rate: 2,
+                    label: "2 kg/month",
+                    color: "text-red-600",
+                    bg: "bg-red-50 border-red-100",
+                  },
+                  {
+                    rate: 3,
+                    label: "3 kg/month",
+                    color: "text-orange-600",
+                    bg: "bg-orange-50 border-orange-100",
+                  },
+                  {
+                    rate: 4,
+                    label: "4 kg/month",
+                    color: "text-amber-600",
+                    bg: "bg-amber-50 border-amber-100",
+                  },
+                  {
+                    rate: 5,
+                    label: "5 kg/month",
+                    color: "text-teal-600",
+                    bg: "bg-teal-50 border-teal-100",
+                  },
+                ].map((item) => (
+                  <div
+                    key={item.rate}
+                    className={`rounded-xl border p-4 text-center ${item.bg}`}
+                    data-ocid={`result.timeline.item.${item.rate / 2}`}
+                  >
+                    <div className={`text-lg font-bold ${item.color}`}>
+                      {calcMonths(item.rate)}
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1 font-medium">
+                      {item.label}
+                    </div>
                   </div>
-                  <div className="text-xs text-muted-foreground mt-1 font-medium">
-                    {item.label}
-                  </div>
-                </div>
-              ))}
-            </div>
-            {isLoss && targetBellyInches > 0 && (
-              <div className="mt-4 bg-primary/5 rounded-xl p-4 text-sm text-muted-foreground">
-                <span className="font-medium text-foreground">
-                  Belly fat target:
-                </span>{" "}
-                {targetBellyInches} inches reduction. Generally, by losing 2–3
-                kg you can expect to lose approximately 1 inch from belly fat.
-                Consistent caloric deficit, strength training, and quality sleep
-                accelerate results.
+                ))}
               </div>
-            )}
+              {isLoss && targetBellyInches > 0 && (
+                <div className="mt-4 bg-teal-50 border border-teal-100 rounded-xl p-4 text-sm text-gray-600">
+                  <span className="font-semibold text-gray-800">
+                    Belly fat target:
+                  </span>{" "}
+                  {targetBellyInches} inches reduction. Generally, by losing 2–3
+                  kg you can expect to lose approximately 1 inch from belly fat.
+                  Consistent caloric deficit, strength training, and quality
+                  sleep accelerate results.
+                </div>
+              )}
+            </ReportCard>
           </motion.div>
         )}
 
-        {/* GLOBAL NUTRITION PHILOSOPHY */}
+        {/* ── GLOBAL NUTRITION PHILOSOPHY + RDA TABLES ── */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.6 }}
-          className="bg-card rounded-2xl border border-border overflow-hidden"
         >
-          <div className="p-6 space-y-6">
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-primary/10 mb-3">
-                <Globe className="w-6 h-6 text-primary" />
-              </div>
-              <h2 className="text-2xl font-display font-bold text-foreground">
-                Global Nutrition Philosophy
-              </h2>
-              <p className="text-muted-foreground mt-2 max-w-2xl mx-auto">
+          <ReportCard
+            title="Global Nutrition Philosophy"
+            icon={<Globe className="w-4 h-4" />}
+          >
+            <div className="text-center mb-5">
+              <p className="text-sm text-gray-600 max-w-2xl mx-auto">
                 A human body requires all these nutrients{" "}
-                <strong className="text-foreground">every single day</strong> to
+                <strong className="text-gray-900">every single day</strong> to
                 meet its biological requirements — to stay healthy, look better,
                 and maintain strong immunity.
               </p>
             </div>
 
-            {/* Macronutrients */}
-            <div>
-              <h3 className="text-lg font-bold text-foreground mb-3 flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-primary inline-block" />
+            {/* Macronutrients Table */}
+            <div className="mb-6">
+              <h3 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2 uppercase tracking-wide">
+                <span className="w-2.5 h-2.5 rounded-full bg-teal-500 inline-block" />
                 Macronutrients — Daily RDA for Indians
               </h3>
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto rounded-lg border border-teal-100">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="bg-primary/10">
-                      <th className="text-left p-3 font-semibold text-foreground rounded-tl-lg">
+                    <tr className="bg-teal-50">
+                      <th className="text-left p-3 font-semibold text-teal-800 rounded-tl-lg">
                         Nutrient
                       </th>
-                      <th className="text-left p-3 font-semibold text-foreground">
+                      <th className="text-left p-3 font-semibold text-teal-800">
                         RDA (Adult)
                       </th>
-                      <th className="text-left p-3 font-semibold text-foreground rounded-tr-lg">
+                      <th className="text-left p-3 font-semibold text-teal-800 rounded-tr-lg">
                         Primary Role
                       </th>
                     </tr>
@@ -810,17 +818,15 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
                     {macroRDA.map((row, i) => (
                       <tr
                         key={row.nutrient}
-                        className={i % 2 === 0 ? "bg-secondary/30" : ""}
+                        className={i % 2 === 0 ? "bg-white" : "bg-teal-50/30"}
                       >
-                        <td className="p-3 font-medium text-foreground">
+                        <td className="p-3 font-medium text-gray-800">
                           {row.nutrient}
                         </td>
-                        <td className="p-3 text-primary font-semibold">
+                        <td className="p-3 text-teal-700 font-semibold">
                           {row.rda}
                         </td>
-                        <td className="p-3 text-muted-foreground">
-                          {row.role}
-                        </td>
+                        <td className="p-3 text-gray-500">{row.role}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -828,23 +834,23 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
               </div>
             </div>
 
-            {/* Micronutrients */}
+            {/* Micronutrients Table */}
             <div>
-              <h3 className="text-lg font-bold text-foreground mb-3 flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-amber-500 inline-block" />
+              <h3 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2 uppercase tracking-wide">
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block" />
                 Micronutrients — Daily RDA for Indians
               </h3>
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto rounded-lg border border-amber-100">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="bg-amber-500/10">
-                      <th className="text-left p-3 font-semibold text-foreground rounded-tl-lg">
+                    <tr className="bg-amber-50">
+                      <th className="text-left p-3 font-semibold text-amber-800 rounded-tl-lg">
                         Nutrient
                       </th>
-                      <th className="text-left p-3 font-semibold text-foreground">
+                      <th className="text-left p-3 font-semibold text-amber-800">
                         RDA (Adult)
                       </th>
-                      <th className="text-left p-3 font-semibold text-foreground rounded-tr-lg">
+                      <th className="text-left p-3 font-semibold text-amber-800 rounded-tr-lg">
                         Primary Role
                       </th>
                     </tr>
@@ -853,17 +859,15 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
                     {MICRO_RDA.map((row, i) => (
                       <tr
                         key={row.nutrient}
-                        className={i % 2 === 0 ? "bg-secondary/30" : ""}
+                        className={i % 2 === 0 ? "bg-white" : "bg-amber-50/30"}
                       >
-                        <td className="p-3 font-medium text-foreground">
+                        <td className="p-3 font-medium text-gray-800">
                           {row.nutrient}
                         </td>
-                        <td className="p-3 text-amber-600 font-semibold">
+                        <td className="p-3 text-amber-700 font-semibold">
                           {row.rda}
                         </td>
-                        <td className="p-3 text-muted-foreground">
-                          {row.role}
-                        </td>
+                        <td className="p-3 text-gray-500">{row.role}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -871,15 +875,15 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
               </div>
             </div>
 
-            <div className="bg-gradient-to-r from-primary/10 to-amber-500/10 border border-primary/20 rounded-xl p-4 text-center">
-              <p className="text-sm font-medium text-foreground">
-                ✨ <strong>Remember:</strong> No single food provides all
-                nutrients. A diverse, balanced diet is the cornerstone of
-                lasting health, vitality, and immunity — eat the rainbow every
-                day.
+            <div className="mt-5 bg-gradient-to-r from-teal-50 to-amber-50 border border-teal-100 rounded-xl p-4 text-center">
+              <p className="text-sm font-medium text-gray-700">
+                ✨ <strong className="text-gray-900">Remember:</strong> No
+                single food provides all nutrients. A diverse, balanced diet is
+                the cornerstone of lasting health, vitality, and immunity — eat
+                the rainbow every day.
               </p>
             </div>
-          </div>
+          </ReportCard>
         </motion.div>
 
         {/* ── Motivational Quote ── */}
@@ -889,18 +893,18 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
           transition={{ duration: 0.5, delay: 0.28 }}
           className="relative text-center py-6 px-8"
         >
-          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-16 rounded-full bg-primary opacity-60" />
-          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-16 rounded-full bg-primary opacity-60" />
-          <span className="text-4xl text-primary/30 font-display leading-none select-none absolute -top-2 left-8">
-            "
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-16 rounded-full bg-teal-500 opacity-60" />
+          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-16 rounded-full bg-teal-500 opacity-60" />
+          <span className="text-4xl text-teal-300 font-bold leading-none select-none absolute -top-2 left-8">
+            &ldquo;
           </span>
-          <p className="text-base sm:text-lg italic font-medium text-foreground/80 leading-relaxed max-w-3xl mx-auto px-6">
+          <p className="text-base sm:text-lg italic font-medium text-gray-700 leading-relaxed max-w-3xl mx-auto px-6">
             7 days to practice, 14 days to feel the change, 21 days to build the
             habit, 90 days to transform your life.{" "}
             <span className="not-italic">🚀</span>
           </p>
-          <span className="text-4xl text-primary/30 font-display leading-none select-none absolute -bottom-4 right-8">
-            "
+          <span className="text-4xl text-teal-300 font-bold leading-none select-none absolute -bottom-4 right-8">
+            &rdquo;
           </span>
         </motion.div>
 
@@ -909,323 +913,205 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="bg-card rounded-2xl border border-border p-6"
         >
-          <h2 className="text-xl font-display font-bold text-foreground mb-2 flex items-center gap-2">
-            <UtensilsCrossed className="w-5 h-5 text-primary" />
-            Weekly Meal Plan
-          </h2>
-          <p className="text-sm text-muted-foreground mb-5">
-            Your personalised 7-day meal schedule — all days visible below.
-            Scroll to see each day's meals in chronological order.
-          </p>
-
-          {/* Meal Schedule Summary */}
-          {schedule && formData.wake_up_time && (
-            <div
-              data-print-schedule
-              className="mb-6 p-3 rounded-2xl border border-primary/20"
-              style={{ background: "oklch(var(--primary) / 0.07)" }}
-            >
-              <div className="text-xs font-bold uppercase tracking-widest text-primary mb-3 flex items-center gap-1.5">
-                <span>🕐</span> Your Daily Meal Schedule
+          <ReportCard
+            title="7-Day Meal Plan"
+            icon={<UtensilsCrossed className="w-4 h-4" />}
+          >
+            {/* Supplement pills banner */}
+            <div className="flex gap-2 mb-3 flex-wrap">
+              <div className="flex items-center gap-1.5 bg-gray-100 border border-gray-200 rounded-full px-3 py-1">
+                <span className="text-xs">💊</span>
+                <span className="text-xs italic text-gray-500 font-medium">
+                  HN Digestion
+                </span>
+                <span className="text-xs text-gray-400">
+                  — before Breakfast, Lunch &amp; Dinner
+                </span>
               </div>
-              <div className="flex flex-wrap gap-2">
-                {schedule.map((item) => (
-                  <div
-                    key={item.key}
-                    data-print-schedule-item
-                    className="flex flex-col items-center bg-card border border-border rounded-xl px-3 py-2 shadow-sm min-w-[80px]"
-                  >
-                    <span className="text-lg mb-0.5">{item.emoji}</span>
-                    <span className="text-[10px] font-semibold text-muted-foreground text-center leading-tight">
-                      {item.label}
-                    </span>
-                    <span className="text-xs font-bold text-primary mt-1">
-                      {timeMap[item.key]}
-                    </span>
-                  </div>
-                ))}
+              <div className="flex items-center gap-1.5 bg-amber-50 border border-amber-200 rounded-full px-3 py-1">
+                <span className="text-xs">🍵</span>
+                <span className="text-xs italic text-amber-700 font-medium">
+                  HN Tea
+                </span>
+                <span className="text-xs text-amber-500">
+                  — 2-3 times between meals
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5 bg-blue-50 border border-blue-200 rounded-full px-3 py-1">
+                <span className="text-xs">💧</span>
+                <span className="text-xs italic text-blue-600 font-medium">
+                  HN Drink
+                </span>
+                <span className="text-xs text-blue-400">— Before exercise</span>
               </div>
             </div>
-          )}
 
-          {/* 7 Day Tables */}
-          <div className="space-y-8">
-            {DAYS_OF_WEEK.map((day, dayIdx) => {
-              const opt = MEAL_OPTIONS[dayIdx];
-              const flavour = HN_SHAKE_FLAVOURS[dayIdx];
-              const eveningSnack =
-                EVENING_SNACKS[dayIdx % EVENING_SNACKS.length];
-              const midSnackGrams = Math.round(formData.weight * 10);
-              // Build meal rows based on meal gap
-              const mealRows: {
-                key: string;
-                emoji: string;
-                meal: string;
-                time: string;
-                details: ReactNode;
-              }[] = [];
+            {/* Timing strip */}
+            {formData.wake_up_time && (
+              <div className="text-xs text-gray-500 bg-teal-50 border border-teal-100 rounded-lg px-3 py-2 mb-4 flex flex-wrap gap-x-4 gap-y-1">
+                <span className="font-semibold text-teal-700">
+                  ⏰ Meal Times:
+                </span>
+                <span>
+                  🌅 Breakfast:{" "}
+                  <strong className="text-teal-700">
+                    {timeMap.breakfast || "—"}
+                  </strong>
+                </span>
+                <span>
+                  🍎 Mid-Morning:{" "}
+                  <strong className="text-teal-700">
+                    {timeMap.midSnack || "—"}
+                  </strong>
+                </span>
+                <span>
+                  🍽️ Lunch:{" "}
+                  <strong className="text-teal-700">
+                    {timeMap.lunch || "—"}
+                  </strong>
+                </span>
+                <span>
+                  🫘 Evening:{" "}
+                  <strong className="text-teal-700">
+                    {timeMap.eveningSnack || "—"}
+                  </strong>
+                </span>
+                <span>
+                  🌙 Dinner:{" "}
+                  <strong className="text-teal-700">
+                    {timeMap.dinner || "—"}
+                  </strong>
+                </span>
+              </div>
+            )}
 
-              // HN Drink note at the top
-              mealRows.push({
-                key: "hnDrink",
-                emoji: "💪",
-                meal: "HN Drink Note",
-                time: "Pre-workout",
-                details: (
-                  <div className="font-medium text-green-800 dark:text-green-200">
-                    Before exercise, drink <strong>HN Drink</strong> for energy
-                    and performance.
-                  </div>
-                ),
-                rowStyle: "bg-green-50 dark:bg-green-950/40",
-              } as any);
-
-              // HN Digestion before Breakfast
-              mealRows.push({
-                key: "hnDigestionBreakfast",
-                emoji: "💊",
-                meal: "HN Digestion",
-                time: "Before Breakfast",
-                details: (
-                  <div className="font-medium text-purple-800 dark:text-purple-200">
-                    Take <strong>HN Digestion</strong> before breakfast for
-                    optimal nutrient absorption.
-                  </div>
-                ),
-                rowStyle: "bg-purple-50 dark:bg-purple-950/40",
-              } as any);
-
-              // Breakfast always present
-              mealRows.push({
-                key: "breakfast",
-                emoji: "🌅",
-                meal: "Breakfast",
-                time: timeMap.breakfast || "—",
-                details: (
-                  <div>
-                    <div className="font-medium text-foreground">
-                      🥤 HN Shake —{" "}
-                      <span className="text-primary">{flavour}</span>
-                    </div>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      230 kcal · Carbs 24g · Fat 3g · Protein 19.75g · 19
-                      Essential Vitamins &amp; Minerals
-                    </div>
-                  </div>
-                ),
-              });
-
-              // Mid-morning snack (3hr gap only)
-              if (formData.meal_gap === 3 || formData.meal_gap === 3) {
-                mealRows.push({
-                  key: "midSnack",
-                  emoji: "🍎",
-                  meal: "Mid-Morning Snack",
-                  time: timeMap.midSnack || "—",
-                  details: (
-                    <div>
-                      <div className="font-medium text-foreground">
-                        Fruits &amp; Sprouts Salad
-                      </div>
-                      <div className="text-xs text-muted-foreground mt-1">
-                        Eat{" "}
-                        <span className="font-semibold text-foreground">
-                          {midSnackGrams}g (1%)
-                        </span>{" "}
-                        of fruits and sprouts mixed with raw vegetables.
-                        Includes 4–5 different colours.
-                        <span className="font-medium"> + 2 Egg Whites</span>
-                      </div>
-                    </div>
-                  ),
-                });
-              }
-
-              // HN Tea after mid-morning snack
-              mealRows.push({
-                key: "hnTea1",
-                emoji: "🍵",
-                meal: "HN Tea",
-                time: "Between meals",
-                details: (
-                  <div className="font-medium text-amber-800 dark:text-amber-200">
-                    <strong>HN Tea</strong> — 1 cup (2–3 times daily for
-                    metabolism and wellness)
-                  </div>
-                ),
-                rowStyle: "bg-amber-50 dark:bg-amber-950/40",
-              } as any);
-
-              // HN Digestion before Lunch
-              mealRows.push({
-                key: "hnDigestionLunch",
-                emoji: "💊",
-                meal: "HN Digestion",
-                time: "Before Lunch",
-                details: (
-                  <div className="font-medium text-purple-800 dark:text-purple-200">
-                    Take <strong>HN Digestion</strong> before lunch.
-                  </div>
-                ),
-                rowStyle: "bg-purple-50 dark:bg-purple-950/40",
-              } as any);
-
-              // Lunch always present
-              mealRows.push({
-                key: "lunch",
-                emoji: "🍽️",
-                meal: "Lunch",
-                time: timeMap.lunch || "—",
-                details: (
-                  <div>
-                    <div className="font-medium text-foreground">
-                      🍚 Rice 100g / 🫓 Chapati 2 pcs
-                    </div>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      Dal: {opt.dal} (100g) · Cooked Veg: {opt.cookedVeg} (100g)
-                      · Salad 300g ({opt.salad.join(", ")}) · Dahi 100g
-                    </div>
-                  </div>
-                ),
-              });
-
-              // HN Tea after lunch
-              mealRows.push({
-                key: "hnTea2",
-                emoji: "🍵",
-                meal: "HN Tea",
-                time: "After Lunch",
-                details: (
-                  <div className="font-medium text-amber-800 dark:text-amber-200">
-                    <strong>HN Tea</strong> — 1 cup after lunch
-                  </div>
-                ),
-                rowStyle: "bg-amber-50 dark:bg-amber-950/40",
-              } as any);
-
-              // Evening snack (3hr and 4hr gap)
-              if (
-                formData.meal_gap === 3 ||
-                formData.meal_gap === 3 ||
-                formData.meal_gap === 4 ||
-                formData.meal_gap === 4
-              ) {
-                mealRows.push({
-                  key: "eveningSnack",
-                  emoji: "🫘",
-                  meal: "Evening Snack",
-                  time: timeMap.eveningSnack || "—",
-                  details: (
-                    <div>
-                      <div className="font-medium text-foreground">
-                        {eveningSnack.name}
-                      </div>
-                      <div className="text-xs text-muted-foreground mt-1">
-                        {eveningSnack.cal} kcal · {eveningSnack.desc}
-                      </div>
-                      <div className="text-xs font-semibold text-amber-700 dark:text-amber-300 mt-1">
-                        Hot Afresh (2 spoons) — every day
-                      </div>
-                    </div>
-                  ),
-                });
-              }
-
-              // HN Digestion before Dinner
-              mealRows.push({
-                key: "hnDigestionDinner",
-                emoji: "💊",
-                meal: "HN Digestion",
-                time: "Before Dinner",
-                details: (
-                  <div className="font-medium text-purple-800 dark:text-purple-200">
-                    Take <strong>HN Digestion</strong> before dinner.
-                  </div>
-                ),
-                rowStyle: "bg-purple-50 dark:bg-purple-950/40",
-              } as any);
-
-              // Dinner always present
-              mealRows.push({
-                key: "dinner",
-                emoji: "🌙",
-                meal: "Dinner",
-                time: timeMap.dinner || "—",
-                details: (
-                  <div>
-                    <div className="font-medium text-foreground">
-                      🍚 Rice 100g / 🫓 Chapati 2 pcs
-                    </div>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      Dal: {opt.dal} (80g) · Cooked Veg: {opt.cookedVeg} (80g) ·
-                      Salad 240g ({opt.salad.join(", ")}) · Dahi 80g
-                    </div>
-                  </div>
-                ),
-              });
-
-              return (
-                <div
-                  key={day}
-                  data-ocid={`result.day_plan.item.${dayIdx + 1}`}
-                  className="rounded-2xl border border-border overflow-hidden"
-                >
-                  <div className="bg-primary/10 px-4 py-3 flex items-center gap-2 border-b border-border">
-                    <span className="text-base font-bold text-primary">
-                      {day}
-                    </span>
-                    <span className="text-xs text-muted-foreground">
-                      — {mealRows.length} meals
-                    </span>
-                  </div>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="bg-secondary/30 border-b border-border">
-                          <th className="text-left px-4 py-2.5 font-semibold text-foreground w-40">
-                            Meal
-                          </th>
-                          <th className="text-left px-4 py-2.5 font-semibold text-foreground w-24">
-                            Time
-                          </th>
-                          <th className="text-left px-4 py-2.5 font-semibold text-foreground">
-                            Food Items / Details
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {mealRows.map((row, ri) => (
-                          <tr
-                            key={row.key}
-                            className={
-                              (row as any).rowStyle ||
-                              (ri % 2 === 0
-                                ? "bg-background"
-                                : "bg-secondary/20")
-                            }
-                          >
-                            <td className="px-4 py-3 font-semibold text-foreground whitespace-nowrap">
-                              <span className="mr-1.5">{row.emoji}</span>
-                              {row.meal}
-                            </td>
-                            <td className="px-4 py-3 text-primary font-semibold whitespace-nowrap text-xs">
-                              {row.time}
-                            </td>
-                            <td className="px-4 py-3">{row.details}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+            {/* Compact 7-day banner table */}
+            <div className="overflow-x-auto print-color-exact">
+              <table
+                className="w-full text-xs border-collapse"
+                style={{
+                  WebkitPrintColorAdjust: "exact",
+                  printColorAdjust: "exact",
+                }}
+              >
+                <thead>
+                  <tr>
+                    <th className="p-2 border border-gray-300 text-white font-bold text-center bg-teal-700 min-w-[48px]">
+                      Day
+                    </th>
+                    <th className="p-2 border border-gray-300 text-white font-bold text-left bg-violet-600 min-w-[130px]">
+                      🥤 Breakfast
+                    </th>
+                    <th className="p-2 border border-gray-300 text-white font-bold text-left bg-teal-600 min-w-[120px]">
+                      🍎 Mid-Morning
+                    </th>
+                    <th className="p-2 border border-gray-300 text-white font-bold text-left bg-orange-500 min-w-[150px]">
+                      🍽️ Lunch
+                    </th>
+                    <th className="p-2 border border-gray-300 text-white font-bold text-left bg-rose-500 min-w-[120px]">
+                      🫘 Evening Snack
+                    </th>
+                    <th className="p-2 border border-gray-300 text-white font-bold text-left bg-blue-600 min-w-[150px]">
+                      🌙 Dinner
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {DAYS_OF_WEEK.map((day, dayIdx) => {
+                    const opt = MEAL_OPTIONS[dayIdx];
+                    const flavour = HN_SHAKE_FLAVOURS[dayIdx];
+                    const eveningSnack =
+                      EVENING_SNACKS[dayIdx % EVENING_SNACKS.length];
+                    const midSnackGrams = Math.round(formData.weight * 10);
+                    const dayLabel = [
+                      "Mon",
+                      "Tue",
+                      "Wed",
+                      "Thu",
+                      "Fri",
+                      "Sat",
+                      "Sun",
+                    ][dayIdx];
+                    const isRewardDay = dayIdx === 6;
+                    const rowBg = dayIdx % 2 === 0 ? "bg-white" : "bg-gray-50";
+                    return (
+                      <tr
+                        key={day}
+                        data-ocid={`result.day_plan.item.${dayIdx + 1}`}
+                        className={rowBg}
+                      >
+                        <td className="p-2 border border-gray-200 font-bold text-teal-700 bg-teal-50 text-center align-top">
+                          {dayLabel}
+                        </td>
+                        <td className="p-2 border border-gray-200 align-top">
+                          <div className="font-semibold text-violet-700">
+                            HN Shake — {flavour}
+                          </div>
+                          <div className="text-gray-400 mt-0.5">
+                            230 kcal · C:24g P:19.75g F:3g
+                          </div>
+                        </td>
+                        <td className="p-2 border border-gray-200 align-top">
+                          <div className="font-semibold text-teal-700">
+                            {midSnackGrams}g Fruits &amp; Sprouts
+                          </div>
+                          <div className="text-gray-400 mt-0.5">
+                            4-5 colours + 2 Egg Whites
+                          </div>
+                        </td>
+                        <td
+                          className={`p-2 border border-gray-200 align-top ${isRewardDay ? "bg-amber-50" : ""}`}
+                        >
+                          {isRewardDay ? (
+                            <div>
+                              <div className="font-bold text-orange-700">
+                                🎉 Reward Meal!
+                              </div>
+                              <div className="text-gray-600 mt-0.5">
+                                Have 1 of your favourite meals — you&apos;ve
+                                earned it! Enjoy mindfully 💪
+                              </div>
+                            </div>
+                          ) : (
+                            <div>
+                              <div className="font-semibold text-orange-700">
+                                Rice 100g + Chapati 2pc
+                              </div>
+                              <div className="text-gray-500 mt-0.5">
+                                {opt.dal} · {opt.cookedVeg} · Salad 300g · Dahi
+                                100g
+                              </div>
+                            </div>
+                          )}
+                        </td>
+                        <td className="p-2 border border-gray-200 align-top">
+                          <div className="font-semibold text-rose-700">
+                            {eveningSnack.name}
+                          </div>
+                          <div className="text-gray-400 mt-0.5">
+                            {eveningSnack.cal} kcal · hot afresh 2 spoon
+                          </div>
+                        </td>
+                        <td className="p-2 border border-gray-200 align-top">
+                          <div className="font-semibold text-blue-700">
+                            Rice 100g + Chapati 2pc
+                          </div>
+                          <div className="text-gray-500 mt-0.5">
+                            {opt.dal} (80g) · {opt.cookedVeg} (80g) · Salad 240g
+                            · Dahi 80g
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </ReportCard>
         </motion.div>
 
-        {/* Daily Wellness */}
+        {/* ── DAILY WELLNESS — DO NOT CHANGE ── */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -1330,278 +1216,296 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
           </div>
         </motion.div>
 
-        {/* Foods to Avoid */}
+        {/* ── FOODS TO AVOID ── */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.42 }}
-          className="bg-card rounded-2xl border border-border p-6"
           data-ocid="result.foods_avoid.section"
         >
-          <h2 className="text-xl font-display font-bold text-foreground mb-2 flex items-center gap-2">
-            <XCircle className="w-5 h-5 text-red-500" />
-            Foods to Avoid
-          </h2>
-          <p className="text-sm text-muted-foreground mb-5">
-            Eliminating these foods accelerates your health goals and prevents
-            nutrient deficiencies.
-          </p>
+          <ReportCard
+            title="Foods to Avoid"
+            icon={<XCircle className="w-4 h-4" />}
+          >
+            <p className="text-sm text-gray-500 mb-5">
+              Eliminating these foods accelerates your health goals and prevents
+              nutrient deficiencies.
+            </p>
 
-          {/* General Avoid List */}
-          <h3 className="text-sm font-bold text-foreground mb-3 uppercase tracking-wide flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-red-500 inline-block" />
-            General Foods to Avoid
-          </h3>
-          <div className="grid sm:grid-cols-2 gap-3 mb-6">
-            {GENERAL_AVOID_FOODS.map((item) => (
-              <div
-                key={item.name}
-                className="flex items-start gap-3 p-3 rounded-xl bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/40"
-              >
-                <XCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
-                <div>
-                  <div className="font-semibold text-foreground text-sm">
-                    {item.name}
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-0.5">
-                    {item.desc}
+            {/* General Avoid List */}
+            <h3 className="text-xs font-bold text-gray-700 mb-3 uppercase tracking-widest flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-red-500 inline-block" />
+              General Foods to Avoid
+            </h3>
+            <div className="grid sm:grid-cols-2 gap-3 mb-6">
+              {GENERAL_AVOID_FOODS.map((item) => (
+                <div
+                  key={item.name}
+                  className="flex items-start gap-3 p-3 rounded-xl bg-red-50 border border-red-100"
+                >
+                  <XCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+                  <div>
+                    <div className="font-semibold text-gray-800 text-sm">
+                      {item.name}
+                    </div>
+                    <div className="text-xs text-gray-500 mt-0.5">
+                      {item.desc}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Condition-Specific Avoid List */}
-          {activeConditions.length > 0 && (
-            <div className="space-y-4">
-              {activeConditions.map((condition) => {
-                const foods = CONDITION_AVOID_FOODS[condition];
-                if (!foods) return null;
-                return (
-                  <div key={condition}>
-                    <div className="flex items-center gap-2 mb-3 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl">
-                      <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
-                      <span className="text-sm font-semibold text-amber-800 dark:text-amber-200">
-                        Based on Your Health Condition: {condition}
-                      </span>
-                    </div>
-                    <div className="overflow-x-auto rounded-xl border border-border">
-                      <Table>
-                        <TableHeader>
-                          <TableRow className="bg-amber-50/80 dark:bg-amber-950/30 hover:bg-amber-50/80">
-                            <TableHead className="font-bold text-foreground">
-                              Food to Avoid
-                            </TableHead>
-                            <TableHead className="font-bold text-foreground">
-                              Reason
-                            </TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {foods.map((f, idx) => (
-                            <TableRow
-                              key={f.food}
-                              className={
-                                idx % 2 === 0
-                                  ? "bg-amber-50/40 dark:bg-amber-950/10"
-                                  : ""
-                              }
-                            >
-                              <TableCell className="font-medium text-foreground text-sm">
-                                <span className="flex items-center gap-2">
-                                  <XCircle className="w-3.5 h-3.5 text-red-400 shrink-0" />
-                                  {f.food}
-                                </span>
-                              </TableCell>
-                              <TableCell className="text-sm text-muted-foreground">
-                                {f.reason}
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
-                  </div>
-                );
-              })}
+              ))}
             </div>
-          )}
+
+            {/* Condition-Specific Avoid List */}
+            {activeConditions.length > 0 && (
+              <div className="space-y-4">
+                {activeConditions.map((condition) => {
+                  const foods = CONDITION_AVOID_FOODS[condition];
+                  if (!foods) return null;
+                  return (
+                    <div key={condition}>
+                      <div className="flex items-center gap-2 mb-3 p-3 bg-amber-50 border border-amber-200 rounded-xl">
+                        <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                        <span className="text-sm font-semibold text-amber-800">
+                          Based on Your Health Condition: {condition}
+                        </span>
+                      </div>
+                      <div className="overflow-x-auto rounded-xl border border-teal-100">
+                        <Table>
+                          <TableHeader>
+                            <TableRow className="bg-teal-50 hover:bg-teal-50">
+                              <TableHead className="font-bold text-teal-800">
+                                Food to Avoid
+                              </TableHead>
+                              <TableHead className="font-bold text-teal-800">
+                                Reason
+                              </TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {foods.map((f, idx) => (
+                              <TableRow
+                                key={f.food}
+                                className={
+                                  idx % 2 === 0 ? "bg-white" : "bg-teal-50/20"
+                                }
+                              >
+                                <TableCell className="font-medium text-gray-800 text-sm">
+                                  <span className="flex items-center gap-2">
+                                    <XCircle className="w-3.5 h-3.5 text-red-400 shrink-0" />
+                                    {f.food}
+                                  </span>
+                                </TableCell>
+                                <TableCell className="text-sm text-gray-500">
+                                  {f.reason}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </ReportCard>
         </motion.div>
 
-        {/* Health Tips */}
+        {/* ── HEALTH TIPS ── */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
-          className="bg-card rounded-2xl border border-border p-6"
         >
-          <h2 className="text-xl font-display font-bold text-foreground mb-5 flex items-center gap-2">
-            <Heart className="w-5 h-5 text-primary" />
-            Personalized Health Tips
-          </h2>
-          <div className="space-y-3">
-            {plan.health_tips.map((tip, i) => (
-              <motion.div
-                key={tip.slice(0, 30)}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.5 + i * 0.06 }}
-                className="flex gap-3 p-3 rounded-xl bg-secondary/40"
-              >
-                <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                <p className="text-sm text-foreground leading-relaxed">{tip}</p>
-              </motion.div>
-            ))}
-          </div>
+          <ReportCard
+            title="Personalized Health Tips"
+            icon={<Heart className="w-4 h-4" />}
+          >
+            <div className="space-y-3">
+              {plan.health_tips.map((tip, i) => (
+                <motion.div
+                  key={tip.slice(0, 30)}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.5 + i * 0.06 }}
+                  className="flex gap-3 p-3 rounded-xl bg-teal-50/60 border border-teal-100"
+                >
+                  <CheckCircle2 className="w-5 h-5 text-teal-600 shrink-0 mt-0.5" />
+                  <p className="text-sm text-gray-700 leading-relaxed">{tip}</p>
+                </motion.div>
+              ))}
+            </div>
+          </ReportCard>
         </motion.div>
 
-        {/* Supplements Note */}
+        {/* ── SUPPLEMENTS ── */}
         {allSupplements.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.5 }}
-            className="bg-card rounded-2xl border border-border p-6"
           >
-            <h2 className="text-xl font-display font-bold text-foreground mb-4 flex items-center gap-2">
-              <Pill className="w-5 h-5 text-primary" />
-              Your Supplements
-            </h2>
-            <div className="flex flex-wrap gap-2 mb-4">
-              {allSupplements.map((s) => (
-                <Badge
-                  key={s}
-                  variant="secondary"
-                  className="bg-primary/10 text-primary border-primary/20"
-                >
-                  {s}
-                </Badge>
-              ))}
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Your supplement stack has been considered in generating your meal
-              plan. Take supplements as directed and consult a healthcare
-              provider for personalized supplement advice.
-            </p>
+            <ReportCard
+              title="Your Supplements"
+              icon={<Pill className="w-4 h-4" />}
+            >
+              <div className="flex flex-wrap gap-2 mb-4">
+                {allSupplements.map((s) => (
+                  <span
+                    key={s}
+                    className="bg-teal-50 text-teal-700 border border-teal-200 rounded-full px-3 py-1 text-sm font-semibold"
+                  >
+                    {s}
+                  </span>
+                ))}
+              </div>
+              <p className="text-sm text-gray-500">
+                Your supplement stack has been considered in generating your
+                meal plan. Take supplements as directed and consult a healthcare
+                provider for personalized supplement advice.
+              </p>
+            </ReportCard>
           </motion.div>
         )}
 
-        {/* ── Referral Section ── */}
+        {/* ── REFERRAL SECTION ── */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.44 }}
-          className="bg-card rounded-2xl border border-emerald-200 p-5 no-print"
+          className="no-print"
           data-ocid="result.referral.section"
         >
-          {/* Promo Banner */}
-          <div className="bg-gradient-to-r from-emerald-500 to-green-600 rounded-xl p-4 mb-5 text-white text-center">
-            <div className="text-2xl mb-1">🎁</div>
-            <div className="font-bold text-lg leading-tight">
-              Refer & Earn Full Refund!
-            </div>
-            <div className="text-sm text-emerald-100 mt-1">
-              Help <strong>2 friends</strong> download their HN Coach report and
-              get a <strong>100% full refund</strong>.
-            </div>
-          </div>
-
-          <h2 className="text-base font-bold text-foreground mb-4 flex items-center gap-2">
-            <Share2 className="w-4 h-4 text-emerald-600" />
-            Your Referral Link
-          </h2>
-
-          {formData.referrer_whatsapp ? (
-            <div className="space-y-4">
-              <div className="flex gap-2">
-                <input
-                  readOnly
-                  value={referralLink}
-                  className="flex-1 text-xs rounded-lg border border-border bg-secondary/40 px-3 py-2 font-mono text-foreground truncate"
-                  data-ocid="result.referral.input"
-                />
-                <button
-                  type="button"
-                  data-ocid="result.referral.button"
-                  onClick={handleCopyLink}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-border bg-secondary hover:bg-secondary/80 text-sm font-semibold text-foreground transition-colors shrink-0"
-                >
-                  <Copy className="w-3.5 h-3.5" />
-                  {copied ? "Copied!" : "Copy"}
-                </button>
+          <ReportCard
+            title="Refer &amp; Earn"
+            icon={<Share2 className="w-4 h-4" />}
+          >
+            {/* Promo Banner */}
+            <div className="bg-gradient-to-r from-teal-500 to-emerald-600 rounded-xl p-4 mb-5 text-white text-center">
+              <div className="text-2xl mb-1">🎁</div>
+              <div className="font-bold text-lg leading-tight">
+                Refer &amp; Earn Full Refund!
               </div>
-              <a
-                href={`https://wa.me/?text=${encodeURIComponent(`Hey! I just got my personalized diet plan from HN Coach. Generate yours free here: ${referralLink}`)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                data-ocid="result.referral.primary_button"
-                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-[#25D366] hover:bg-[#1ebe5a] text-white font-semibold text-sm transition-colors"
-              >
-                <MessageCircle className="w-4 h-4" />
-                Share on WhatsApp
-              </a>
-              <div className="flex items-center justify-between p-3 rounded-xl bg-emerald-50 border border-emerald-200">
-                <span className="text-sm text-emerald-800 font-medium">
-                  Friends referred via your link
-                </span>
-                <span className="text-2xl font-bold text-emerald-700">
-                  {referralCount}
-                </span>
+              <div className="text-sm text-teal-100 mt-1">
+                Help <strong>2 friends</strong> download their HN Coach report
+                and get a <strong>100% full refund</strong>.
               </div>
-              {referralCount >= 2 && (
-                <div className="p-3 rounded-xl bg-green-100 border border-green-300 text-green-800 text-sm font-semibold text-center">
-                  🎉 Congratulations! You&apos;ve referred {referralCount}{" "}
-                  friends. You qualify for a full refund!
+            </div>
+
+            {formData.user_whatsapp ? (
+              <div className="space-y-4">
+                <div className="flex gap-2">
+                  <input
+                    readOnly
+                    value={referralLink}
+                    data-ocid="result.referral.input"
+                    className="flex-1 text-xs rounded-lg border border-teal-200 bg-teal-50/50 px-3 py-2 font-mono text-gray-600 focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleCopyLink}
+                    data-ocid="result.referral.secondary_button"
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-teal-200 bg-teal-50 text-teal-700 text-xs font-semibold hover:bg-teal-100 transition-colors"
+                  >
+                    {copied ? (
+                      <>
+                        <CheckCircle2 className="w-3.5 h-3.5" /> Copied!
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5" /> Copy
+                      </>
+                    )}
+                  </button>
                 </div>
-              )}
-            </div>
-          ) : (
-            <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-sm text-amber-800">
-              <strong>To generate your referral link:</strong> Fill in your
-              WhatsApp number in Step 1 of the form. Your unique referral link
-              will appear here so friends can register under you.
-            </div>
-          )}
+
+                <a
+                  href={`https://wa.me/?text=${encodeURIComponent(
+                    `Hey! I just got my personalized diet plan from HN Coach. Generate yours free here: ${referralLink}`,
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-ocid="result.referral.primary_button"
+                  className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-[#25D366] hover:bg-[#1ebe5a] text-white font-semibold transition-colors"
+                >
+                  <Share2 className="w-4 h-4" />
+                  Share on WhatsApp
+                </a>
+
+                <div className="text-center py-3 bg-teal-50 rounded-xl border border-teal-100">
+                  <div className="text-xs text-teal-600 font-semibold uppercase tracking-wide mb-1">
+                    Friends Referred
+                  </div>
+                  <div className="text-3xl font-bold text-teal-700">
+                    {referralCount}
+                    <span className="text-base font-normal text-gray-500">
+                      {" "}
+                      / 2 for full refund
+                    </span>
+                  </div>
+                  <div className="mt-2 h-2 bg-gray-200 rounded-full overflow-hidden mx-4">
+                    <div
+                      className="h-full bg-teal-500 rounded-full transition-all"
+                      style={{
+                        width: `${Math.min(100, (referralCount / 2) * 100)}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="p-4 rounded-xl bg-teal-50 border border-teal-100 text-sm text-gray-600 text-center">
+                Add your WhatsApp number when generating a report to get your
+                unique referral link.
+              </div>
+            )}
+          </ReportCard>
         </motion.div>
 
-        {/* ── Personal Coach Section ── */}
+        {/* ── PERSONAL COACH ── */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.46 }}
-          className="bg-card rounded-2xl border border-border p-5 no-print"
-          data-ocid="result.personal_coach.section"
+          className="no-print"
         >
-          <h2 className="text-base font-bold text-foreground mb-1 flex items-center gap-2">
-            <MessageCircle className="w-4 h-4 text-emerald-600" />
-            Get Your Personal Coach
-          </h2>
-          <p className="text-sm text-muted-foreground mb-4">
-            Your HN Coach referrer will guide you <strong>24×7</strong> on your
-            nutrition and wellness journey.
-          </p>
-          {formData.referrer_whatsapp ? (
-            <a
-              href={`https://wa.me/91${formData.referrer_whatsapp}?text=${encodeURIComponent("Hi! I generated my HN Coach diet plan and would like personal guidance. Please help me achieve my goals.")}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              data-ocid="result.personal_coach.primary_button"
-              className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-[#25D366] hover:bg-[#1ebe5a] text-white font-semibold transition-colors"
-            >
-              <MessageCircle className="w-5 h-5" />
-              Chat with My Coach on WhatsApp
-            </a>
-          ) : (
-            <div className="p-4 rounded-xl bg-secondary/50 border border-border text-sm text-muted-foreground text-center">
-              Ask the friend who referred you to HN Coach for personal coaching
-              guidance.
+          <ReportCard
+            title="Get Your Personal Coach"
+            icon={<MessageCircle className="w-4 h-4" />}
+          >
+            <div className="text-center mb-5">
+              <div className="text-3xl mb-2">👨‍⚕️</div>
+              <p className="text-sm text-gray-600 max-w-sm mx-auto">
+                Get 24×7 personal guidance from a dedicated coach who will help
+                you achieve your health goals faster.
+              </p>
             </div>
-          )}
+            {formData.referrer_whatsapp ? (
+              <a
+                href={`https://wa.me/91${formData.referrer_whatsapp}?text=${encodeURIComponent(
+                  "Hi! I generated my HN Coach diet plan and would like personal guidance. Please help me achieve my goals.",
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-ocid="result.personal_coach.primary_button"
+                className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-[#25D366] hover:bg-[#1ebe5a] text-white font-semibold transition-colors"
+              >
+                <MessageCircle className="w-5 h-5" />
+                Chat with My Coach on WhatsApp
+              </a>
+            ) : (
+              <div className="p-4 rounded-xl bg-teal-50 border border-teal-100 text-sm text-gray-600 text-center">
+                Ask the friend who referred you to HN Coach for personal
+                coaching guidance.
+              </div>
+            )}
+          </ReportCard>
         </motion.div>
 
         {/* Trust signal */}
-        <div className="border-t border-border pt-4 pb-6 text-center space-y-1">
-          <p className="text-xs text-muted-foreground max-w-xl mx-auto">
+        <div className="border-t border-teal-100 pt-4 pb-6 text-center space-y-1">
+          <p className="text-xs text-gray-400 max-w-xl mx-auto">
             🔒 This report is generated based on your personal health data and
             follows evidence-based nutrition guidelines aligned with Indian RDA
             standards.
@@ -1612,17 +1516,58 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
   );
 }
 
-// ── Sub-components ────────────────────────────────────────────────────────────
+// ── ReportCard & ReportField — Teal pill-label card style ─────────────────────
 
-function SummaryField({ label, value }: { label: string; value: string }) {
+function ReportCard({
+  title,
+  icon,
+  children,
+  className,
+}: {
+  title?: string;
+  icon?: ReactNode;
+  children: ReactNode;
+  className?: string;
+}) {
   return (
-    <div className="space-y-1">
-      <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+    <div
+      className={`bg-white rounded-xl border border-teal-100 shadow-sm overflow-hidden print:shadow-none print:border print:border-teal-200 ${
+        className || ""
+      }`}
+    >
+      <div className="border-l-4 border-teal-500 px-5 py-5">
+        {title && (
+          <div className="flex items-center gap-2 mb-4">
+            {icon && (
+              <span className="text-teal-600 shrink-0 print:text-teal-600">
+                {icon}
+              </span>
+            )}
+            <h2 className="text-sm font-bold uppercase tracking-widest text-gray-800">
+              <span className="text-teal-500 mr-1.5">—</span>
+              {title}
+            </h2>
+          </div>
+        )}
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function ReportField({
+  label,
+  value,
+}: {
+  label: string;
+  value: string | ReactNode;
+}) {
+  return (
+    <div className="flex items-center gap-3 border-b border-gray-100 py-2 last:border-b-0">
+      <span className="bg-teal-50 text-teal-700 text-xs font-semibold uppercase rounded-full px-3 py-1 min-w-[100px] text-center shrink-0 print:bg-teal-50 print:text-teal-700">
         {label}
-      </div>
-      <div className="text-sm font-medium text-foreground bg-secondary/40 rounded-lg px-3 py-2">
-        {value}
-      </div>
+      </span>
+      <span className="text-gray-800 font-medium text-sm">{value}</span>
     </div>
   );
 }
@@ -1807,28 +1752,20 @@ function EveningSnackCard({
             <div className="font-semibold text-foreground text-sm mt-0.5">
               {snack.name}
             </div>
-            <div className="text-xs text-muted-foreground mt-0.5">
-              {snack.cal} kcal · {snack.desc}
-            </div>
           </div>
         </div>
         <div className="mt-3 p-3 bg-amber-100 dark:bg-amber-900/40 rounded-lg">
-          <p className="text-xs font-semibold text-amber-800 dark:text-amber-200">
-            Indian snack under 150 kcal — freshly prepared, eaten hot/warm.
+          <p className="text-xs text-amber-700 dark:text-amber-300">
+            {snack.cal} kcal · {snack.desc}
           </p>
-          <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
-            +{" "}
-            <span className="font-semibold">
-              Hot Afresh (2 spoons) — every day
-            </span>
+          <p className="text-xs font-semibold text-amber-800 dark:text-amber-200 mt-1">
+            Hot Afresh (2 spoons) — every day
           </p>
         </div>
       </div>
     </div>
   );
 }
-
-// ── Nutrition RDA Data ────────────────────────────────────────────────────────
 
 const MICRO_RDA = [
   {
