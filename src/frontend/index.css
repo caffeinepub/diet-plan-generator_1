@@ -175,28 +175,38 @@
   table {
     border-collapse: collapse !important;
     width: 100% !important;
-    font-size: 7.5pt !important;
-    page-break-inside: avoid;
+    font-size: 7pt !important;
+    page-break-inside: auto;
     margin: 0 0 6px 0 !important;
+    table-layout: fixed;
   }
   th, td {
     border: 1px solid #ddd !important;
-    padding: 2px 5px !important;
-    font-size: 7.5pt !important;
+    padding: 2px 4px !important;
+    font-size: 7pt !important;
     line-height: 1.2 !important;
+    vertical-align: top !important;
+    word-break: break-word !important;
+    overflow: visible !important;
   }
   th {
     background: #f5f5f5 !important;
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
     font-weight: 600 !important;
-    font-size: 8pt !important;
+    font-size: 7.5pt !important;
   }
 
-  /* Day plan tables - avoid page break inside each day */
+  /* Day plan table rows - avoid page break inside each row */
   [data-ocid*="day_plan"] {
     page-break-inside: avoid;
-    margin-bottom: 6px !important;
+    break-inside: avoid;
+    margin-bottom: 2px !important;
+  }
+  
+  /* Diet plan table wrapper - allow breaks between rows */
+  .overflow-x-auto {
+    overflow: visible !important;
   }
 
   /* Headings - compact */

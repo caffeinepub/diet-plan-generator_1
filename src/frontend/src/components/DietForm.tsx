@@ -269,9 +269,11 @@ export default function DietForm({ onComplete, onViewPreviousReport }: Props) {
       <header className="no-print border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-2xl mx-auto px-4 py-4">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-              <Leaf className="w-4 h-4 text-primary-foreground" />
-            </div>
+            <img
+              src="/assets/uploads/IMG-20260226-WA0000-2.jpg"
+              alt="HN Coach Logo"
+              className="w-10 h-10 rounded-full object-cover shadow-sm"
+            />
             <div>
               <span className="font-display font-bold text-lg text-foreground">
                 HN Coach
@@ -533,9 +535,116 @@ function HeightInput({ data, errors = {}, update }: StepProps) {
   );
 }
 
+function DownloadCountBar() {
+  const [count, setCount] = useState(53);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("hncoach_download_count");
+    let current = stored ? Number.parseInt(stored, 10) : 53;
+    if (!localStorage.getItem("hncoach_visited")) {
+      current = current + 1;
+      localStorage.setItem("hncoach_visited", "1");
+      localStorage.setItem("hncoach_download_count", String(current));
+    }
+    setCount(current);
+  }, []);
+
+  const total = 1000;
+  const pct = Math.min((count / total) * 100, 100);
+  const earlyBirdActive = count <= 100;
+
+  return (
+    <div className="rounded-2xl overflow-hidden shadow-md mb-5 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500">
+      <div className="px-4 pt-3 pb-2 text-white">
+        <div className="flex items-center justify-between mb-1">
+          <span className="font-bold text-base tracking-wide">
+            🔥 {count.toLocaleString()} Plans Generated!
+          </span>
+          <span className="text-xs bg-white/20 rounded-full px-2 py-0.5 font-semibold">
+            {total - count} slots left at discounted price
+          </span>
+        </div>
+        {/* Progress Bar */}
+        <div className="relative h-4 bg-white/30 rounded-full overflow-hidden mb-2">
+          <div
+            className="absolute left-0 top-0 h-full bg-white rounded-full transition-all duration-700"
+            style={{ width: `${pct}%` }}
+          />
+          {/* Milestone markers */}
+          <div
+            className="absolute top-0 h-full w-0.5 bg-yellow-300"
+            style={{ left: "10%" }}
+          />
+        </div>
+        {/* Price milestones */}
+        <div className="flex items-center gap-2 flex-wrap text-sm">
+          <span className="line-through text-white/60 font-medium">₹1,000</span>
+          <span className="text-white/40">→</span>
+          {earlyBirdActive ? (
+            <>
+              <span className="bg-green-400 text-green-900 font-bold rounded-full px-3 py-0.5 text-xs animate-pulse">
+                🎉 First 100: ₹101 only!
+              </span>
+              <span className="text-white/60 text-xs">After 100: ₹299</span>
+            </>
+          ) : (
+            <>
+              <span className="text-green-300 line-through text-xs">
+                ₹101 (sold out)
+              </span>
+              <span className="bg-blue-400 text-blue-900 font-bold rounded-full px-3 py-0.5 text-xs">
+                Current Price: ₹299
+              </span>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Step1({ data, errors = {}, update }: StepProps) {
   return (
     <div className="space-y-5">
+      {/* Surprise offer banner - Premium Design */}
+      <div
+        className="relative overflow-hidden rounded-2xl shadow-xl"
+        style={{
+          background:
+            "linear-gradient(135deg, #7c3aed 0%, #db2777 50%, #f97316 100%)",
+        }}
+      >
+        {/* Shimmer overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 animate-shimmer" />
+        {/* FREE corner ribbon */}
+        <div
+          className="absolute top-0 right-0 w-0 h-0"
+          style={{
+            borderLeft: "60px solid transparent",
+            borderTop: "60px solid #facc15",
+          }}
+        />
+        <div
+          className="absolute top-1 right-1 text-xs font-black text-purple-900 rotate-45 translate-x-1 -translate-y-1"
+          style={{ fontSize: "9px" }}
+        >
+          FREE!
+        </div>
+        <div className="relative p-5 text-center">
+          {/* EXCLUSIVE OFFER badge */}
+          <div className="inline-block bg-yellow-400 text-purple-900 text-xs font-black px-3 py-1 rounded-full tracking-widest uppercase mb-3 shadow-md">
+            ✨ Exclusive Offer ✨
+          </div>
+          <div className="text-3xl mb-2">✨ 🎁 ✨</div>
+          <p className="font-black text-white text-base leading-snug drop-shadow-lg mb-1">
+            Buy your diet plan &amp; get a FREE weekly tracking call!
+          </p>
+          <p className="text-yellow-200 text-sm font-semibold drop-shadow">
+            Worth ₹999 — absolutely FREE for you 🎉
+          </p>
+        </div>
+      </div>
+      <DownloadCountBar />
       <div className="mb-4 rounded-xl overflow-hidden">
         <img
           src="/assets/generated/fit-india-banner.dim_800x200.jpg"

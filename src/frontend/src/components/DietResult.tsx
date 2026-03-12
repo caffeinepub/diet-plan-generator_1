@@ -96,6 +96,42 @@ function getMacroRDA(weight: number, bmr: number, tdee: number) {
 
 // ── Lunch / Dinner data ───────────────────────────────────────────────────────
 
+const INDIAN_VEGETABLES = [
+  "Palak Sabzi",
+  "Bhindi Masala",
+  "Aloo Gobhi",
+  "Lauki Chana Dal",
+  "Tinda Masala",
+  "Karela Masala",
+  "Baingan Bharta",
+  "Gajar Matar",
+  "Paneer Capsicum",
+  "Mix Vegetable",
+  "Beans Carrot Stir Fry",
+  "Patta Gobhi Matar",
+  "Lauki Tamatar",
+  "Methi Aloo",
+];
+
+function seededShuffle<T>(arr: T[], seed: number): T[] {
+  const a = [...arr];
+  let s = seed;
+  for (let i = a.length - 1; i > 0; i--) {
+    s = (s * 1664525 + 1013904223) & 0xffffffff;
+    const j = Math.abs(s) % (i + 1);
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function getVegSeed(name: string, weight: number): number {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = ((hash << 5) - hash + name.charCodeAt(i)) | 0;
+  }
+  return Math.abs(hash) + Math.floor(weight * 7);
+}
+
 interface MealOption {
   dal: string;
   cookedVeg: string;
@@ -172,7 +208,7 @@ const DAYS_OF_WEEK = [
 
 const EVENING_SNACKS = [
   {
-    name: "Roasted Chana (Bengal Gram)",
+    name: "Roasted Chana",
     cal: 120,
     desc: "High protein, high fibre, satisfying crunch",
   },
@@ -182,30 +218,60 @@ const EVENING_SNACKS = [
     desc: "Light, whole grain, low calorie",
   },
   {
-    name: "Makhana (Fox Nuts) – 30g roasted",
+    name: "Sprouts Chaat",
+    cal: 130,
+    desc: "High protein, gut-friendly probiotics",
+  },
+  {
+    name: "Roasted Makhana",
     cal: 110,
     desc: "Low fat, rich in magnesium & calcium",
   },
   {
-    name: "Tomato Soup (no cream)",
-    cal: 80,
-    desc: "Antioxidant-rich, warm and filling",
+    name: "Boiled Corn Chaat",
+    cal: 125,
+    desc: "Fibre-rich, satisfying and nutritious",
   },
   {
-    name: "Roasted Peanuts – 20g",
+    name: "Cucumber Peanut Salad",
+    cal: 115,
+    desc: "Hydrating, healthy fats and protein",
+  },
+  {
+    name: "Roasted Peanuts (20g)",
     cal: 115,
     desc: "Healthy fats, protein-packed",
   },
   {
-    name: "Mixed Vegetable Clear Soup",
-    cal: 70,
-    desc: "Low calorie, micronutrient-rich",
+    name: "Moong Dal Chilla",
+    cal: 140,
+    desc: "High protein, light and digestible",
   },
+  { name: "Vegetable Soup", cal: 70, desc: "Low calorie, micronutrient-rich" },
   {
-    name: "Sprout Chaat (small bowl)",
-    cal: 130,
-    desc: "High protein, gut-friendly probiotics",
+    name: "Boiled Egg 3 pcs (without yolk)",
+    cal: 105,
+    desc: "Pure protein, zero fat",
   },
+  { name: "Sabudana Soup", cal: 100, desc: "Light, soothing and energising" },
+  { name: "Barley Soup", cal: 95, desc: "High fibre, gut-friendly" },
+];
+
+const FRUIT_COMBOS = [
+  "Apple + Cucumber + Carrot + Sprouts + Lemon",
+  "Papaya + Pomegranate + Cucumber + Sprouts + Mint",
+  "Banana + Apple + Tomato + Cucumber + Sprouts",
+  "Guava + Carrot + Cucumber + Sprouts + Lemon",
+  "Orange + Papaya + Sprouts + Cucumber + Mint",
+  "Watermelon + Pomegranate + Cucumber + Sprouts + Lemon",
+  "Pineapple + Apple + Carrot + Sprouts + Mint",
+  "Papaya + Guava + Tomato + Cucumber + Sprouts",
+  "Banana + Orange + Carrot + Sprouts + Lemon",
+  "Apple + Watermelon + Cucumber + Sprouts + Mint",
+  "Pineapple + Papaya + Carrot + Cucumber + Sprouts",
+  "Guava + Pomegranate + Cucumber + Sprouts + Lemon",
+  "Orange + Apple + Tomato + Sprouts + Mint",
+  "Watermelon + Banana + Carrot + Cucumber + Sprouts",
 ];
 
 const GENERAL_AVOID_FOODS = [
@@ -436,7 +502,7 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
       ? formData.food_allergies
       : [];
 
-  let sleepDurationText = "—";
+  let _sleepDurationText = "—";
   if (formData.bed_time && formData.wake_up_time) {
     const [bh, bm] = formData.bed_time.split(":").map(Number);
     const [wh, wm] = formData.wake_up_time.split(":").map(Number);
@@ -444,7 +510,7 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
     if (diff < 0) diff += 24 * 60;
     const hours = Math.floor(diff / 60);
     const mins = diff % 60;
-    sleepDurationText = `${hours}h${mins > 0 ? ` ${mins}m` : ""}`;
+    _sleepDurationText = `${hours}h${mins > 0 ? ` ${mins}m` : ""}`;
   }
 
   const isLoss = formData.goal === "weight_loss";
@@ -457,6 +523,11 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
   const tdee = formData.tdee_manual > 0 ? formData.tdee_manual : plan.tdee;
 
   const macroRDA = getMacroRDA(formData.weight, bmr, tdee);
+
+  const vegSeed = getVegSeed(formData.name || "user", formData.weight || 70);
+  const shuffledVegs = seededShuffle(INDIAN_VEGETABLES, vegSeed);
+  const lunchVegs = shuffledVegs.slice(0, 7);
+  const dinnerVegs = shuffledVegs.slice(7, 14);
 
   function calcMonths(kgPerMonth: number): string {
     if (!targetKg || kgPerMonth <= 0) return "—";
@@ -584,7 +655,7 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
           <img
             src="/assets/generated/report-header-left-transparent.dim_200x300.png"
             alt=""
-            className="hidden sm:block absolute left-0 top-1/2 -translate-y-1/2 w-28 md:w-36 opacity-90 pointer-events-none print:w-24 print:opacity-80"
+            className="hidden sm:block absolute left-0 top-1/2 -translate-y-1/2 w-40 md:w-56 opacity-100 pointer-events-none print:w-32"
           />
           {/* Center content */}
           <div className="text-center px-4 sm:px-40">
@@ -604,7 +675,7 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
           <img
             src="/assets/generated/report-header-right-transparent.dim_200x300.png"
             alt=""
-            className="hidden sm:block absolute right-0 top-1/2 -translate-y-1/2 w-28 md:w-36 opacity-90 pointer-events-none print:w-24 print:opacity-80"
+            className="hidden sm:block absolute right-0 top-1/2 -translate-y-1/2 w-40 md:w-56 opacity-100 pointer-events-none print:w-32"
           />
         </motion.div>
 
@@ -682,23 +753,6 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
                       : "None"
                   }
                 />
-                <ReportField
-                  label="Bed Time"
-                  value={formData.bed_time || "—"}
-                />
-                <ReportField
-                  label="Wake Up"
-                  value={formData.wake_up_time || "—"}
-                />
-                <ReportField label="Sleep" value={sleepDurationText} />
-                {(formData.protein_target > 0 ||
-                  formData.fat_target > 0 ||
-                  formData.carbs_target > 0) && (
-                  <ReportField
-                    label="Macros"
-                    value={`P: ${formData.protein_target}g · F: ${formData.fat_target}g · C: ${formData.carbs_target}g`}
-                  />
-                )}
                 {allSupplements.length > 0 && (
                   <ReportField
                     label="Supplements"
@@ -866,6 +920,50 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
               <p className="text-xs text-gray-500 mt-1">
                 Your body needs all 25 essential nutrients every single day to
                 maintain cellular health and vitality
+              </p>
+            </div>
+          </div>
+
+          {/* Card 3 - Body Tissues */}
+          <div className="bg-white rounded-xl border border-rose-100 shadow-sm overflow-hidden">
+            <div className="h-1 bg-rose-500 w-full" />
+            <div className="p-5 flex flex-col items-center text-center gap-2">
+              <div className="w-12 h-12 rounded-full bg-rose-50 border border-rose-200 flex items-center justify-center">
+                <span className="text-2xl">🔬</span>
+              </div>
+              <p className="text-xs font-bold uppercase tracking-widest text-rose-600">
+                Types of Body Tissues
+              </p>
+              <p className="text-4xl font-extrabold text-gray-900 leading-none">
+                4{" "}
+                <span className="text-2xl font-bold text-rose-500">Types</span>
+              </p>
+              <p className="text-xs text-gray-500 max-w-xs">
+                Epithelial · Connective · Muscle · Nervous — all tissues require
+                daily nutrition to repair and regenerate
+              </p>
+            </div>
+          </div>
+
+          {/* Card 4 - Body Organs */}
+          <div className="bg-white rounded-xl border border-purple-100 shadow-sm overflow-hidden">
+            <div className="h-1 bg-purple-500 w-full" />
+            <div className="p-5 flex flex-col items-center text-center gap-2">
+              <div className="w-12 h-12 rounded-full bg-purple-50 border border-purple-200 flex items-center justify-center">
+                <span className="text-2xl">🫀</span>
+              </div>
+              <p className="text-xs font-bold uppercase tracking-widest text-purple-600">
+                Organs in Human Body
+              </p>
+              <p className="text-4xl font-extrabold text-gray-900 leading-none">
+                79{" "}
+                <span className="text-2xl font-bold text-purple-500">
+                  Organs
+                </span>
+              </p>
+              <p className="text-xs text-gray-500 max-w-xs">
+                Every organ depends on proper nutrition to function optimally —
+                feed them right every day
               </p>
             </div>
           </div>
@@ -1077,6 +1175,144 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
                 </div>
               </div>
             </div>
+
+            {/* Protein */}
+            <div className="bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800 rounded-xl p-4 flex gap-3 items-start">
+              <div className="text-2xl mt-0.5">🥩</div>
+              <div>
+                <div className="text-xs font-semibold text-rose-600 dark:text-rose-400 uppercase tracking-wide mb-1">
+                  Daily Protein
+                </div>
+                <div className="text-2xl font-bold text-foreground">
+                  {formData.protein_target > 0
+                    ? formData.protein_target
+                    : Math.round(1.2 * formData.weight)}
+                  <span className="text-sm font-normal text-muted-foreground">
+                    {" "}
+                    g/day
+                  </span>
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  For muscle repair, enzymes &amp; immune function
+                </div>
+              </div>
+            </div>
+
+            {/* Carbohydrates */}
+            <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl p-4 flex gap-3 items-start">
+              <div className="text-2xl mt-0.5">🌾</div>
+              <div>
+                <div className="text-xs font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wide mb-1">
+                  Daily Carbs
+                </div>
+                <div className="text-2xl font-bold text-foreground">
+                  {formData.carbs_target > 0
+                    ? formData.carbs_target
+                    : Math.round(
+                        (0.4 *
+                          (formData.tdee_manual > 0
+                            ? formData.tdee_manual
+                            : plan.tdee)) /
+                          4,
+                      )}
+                  <span className="text-sm font-normal text-muted-foreground">
+                    {" "}
+                    g/day
+                  </span>
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  Primary energy source for brain &amp; body
+                </div>
+              </div>
+            </div>
+
+            {/* Dietary Fat */}
+            <div className="bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-xl p-4 flex gap-3 items-start">
+              <div className="text-2xl mt-0.5">🥑</div>
+              <div>
+                <div className="text-xs font-semibold text-green-600 dark:text-green-400 uppercase tracking-wide mb-1">
+                  Daily Fat
+                </div>
+                <div className="text-2xl font-bold text-foreground">
+                  {formData.fat_target > 0
+                    ? formData.fat_target
+                    : Math.round(
+                        (0.25 *
+                          (formData.bmr_manual > 0
+                            ? formData.bmr_manual
+                            : plan.bmr)) /
+                          9,
+                      )}
+                  <span className="text-sm font-normal text-muted-foreground">
+                    {" "}
+                    g/day
+                  </span>
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  Hormone production &amp; fat-soluble vitamins
+                </div>
+              </div>
+            </div>
+
+            {/* Dietary Fibre */}
+            <div className="bg-teal-50 dark:bg-teal-950/30 border border-teal-200 dark:border-teal-800 rounded-xl p-4 flex gap-3 items-start">
+              <div className="text-2xl mt-0.5">🥦</div>
+              <div>
+                <div className="text-xs font-semibold text-teal-600 dark:text-teal-400 uppercase tracking-wide mb-1">
+                  Daily Fibre
+                </div>
+                <div className="text-2xl font-bold text-foreground">
+                  25–40
+                  <span className="text-sm font-normal text-muted-foreground">
+                    {" "}
+                    g/day
+                  </span>
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  Gut health &amp; blood sugar regulation
+                </div>
+              </div>
+            </div>
+
+            {/* Meditation */}
+            <div className="bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800 rounded-xl p-4 flex gap-3 items-start">
+              <div className="text-2xl mt-0.5">🧘</div>
+              <div>
+                <div className="text-xs font-semibold text-purple-600 dark:text-purple-400 uppercase tracking-wide mb-1">
+                  Daily Meditation
+                </div>
+                <div className="text-2xl font-bold text-foreground">
+                  10
+                  <span className="text-sm font-normal text-muted-foreground">
+                    {" "}
+                    mins/day
+                  </span>
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  Better mental health &amp; wellness
+                </div>
+              </div>
+            </div>
+
+            {/* Spiritual Wellness */}
+            <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl p-4 flex gap-3 items-start">
+              <div className="text-2xl mt-0.5">🙏</div>
+              <div>
+                <div className="text-xs font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wide mb-1">
+                  Daily Spiritual Wellness
+                </div>
+                <div className="text-2xl font-bold text-foreground">
+                  10
+                  <span className="text-sm font-normal text-muted-foreground">
+                    {" "}
+                    mins/day
+                  </span>
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  Worship &amp; gratitude to God for better spiritual wellness
+                </div>
+              </div>
+            </div>
           </div>
         </motion.div>
 
@@ -1244,6 +1480,10 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
                           {dayLabel}
                         </td>
                         <td className="p-2 border border-gray-200 align-top">
+                          <div className="text-[10px] italic text-gray-400 bg-gray-100 rounded px-1.5 py-0.5 mb-1 inline-block">
+                            💊 HN Digestion — for better digestion &amp;
+                            absorption
+                          </div>
                           <div className="font-semibold text-violet-700">
                             HN Shake — {flavour}
                           </div>
@@ -1252,12 +1492,25 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
                           </div>
                         </td>
                         <td className="p-2 border border-gray-200 align-top">
-                          <div className="font-semibold text-teal-700">
-                            {midSnackGrams}g Fruits &amp; Sprouts
+                          <div className="font-semibold text-teal-700 text-xs">
+                            🍎 {Math.round(midSnackGrams / 2)}g Fruits:
                           </div>
-                          <div className="text-gray-400 mt-0.5">
-                            4-5 colours + 2 Egg Whites
+                          <div className="text-gray-500 text-[10px] mt-0.5 italic">
+                            {
+                              seededShuffle(
+                                FRUIT_COMBOS,
+                                getVegSeed(formData.name, formData.weight),
+                              )[dayIdx % FRUIT_COMBOS.length]
+                            }
                           </div>
+                          <div className="text-gray-400 mt-0.5 text-[10px]">
+                            + 2 Egg Whites
+                          </div>
+                          <div className="font-semibold text-teal-700 mt-1">
+                            {Math.round(midSnackGrams / 2)}g Sprouts +
+                            Vegetables
+                          </div>
+                          <div className="text-gray-400 mt-0.5">+ HN Tea</div>
                         </td>
                         <td
                           className={`p-2 border border-gray-200 align-top ${isRewardDay ? "bg-gradient-to-br from-yellow-100 via-amber-50 to-orange-100 border-amber-400 border-2" : ""}`}
@@ -1277,12 +1530,16 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
                             </div>
                           ) : (
                             <div>
+                              <div className="text-[10px] italic text-gray-400 bg-gray-100 rounded px-1.5 py-0.5 mb-1 inline-block">
+                                💊 HN Digestion — for better digestion &amp;
+                                absorption
+                              </div>
                               <div className="font-semibold text-orange-700">
                                 Rice 100g + Chapati 2pc
                               </div>
                               <div className="text-gray-500 mt-0.5">
                                 {opt.dal} / {NON_VEG_OPTIONS[dayIdx].protein} ·{" "}
-                                {opt.cookedVeg} · Salad 300g · Dahi 100g
+                                {lunchVegs[dayIdx]} · Salad 300g · Dahi 100g
                               </div>
                             </div>
                           )}
@@ -1292,16 +1549,20 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
                             {eveningSnack.name}
                           </div>
                           <div className="text-gray-400 mt-0.5">
-                            {eveningSnack.cal} kcal · hot afresh 2 spoon
+                            {eveningSnack.cal} kcal · hot HN tea 2 spoon
                           </div>
                         </td>
                         <td className="p-2 border border-gray-200 align-top">
+                          <div className="text-[10px] italic text-gray-400 bg-gray-100 rounded px-1.5 py-0.5 mb-1 inline-block">
+                            💊 HN Digestion — for better digestion &amp;
+                            absorption
+                          </div>
                           <div className="font-semibold text-blue-700">
                             Rice 100g + Chapati 2pc
                           </div>
                           <div className="text-gray-500 mt-0.5">
-                            {opt.dal} / {NON_VEG_OPTIONS[dayIdx].protein} (80g)
-                            · {opt.cookedVeg} (80g) · Salad 240g · Dahi 80g
+                            {opt.dal} (80g) · {dinnerVegs[dayIdx]} (80g) · Salad
+                            240g · Dahi 80g
                           </div>
                         </td>
                       </tr>
@@ -1311,6 +1572,54 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
               </table>
             </div>
           </ReportCard>
+        </motion.div>
+
+        {/* ── POST-SUNDAY CALORIE GUIDANCE ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.41 }}
+        >
+          <div className="rounded-xl border border-teal-200 bg-gradient-to-r from-teal-50 to-emerald-50 px-5 py-4 shadow-sm">
+            <p className="text-sm font-semibold text-teal-800 mb-2">
+              📅 Daily Calorie Guide
+            </p>
+            <div className="grid sm:grid-cols-2 gap-3">
+              <div className="bg-white/80 rounded-lg border border-teal-100 px-4 py-3 text-center">
+                <div className="text-xs text-gray-500 mb-1 font-medium uppercase tracking-wide">
+                  Working Days
+                </div>
+                <div className="text-2xl font-bold text-teal-700">
+                  {tdee}{" "}
+                  <span className="text-sm font-normal text-gray-500">
+                    kcal
+                  </span>
+                </div>
+              </div>
+              <div className="bg-white/80 rounded-lg border border-teal-100 px-4 py-3 text-center">
+                <div className="text-xs text-gray-500 mb-1 font-medium uppercase tracking-wide">
+                  Holidays &amp; Rest Days
+                </div>
+                <div className="text-2xl font-bold text-emerald-700">
+                  {bmr}{" "}
+                  <span className="text-sm font-normal text-gray-500">
+                    kcal
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="mt-3 p-2 bg-teal-50 dark:bg-teal-900/30 rounded-lg border border-teal-100">
+              <p className="text-xs text-teal-800 dark:text-teal-200 font-medium text-center leading-relaxed">
+                📈 Eat <strong>more</strong> calories → gain weight
+                &nbsp;|&nbsp; 🔥 Eat <strong>less</strong> calories → lose
+                weight &amp; fat &nbsp;|&nbsp; ✅ <strong>Complete</strong> your
+                daily requirement → maintain
+              </p>
+            </div>
+            <p className="text-xs text-gray-500 mt-2 text-center">
+              Contact us for personalized guidance and personal coaching.
+            </p>
+          </div>
         </motion.div>
 
         {/* ── FOODS TO AVOID ── */}
@@ -1471,7 +1780,6 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.44 }}
-          className="no-print"
           data-ocid="result.referral.section"
         >
           <ReportCard
@@ -1571,7 +1879,6 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.46 }}
-          className="no-print"
         >
           <ReportCard
             title="Get Your Personal Coach"
@@ -1812,16 +2119,26 @@ function MidMorningSnackCard({
         </div>
         <div className="mt-3 p-3 bg-green-100 dark:bg-green-900/40 rounded-lg">
           <p className="text-sm font-semibold text-green-800 dark:text-green-200">
-            Eat{" "}
+            Total:{" "}
             <span className="text-green-600 dark:text-green-400 font-bold">
-              {grams}g (1%)
-            </span>{" "}
-            of fruits and sprouts mixed with raw vegetables.
+              {grams}g (1% of body weight)
+            </span>
           </p>
-          <p className="text-xs text-green-700 dark:text-green-300 mt-1">
-            Includes 4–5 different colours of fruits and vegetables for maximum
-            micronutrients.
-          </p>
+          <div className="mt-2 space-y-1">
+            <p className="text-xs text-green-700 dark:text-green-300 font-semibold">
+              🍎{" "}
+              <span className="font-bold">{Math.round(grams / 2)}g Fruits</span>
+            </p>
+            <p className="text-xs text-green-700 dark:text-green-300 font-semibold">
+              🌱{" "}
+              <span className="font-bold">
+                {Math.round(grams / 2)}g Sprouts + Raw Vegetables
+              </span>
+            </p>
+            <p className="text-xs text-green-700 dark:text-green-300 font-semibold">
+              🍵 + HN Tea
+            </p>
+          </div>
           <p className="text-xs text-green-700 dark:text-green-300 mt-1 font-medium">
             + 2 Egg Whites (boiled or poached)
           </p>
@@ -1862,7 +2179,7 @@ function EveningSnackCard({
             {snack.cal} kcal · {snack.desc}
           </p>
           <p className="text-xs font-semibold text-amber-800 dark:text-amber-200 mt-1">
-            Hot Afresh (2 spoons) — every day
+            Hot HN Tea (2 spoons) — every day
           </p>
         </div>
       </div>
