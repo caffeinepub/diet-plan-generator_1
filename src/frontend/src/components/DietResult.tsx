@@ -11,12 +11,14 @@ import {
 } from "@/components/ui/table";
 import {
   AlertTriangle,
+  Atom,
   CheckCircle2,
   ChevronDown,
   ChevronUp,
   Copy,
   Globe,
   Heart,
+  Layers,
   Leaf,
   Lock,
   MessageCircle,
@@ -146,6 +148,16 @@ const HN_SHAKE_FLAVOURS = [
   "Chocolate",
   "Strawberry",
   "Kulfi",
+];
+
+const NON_VEG_OPTIONS = [
+  { protein: "Egg Curry" },
+  { protein: "Fish Kabab" },
+  { protein: "Chicken Tikka" },
+  { protein: "Mutton Handi" },
+  { protein: "Egg Curry" },
+  { protein: "Fish Kabab" },
+  { protein: "Chicken Tikka" },
 ];
 
 const DAYS_OF_WEEK = [
@@ -566,19 +578,34 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-center py-4"
+          className="relative flex items-center justify-center py-4"
         >
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-teal-50 border border-teal-200 mb-4">
-            <UtensilsCrossed className="w-7 h-7 text-teal-600" />
+          {/* Left illustration */}
+          <img
+            src="/assets/generated/report-header-left-transparent.dim_200x300.png"
+            alt=""
+            className="hidden sm:block absolute left-0 top-1/2 -translate-y-1/2 w-28 md:w-36 opacity-90 pointer-events-none print:w-24 print:opacity-80"
+          />
+          {/* Center content */}
+          <div className="text-center px-4 sm:px-40">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-teal-50 border border-teal-200 mb-4">
+              <UtensilsCrossed className="w-7 h-7 text-teal-600" />
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">
+              {formData.name}&apos;s Diet Plan
+            </h1>
+            <div className="flex items-center justify-center gap-2 mt-3 flex-wrap">
+              <span className="inline-flex items-center gap-1.5 bg-teal-50 text-teal-700 border border-teal-200 rounded-full px-4 py-1.5 text-sm font-semibold">
+                {GOAL_LABELS[formData.goal]}
+              </span>
+            </div>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">
-            {formData.name}&apos;s Diet Plan
-          </h1>
-          <div className="flex items-center justify-center gap-2 mt-3 flex-wrap">
-            <span className="inline-flex items-center gap-1.5 bg-teal-50 text-teal-700 border border-teal-200 rounded-full px-4 py-1.5 text-sm font-semibold">
-              {GOAL_LABELS[formData.goal]}
-            </span>
-          </div>
+          {/* Right illustration */}
+          <img
+            src="/assets/generated/report-header-right-transparent.dim_200x300.png"
+            alt=""
+            className="hidden sm:block absolute right-0 top-1/2 -translate-y-1/2 w-28 md:w-36 opacity-90 pointer-events-none print:w-24 print:opacity-80"
+          />
         </motion.div>
 
         {/* ── PERSONAL DETAILS ── */}
@@ -774,6 +801,76 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
           </motion.div>
         )}
 
+        {/* ── BODY SCIENCE INFO CARDS ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.55 }}
+          className="grid grid-cols-1 md:grid-cols-2 gap-4"
+        >
+          {/* Card 1 – Human Body Cells */}
+          <div className="bg-white rounded-xl border border-teal-100 shadow-sm overflow-hidden">
+            <div className="h-1 bg-teal-500 w-full" />
+            <div className="p-5 flex flex-col items-center text-center gap-2">
+              <div className="w-12 h-12 rounded-full bg-teal-50 border border-teal-200 flex items-center justify-center">
+                <Atom className="w-6 h-6 text-teal-600" />
+              </div>
+              <p className="text-xs font-bold uppercase tracking-widest text-teal-600">
+                Human Body Cells
+              </p>
+              <p className="text-4xl font-extrabold text-gray-900 leading-none">
+                37.2{" "}
+                <span className="text-2xl font-bold text-teal-500">
+                  Trillion
+                </span>
+              </p>
+              <p className="text-xs text-gray-500 max-w-xs">
+                living cells in the average adult human body — each needing
+                daily nutrients to function, repair, and thrive
+              </p>
+            </div>
+          </div>
+
+          {/* Card 2 – Daily Nutrient Requirements */}
+          <div className="bg-white rounded-xl border border-amber-100 shadow-sm overflow-hidden">
+            <div className="h-1 bg-amber-500 w-full" />
+            <div className="p-5 flex flex-col items-center text-center gap-2">
+              <div className="w-12 h-12 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center">
+                <Layers className="w-6 h-6 text-amber-600" />
+              </div>
+              <p className="text-xs font-bold uppercase tracking-widest text-amber-600">
+                Daily Nutrients Needed
+              </p>
+              <div className="flex gap-3 items-center justify-center flex-wrap mt-1">
+                <div className="flex flex-col items-center">
+                  <span className="text-2xl font-extrabold text-teal-600">
+                    5
+                  </span>
+                  <span className="text-xs text-gray-500">Macronutrients</span>
+                </div>
+                <span className="text-2xl font-bold text-gray-300">+</span>
+                <div className="flex flex-col items-center">
+                  <span className="text-2xl font-extrabold text-amber-600">
+                    20
+                  </span>
+                  <span className="text-xs text-gray-500">Micronutrients</span>
+                </div>
+                <span className="text-2xl font-bold text-gray-300">=</span>
+                <div className="flex flex-col items-center">
+                  <span className="text-2xl font-extrabold text-gray-900">
+                    25
+                  </span>
+                  <span className="text-xs text-gray-500">Essential Total</span>
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                Your body needs all 25 essential nutrients every single day to
+                maintain cellular health and vitality
+              </p>
+            </div>
+          </div>
+        </motion.div>
+
         {/* ── GLOBAL NUTRITION PHILOSOPHY + RDA TABLES ── */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -799,38 +896,23 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
                 <span className="w-2.5 h-2.5 rounded-full bg-teal-500 inline-block" />
                 Macronutrients — Daily RDA for Indians
               </h3>
-              <div className="overflow-x-auto rounded-lg border border-teal-100">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="bg-teal-50">
-                      <th className="text-left p-3 font-semibold text-teal-800 rounded-tl-lg">
-                        Nutrient
-                      </th>
-                      <th className="text-left p-3 font-semibold text-teal-800">
-                        RDA (Adult)
-                      </th>
-                      <th className="text-left p-3 font-semibold text-teal-800 rounded-tr-lg">
-                        Primary Role
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {macroRDA.map((row, i) => (
-                      <tr
-                        key={row.nutrient}
-                        className={i % 2 === 0 ? "bg-white" : "bg-teal-50/30"}
-                      >
-                        <td className="p-3 font-medium text-gray-800">
-                          {row.nutrient}
-                        </td>
-                        <td className="p-3 text-teal-700 font-semibold">
-                          {row.rda}
-                        </td>
-                        <td className="p-3 text-gray-500">{row.role}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              <div className="grid grid-cols-2 sm:grid-cols-3 print:grid-cols-3 gap-2">
+                {macroRDA.map((row) => (
+                  <div
+                    key={row.nutrient}
+                    className="bg-teal-50 border border-teal-100 rounded-lg p-2"
+                  >
+                    <p className="text-xs font-bold text-gray-800 leading-tight">
+                      {row.nutrient}
+                    </p>
+                    <p className="text-sm font-semibold text-teal-700 mt-0.5">
+                      {row.rda}
+                    </p>
+                    <p className="text-xs text-gray-400 mt-0.5 leading-tight">
+                      {row.role}
+                    </p>
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -840,38 +922,23 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block" />
                 Micronutrients — Daily RDA for Indians
               </h3>
-              <div className="overflow-x-auto rounded-lg border border-amber-100">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="bg-amber-50">
-                      <th className="text-left p-3 font-semibold text-amber-800 rounded-tl-lg">
-                        Nutrient
-                      </th>
-                      <th className="text-left p-3 font-semibold text-amber-800">
-                        RDA (Adult)
-                      </th>
-                      <th className="text-left p-3 font-semibold text-amber-800 rounded-tr-lg">
-                        Primary Role
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {MICRO_RDA.map((row, i) => (
-                      <tr
-                        key={row.nutrient}
-                        className={i % 2 === 0 ? "bg-white" : "bg-amber-50/30"}
-                      >
-                        <td className="p-3 font-medium text-gray-800">
-                          {row.nutrient}
-                        </td>
-                        <td className="p-3 text-amber-700 font-semibold">
-                          {row.rda}
-                        </td>
-                        <td className="p-3 text-gray-500">{row.role}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 print:grid-cols-4 gap-2">
+                {MICRO_RDA.map((row) => (
+                  <div
+                    key={row.nutrient}
+                    className="bg-amber-50 border border-amber-100 rounded-lg p-2"
+                  >
+                    <p className="text-xs font-bold text-gray-800 leading-tight">
+                      {row.nutrient}
+                    </p>
+                    <p className="text-sm font-semibold text-amber-700 mt-0.5">
+                      {row.rda}
+                    </p>
+                    <p className="text-xs text-gray-400 mt-0.5 leading-tight">
+                      {row.role}
+                    </p>
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -906,6 +973,138 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
           <span className="text-4xl text-teal-300 font-bold leading-none select-none absolute -bottom-4 right-8">
             &rdquo;
           </span>
+        </motion.div>
+
+        {/* ── DAILY WELLNESS — DO NOT CHANGE ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.38 }}
+          className="bg-card rounded-2xl border border-border p-6"
+          data-ocid="result.daily_wellness.section"
+        >
+          <h2 className="text-xl font-display font-bold text-foreground mb-5 flex items-center gap-2">
+            <span className="text-2xl">🌿</span>
+            Daily Wellness
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Hydration */}
+            <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-xl p-4 flex gap-3 items-start">
+              <div className="text-2xl mt-0.5">💧</div>
+              <div>
+                <div className="text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide mb-1">
+                  Hydration
+                </div>
+                <div className="text-2xl font-bold text-foreground">
+                  {(formData.weight / 18).toFixed(1)} L
+                  <span className="text-sm font-normal text-muted-foreground">
+                    /day
+                  </span>
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  Drink 250ml of water every hour
+                </div>
+              </div>
+            </div>
+            {/* Walking */}
+            <div className="bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-xl p-4 flex gap-3 items-start">
+              <div className="text-2xl mt-0.5">🚶</div>
+              <div>
+                <div className="text-xs font-semibold text-green-600 dark:text-green-400 uppercase tracking-wide mb-1">
+                  Daily Walking
+                </div>
+                <div className="text-2xl font-bold text-foreground">
+                  {Math.round(formData.weight * 110).toLocaleString()}
+                  <span className="text-sm font-normal text-muted-foreground">
+                    {" "}
+                    steps/day
+                  </span>
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  Target footsteps based on your body weight
+                </div>
+              </div>
+            </div>
+            {/* Exercise */}
+            <div className="bg-orange-50 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-800 rounded-xl p-4 flex gap-3 items-start">
+              <div className="text-2xl mt-0.5">🏋️</div>
+              <div>
+                <div className="text-xs font-semibold text-orange-600 dark:text-orange-400 uppercase tracking-wide mb-1">
+                  General Exercise
+                </div>
+                <div className="text-2xl font-bold text-foreground">
+                  {Math.round((formData.weight * 45) / 60)}
+                  <span className="text-sm font-normal text-muted-foreground">
+                    {" "}
+                    min/day
+                  </span>
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  Recommended daily exercise duration
+                </div>
+              </div>
+            </div>
+            {/* Sleep */}
+            <div className="bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800 rounded-xl p-4 flex gap-3 items-start">
+              <div className="text-2xl mt-0.5">🌙</div>
+              <div>
+                <div className="text-xs font-semibold text-purple-600 dark:text-purple-400 uppercase tracking-wide mb-1">
+                  Sleep (WHO Recommendation)
+                </div>
+                <div className="text-2xl font-bold text-foreground">
+                  {formData.age <= 1
+                    ? "14–17"
+                    : formData.age <= 2
+                      ? "12–15"
+                      : formData.age <= 5
+                        ? "10–13"
+                        : formData.age <= 13
+                          ? "9–11"
+                          : formData.age <= 17
+                            ? "8–10"
+                            : formData.age <= 25
+                              ? "7–9"
+                              : formData.age <= 64
+                                ? "7–9"
+                                : "7–8"}
+                  <span className="text-sm font-normal text-muted-foreground">
+                    {" "}
+                    hours/night
+                  </span>
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  Based on your age ({formData.age} yrs)
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* ── Nutrition Philosophy Image ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.32 }}
+          className="flex justify-center my-4"
+        >
+          <img
+            src="/assets/generated/hn-nutrition-philosophy.dim_800x600.png"
+            alt="HN Coach Nutrition Philosophy"
+            className="max-w-xs sm:max-w-sm md:max-w-md rounded-2xl shadow-md"
+          />
+        </motion.div>
+
+        {/* ── Second Quote ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.34 }}
+          className="text-center py-4 px-8"
+        >
+          <p className="text-base sm:text-lg font-semibold text-teal-700 italic">
+            &quot;You don&apos;t need to eat less — You only need to eat
+            right&quot;
+          </p>
         </motion.div>
 
         {/* ── 7-Day Meal Plan ── */}
@@ -1061,16 +1260,19 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
                           </div>
                         </td>
                         <td
-                          className={`p-2 border border-gray-200 align-top ${isRewardDay ? "bg-amber-50" : ""}`}
+                          className={`p-2 border border-gray-200 align-top ${isRewardDay ? "bg-gradient-to-br from-yellow-100 via-amber-50 to-orange-100 border-amber-400 border-2" : ""}`}
                         >
                           {isRewardDay ? (
-                            <div>
-                              <div className="font-bold text-orange-700">
-                                🎉 Reward Meal!
+                            <div className="text-center">
+                              <div className="text-lg font-extrabold text-amber-600 animate-pulse">
+                                🏆 REWARD MEAL! 🎉
                               </div>
-                              <div className="text-gray-600 mt-0.5">
-                                Have 1 of your favourite meals — you&apos;ve
-                                earned it! Enjoy mindfully 💪
+                              <div className="text-xs font-bold text-orange-600 bg-amber-200 rounded-full px-2 py-0.5 inline-block mt-1">
+                                ★ You Earned It! ★
+                              </div>
+                              <div className="text-gray-700 mt-1 text-xs">
+                                Have 1 of your favourite meals today — celebrate
+                                your dedication! 💪🌟
                               </div>
                             </div>
                           ) : (
@@ -1079,8 +1281,8 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
                                 Rice 100g + Chapati 2pc
                               </div>
                               <div className="text-gray-500 mt-0.5">
-                                {opt.dal} · {opt.cookedVeg} · Salad 300g · Dahi
-                                100g
+                                {opt.dal} / {NON_VEG_OPTIONS[dayIdx].protein} ·{" "}
+                                {opt.cookedVeg} · Salad 300g · Dahi 100g
                               </div>
                             </div>
                           )}
@@ -1098,8 +1300,8 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
                             Rice 100g + Chapati 2pc
                           </div>
                           <div className="text-gray-500 mt-0.5">
-                            {opt.dal} (80g) · {opt.cookedVeg} (80g) · Salad 240g
-                            · Dahi 80g
+                            {opt.dal} / {NON_VEG_OPTIONS[dayIdx].protein} (80g)
+                            · {opt.cookedVeg} (80g) · Salad 240g · Dahi 80g
                           </div>
                         </td>
                       </tr>
@@ -1109,111 +1311,6 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
               </table>
             </div>
           </ReportCard>
-        </motion.div>
-
-        {/* ── DAILY WELLNESS — DO NOT CHANGE ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.38 }}
-          className="bg-card rounded-2xl border border-border p-6"
-          data-ocid="result.daily_wellness.section"
-        >
-          <h2 className="text-xl font-display font-bold text-foreground mb-5 flex items-center gap-2">
-            <span className="text-2xl">🌿</span>
-            Daily Wellness
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Hydration */}
-            <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-xl p-4 flex gap-3 items-start">
-              <div className="text-2xl mt-0.5">💧</div>
-              <div>
-                <div className="text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide mb-1">
-                  Hydration
-                </div>
-                <div className="text-2xl font-bold text-foreground">
-                  {(formData.weight / 18).toFixed(1)} L
-                  <span className="text-sm font-normal text-muted-foreground">
-                    /day
-                  </span>
-                </div>
-                <div className="text-xs text-muted-foreground mt-1">
-                  Drink 250ml of water every hour
-                </div>
-              </div>
-            </div>
-            {/* Walking */}
-            <div className="bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-xl p-4 flex gap-3 items-start">
-              <div className="text-2xl mt-0.5">🚶</div>
-              <div>
-                <div className="text-xs font-semibold text-green-600 dark:text-green-400 uppercase tracking-wide mb-1">
-                  Daily Walking
-                </div>
-                <div className="text-2xl font-bold text-foreground">
-                  {Math.round(formData.weight * 110).toLocaleString()}
-                  <span className="text-sm font-normal text-muted-foreground">
-                    {" "}
-                    steps/day
-                  </span>
-                </div>
-                <div className="text-xs text-muted-foreground mt-1">
-                  Target footsteps based on your body weight
-                </div>
-              </div>
-            </div>
-            {/* Exercise */}
-            <div className="bg-orange-50 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-800 rounded-xl p-4 flex gap-3 items-start">
-              <div className="text-2xl mt-0.5">🏋️</div>
-              <div>
-                <div className="text-xs font-semibold text-orange-600 dark:text-orange-400 uppercase tracking-wide mb-1">
-                  General Exercise
-                </div>
-                <div className="text-2xl font-bold text-foreground">
-                  {Math.round((formData.weight * 45) / 60)}
-                  <span className="text-sm font-normal text-muted-foreground">
-                    {" "}
-                    min/day
-                  </span>
-                </div>
-                <div className="text-xs text-muted-foreground mt-1">
-                  Recommended daily exercise duration
-                </div>
-              </div>
-            </div>
-            {/* Sleep */}
-            <div className="bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800 rounded-xl p-4 flex gap-3 items-start">
-              <div className="text-2xl mt-0.5">🌙</div>
-              <div>
-                <div className="text-xs font-semibold text-purple-600 dark:text-purple-400 uppercase tracking-wide mb-1">
-                  Sleep (WHO Recommendation)
-                </div>
-                <div className="text-2xl font-bold text-foreground">
-                  {formData.age <= 1
-                    ? "14–17"
-                    : formData.age <= 2
-                      ? "12–15"
-                      : formData.age <= 5
-                        ? "10–13"
-                        : formData.age <= 13
-                          ? "9–11"
-                          : formData.age <= 17
-                            ? "8–10"
-                            : formData.age <= 25
-                              ? "7–9"
-                              : formData.age <= 64
-                                ? "7–9"
-                                : "7–8"}
-                  <span className="text-sm font-normal text-muted-foreground">
-                    {" "}
-                    hours/night
-                  </span>
-                </div>
-                <div className="text-xs text-muted-foreground mt-1">
-                  Based on your age ({formData.age} yrs)
-                </div>
-              </div>
-            </div>
-          </div>
         </motion.div>
 
         {/* ── FOODS TO AVOID ── */}
@@ -1453,6 +1550,12 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
                     />
                   </div>
                 </div>
+                {referralCount >= 2 && (
+                  <div className="mt-3 mx-2 p-3 rounded-xl bg-gradient-to-r from-teal-500 to-green-500 text-white text-center text-sm font-semibold shadow">
+                    🎉 Goal Achieved! Share more &amp; earn more with us by
+                    spreading awareness!
+                  </div>
+                )}
               </div>
             ) : (
               <div className="p-4 rounded-xl bg-teal-50 border border-teal-100 text-sm text-gray-600 text-center">
