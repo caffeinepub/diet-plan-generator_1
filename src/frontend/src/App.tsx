@@ -1,6 +1,7 @@
 import { Toaster } from "@/components/ui/sonner";
 import { useEffect, useState } from "react";
 import type { DietPlan } from "./backend.d";
+import AdminPanel from "./components/AdminPanel";
 import DietForm from "./components/DietForm";
 import DietResult from "./components/DietResult";
 import type { FormData } from "./types/diet";
@@ -44,7 +45,40 @@ function loadRazorpayScript(): Promise<boolean> {
   });
 }
 
+function isAdminRoute(): boolean {
+  const { pathname, hash, search } = window.location;
+  return (
+    pathname.startsWith("/admin") ||
+    hash === "#admin" ||
+    hash === "#/admin" ||
+    hash.startsWith("#admin") ||
+    search.includes("admin=1")
+  );
+}
+
 export default function App() {
+  const [route, setRoute] = useState(() => (isAdminRoute() ? "admin" : "main"));
+
+  useEffect(() => {
+    function onHashChange() {
+      setRoute(isAdminRoute() ? "admin" : "main");
+    }
+    window.addEventListener("hashchange", onHashChange);
+    window.addEventListener("popstate", onHashChange);
+    return () => {
+      window.removeEventListener("hashchange", onHashChange);
+      window.removeEventListener("popstate", onHashChange);
+    };
+  }, []);
+
+  if (route === "admin") {
+    return <AdminPanel />;
+  }
+
+  return <MainApp />;
+}
+
+function MainApp() {
   const [view, setView] = useState<AppView>("form");
   const [dietPlan, setDietPlan] = useState<DietPlan | null>(null);
   const [formData, setFormData] = useState<FormData | null>(null);
@@ -117,6 +151,25 @@ export default function App() {
           const count = getDownloadCount();
           localStorage.setItem(LS_DOWNLOAD_COUNT_KEY, String(count + 1));
         } catch (_) {}
+
+        // Save to global reports list for admin panel
+        try {
+          const reports = JSON.parse(
+            localStorage.getItem("hn_coach_reports") || "[]",
+          );
+          reports.push({
+            id: Date.now().toString(),
+            name: pendingFormData?.name || "",
+            whatsapp: pendingFormData?.user_whatsapp || "",
+            referredBy: pendingFormData?.referrer_whatsapp || "",
+            goal: pendingFormData?.goal || "",
+            amount: price,
+            paidAt: new Date().toISOString(),
+            rewardPaid: false,
+          });
+          localStorage.setItem("hn_coach_reports", JSON.stringify(reports));
+        } catch (_) {}
+
         setDietPlan(pendingPlan);
         setFormData(pendingFormData);
         setView("result");
