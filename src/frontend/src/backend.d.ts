@@ -15,6 +15,16 @@ export interface Meal {
     ingredients: Array<string>;
     protein: number;
 }
+export interface AdminReport {
+    id: string;
+    goal: string;
+    name: string;
+    whatsapp: string;
+    referredBy: string;
+    rewardPaid: boolean;
+    amount: number;
+    paidAt: string;
+}
 export interface MacronutrientBreakdown {
     carbs: number;
     fats: number;
@@ -78,11 +88,27 @@ export enum StressLevel {
     moderate = "moderate"
 }
 export interface backendInterface {
+    /**
+     * / * Admin Report Methods **
+     * / Add admin report. Public, no authentication performed!
+     */
+    addAdminReport(report: AdminReport): Promise<void>;
     addDietPlan(plan: DietPlan): Promise<void>;
+    /**
+     * / * DietPlan Methods **
+     */
     addProfile(profile: DietProfile): Promise<void>;
     deleteWrapper(arg0: string): Promise<string>;
+    /**
+     * / Get all admin reports. Public, no authentication performed!
+     */
+    getAdminReports(): Promise<Array<AdminReport>>;
     getAllDietPlans(): Promise<Array<DietPlan>>;
     getAllProfiles(): Promise<Array<DietProfile>>;
     getDietPlan(profile_id: string): Promise<DietPlan>;
     getProfile(id: string): Promise<DietProfile>;
+    /**
+     * / Set rewardPaid flag to true. Public, no authentication performed!
+     */
+    markRewardPaid(id: string): Promise<boolean>;
 }

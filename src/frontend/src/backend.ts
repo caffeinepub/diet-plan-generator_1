@@ -97,6 +97,16 @@ export interface Meal {
     ingredients: Array<string>;
     protein: number;
 }
+export interface AdminReport {
+    id: string;
+    goal: string;
+    name: string;
+    whatsapp: string;
+    referredBy: string;
+    rewardPaid: boolean;
+    amount: number;
+    paidAt: string;
+}
 export interface MacronutrientBreakdown {
     carbs: number;
     fats: number;
@@ -160,17 +170,47 @@ export enum StressLevel {
     moderate = "moderate"
 }
 export interface backendInterface {
+    /**
+     * / * Admin Report Methods **
+     * / Add admin report. Public, no authentication performed!
+     */
+    addAdminReport(report: AdminReport): Promise<void>;
     addDietPlan(plan: DietPlan): Promise<void>;
+    /**
+     * / * DietPlan Methods **
+     */
     addProfile(profile: DietProfile): Promise<void>;
     deleteWrapper(arg0: string): Promise<string>;
+    /**
+     * / Get all admin reports. Public, no authentication performed!
+     */
+    getAdminReports(): Promise<Array<AdminReport>>;
     getAllDietPlans(): Promise<Array<DietPlan>>;
     getAllProfiles(): Promise<Array<DietProfile>>;
     getDietPlan(profile_id: string): Promise<DietPlan>;
     getProfile(id: string): Promise<DietProfile>;
+    /**
+     * / Set rewardPaid flag to true. Public, no authentication performed!
+     */
+    markRewardPaid(id: string): Promise<boolean>;
 }
 import type { ActivityLevel as _ActivityLevel, DietProfile as _DietProfile, Gender as _Gender, HealthGoal as _HealthGoal, StressLevel as _StressLevel } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
+    async addAdminReport(arg0: AdminReport): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.addAdminReport(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.addAdminReport(arg0);
+            return result;
+        }
+    }
     async addDietPlan(arg0: DietPlan): Promise<void> {
         if (this.processError) {
             try {
@@ -210,6 +250,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.deleteWrapper(arg0);
+            return result;
+        }
+    }
+    async getAdminReports(): Promise<Array<AdminReport>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getAdminReports();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getAdminReports();
             return result;
         }
     }
@@ -267,6 +321,20 @@ export class Backend implements backendInterface {
         } else {
             const result = await this.actor.getProfile(arg0);
             return from_candid_DietProfile_n12(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async markRewardPaid(arg0: string): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.markRewardPaid(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.markRewardPaid(arg0);
+            return result;
         }
     }
 }

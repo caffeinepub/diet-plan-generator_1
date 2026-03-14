@@ -5,7 +5,12 @@ import Text "mo:core/Text";
 import Float "mo:core/Float";
 import Runtime "mo:core/Runtime";
 
+
+// Specify the data migration module in the with-clause
+
 actor {
+  /*** DietPlan Types ***/
+
   type Gender = {
     #male;
     #female;
@@ -85,6 +90,19 @@ actor {
     health_tips : [Text];
   };
 
+  /*** Admin Report Types ***/
+
+  type AdminReport = {
+    id : Text;
+    name : Text;
+    whatsapp : Text;
+    referredBy : Text;
+    goal : Text;
+    amount : Float;
+    paidAt : Text;
+    rewardPaid : Bool;
+  };
+
   module DietProfile {
     public func compare(profile1 : DietProfile, profile2 : DietProfile) : Order.Order {
       Text.compare(profile1.id, profile2.id);
@@ -97,8 +115,13 @@ actor {
     };
   };
 
+  /*** State: Use persistent Maps for storage ***/
+
   let profiles = Map.empty<Text, DietProfile>();
   let plans = Map.empty<Text, DietPlan>();
+  let adminReports = Map.empty<Text, AdminReport>();
+
+  /*** DietPlan Methods ***/
 
   public shared ({ caller }) func addProfile(profile : DietProfile) : async () {
     switch (profiles.get(profile.id)) {
@@ -116,9 +139,7 @@ actor {
       case (null) {
         Runtime.trap("Profile does not exist");
       };
-      case (?profile) {
-        profile;
-      };
+      case (?profile) { profile };
     };
   };
 
@@ -128,23 +149,15 @@ actor {
 
   public shared ({ caller }) func addDietPlan(plan : DietPlan) : async () {
     switch (plans.get(plan.profile_id)) {
-      case (null) {
-        plans.add(plan.profile_id, plan);
-      };
-      case (?_) {
-        Runtime.trap("Diet plan already exists for this profile");
-      };
+      case (null) { plans.add(plan.profile_id, plan) };
+      case (?_) { Runtime.trap("Diet plan already exists for this profile") };
     };
   };
 
   public query ({ caller }) func getDietPlan(profile_id : Text) : async DietPlan {
     switch (plans.get(profile_id)) {
-      case (null) {
-        Runtime.trap("Diet plan does not exist for this profile");
-      };
-      case (?plan) {
-        plan;
-      };
+      case (null) { Runtime.trap("Diet plan does not exist for this profile") };
+      case (?plan) { plan };
     };
   };
 
@@ -154,5 +167,35 @@ actor {
 
   public query ({ caller }) func deleteWrapper(_ : Text) : async Text {
     Runtime.trap("You cannot delete the entire diet plan generator backend canister.");
+  };
+
+  /*** Admin Report Methods ***/
+
+  /// Add admin report. Public, no authentication performed!
+  public shared ({ caller }) func addAdminReport(report : AdminReport) : async () {
+    switch (adminReports.get(report.id)) {
+      case (null) {
+        adminReports.add(report.id, report);
+      };
+      case (?_) {
+        Runtime.trap("Report already exists");
+      };
+    };
+  };
+
+  /// Get all admin reports. Public, no authentication performed!
+  public query ({ caller }) func getAdminReports() : async [AdminReport] {
+    adminReports.values().toArray();
+  };
+
+  /// Set rewardPaid flag to true. Public, no authentication performed!
+  public shared ({ caller }) func markRewardPaid(id : Text) : async Bool {
+    let report = switch (adminReports.get(id)) {
+      case (null) { Runtime.trap("Report does not exist") };
+      case (?report) { report };
+    };
+    let updatedReport = { report with rewardPaid = true };
+    adminReports.add(id, updatedReport);
+    true;
   };
 };

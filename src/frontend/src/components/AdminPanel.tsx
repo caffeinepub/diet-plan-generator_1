@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { createActorWithConfig } from "../config";
 
 interface ReportEntry {
   id: string;
@@ -9,6 +10,18 @@ interface ReportEntry {
   amount: number;
   paidAt: string;
   rewardPaid: boolean;
+}
+
+function mergeReports(
+  local: ReportEntry[],
+  remote: ReportEntry[],
+): ReportEntry[] {
+  const map = new Map<string, ReportEntry>();
+  for (const r of local) map.set(r.id, r);
+  for (const r of remote) map.set(r.id, r); // remote wins on conflict
+  return Array.from(map.values()).sort(
+    (a, b) => new Date(b.paidAt).getTime() - new Date(a.paidAt).getTime(),
+  );
 }
 
 function loadReports(): ReportEntry[] {
@@ -67,12 +80,12 @@ function TreeNode({ node, depth }: { node: TreeNodeData; depth: number }) {
     <div style={{ marginLeft: depth > 0 ? 24 : 0 }}>
       <button
         type="button"
-        className="w-full flex items-center gap-2 py-2 px-3 rounded-lg hover:bg-teal-50 transition-colors cursor-pointer border border-transparent hover:border-teal-100 text-left"
+        className="w-full flex items-center gap-2 py-2 px-3 rounded-lg hover:bg-forest-50 transition-colors cursor-pointer border border-transparent hover:border-forest-100 text-left"
         onClick={toggle}
         data-ocid="admin.tree.row"
       >
         {node.children.length > 0 && (
-          <span className="text-teal-600 font-bold text-sm w-4">
+          <span className="text-forest-600 font-bold text-sm w-4">
             {open ? "▼" : "▶"}
           </span>
         )}
@@ -82,7 +95,7 @@ function TreeNode({ node, depth }: { node: TreeNodeData; depth: number }) {
             {node.entry.name}
           </span>
           <span className="text-gray-500 text-xs">{node.entry.whatsapp}</span>
-          <span className="bg-teal-50 text-teal-700 text-xs px-2 py-0.5 rounded-full font-medium">
+          <span className="bg-forest-50 text-forest-700 text-xs px-2 py-0.5 rounded-full font-medium">
             {node.entry.goal}
           </span>
           <span className="text-green-700 text-xs font-bold">
@@ -93,7 +106,7 @@ function TreeNode({ node, depth }: { node: TreeNodeData; depth: number }) {
               className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                 node.entry.rewardPaid
                   ? "bg-gray-100 text-gray-400 line-through"
-                  : "bg-yellow-50 text-yellow-700"
+                  : "bg-gold-50 text-gold-700"
               }`}
             >
               Reward: ₹{reward}
@@ -110,7 +123,7 @@ function TreeNode({ node, depth }: { node: TreeNodeData; depth: number }) {
         </span>
       </button>
       {open && node.children.length > 0 && (
-        <div className="border-l-2 border-teal-100 ml-5">
+        <div className="border-l-2 border-forest-100 ml-5">
           {node.children.map((child) => (
             <TreeNode key={child.entry.id} node={child} depth={depth + 1} />
           ))}
@@ -127,6 +140,43 @@ export default function AdminPanel() {
   const [view, setView] = useState<"table" | "tree">("table");
   const [reports, setReports] = useState<ReportEntry[]>(loadReports);
 
+  // Load from backend on mount
+  useEffect(() => {
+    createActorWithConfig()
+      .then((actor) => actor.getAdminReports())
+      .then((remote) => {
+        setReports((prev) => mergeReports(prev, remote as ReportEntry[]));
+      })
+      .catch(() => {});
+  }, []);
+
+  // Reload reports when window gains focus
+  useEffect(() => {
+    function handleFocus() {
+      const local = loadReports();
+      setReports(local);
+      createActorWithConfig()
+        .then((actor) => actor.getAdminReports())
+        .then((remote) => {
+          setReports((prev) => mergeReports(prev, remote as ReportEntry[]));
+        })
+        .catch(() => {});
+    }
+    window.addEventListener("focus", handleFocus);
+    return () => window.removeEventListener("focus", handleFocus);
+  }, []);
+
+  function handleRefresh() {
+    const local = loadReports();
+    setReports(local);
+    createActorWithConfig()
+      .then((actor) => actor.getAdminReports())
+      .then((remote) => {
+        setReports((prev) => mergeReports(prev, remote as ReportEntry[]));
+      })
+      .catch(() => {});
+  }
+
   function handleLogin() {
     if (password === "hncoach2024") {
       setAuthed(true);
@@ -142,6 +192,9 @@ export default function AdminPanel() {
     );
     setReports(updated);
     saveReports(updated);
+    createActorWithConfig()
+      .then((actor) => actor.markRewardPaid(id))
+      .catch(() => {});
   }
 
   const stats = useMemo(() => {
@@ -159,12 +212,23 @@ export default function AdminPanel() {
 
   if (!authed) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-teal-50 to-cyan-100 px-4">
-        <div className="w-full max-w-sm bg-white rounded-2xl shadow-xl overflow-hidden">
-          <div className="bg-gradient-to-r from-teal-600 to-cyan-600 px-8 py-8 text-center">
+      <div
+        className="min-h-screen flex items-center justify-center px-4"
+        style={{
+          background:
+            "linear-gradient(135deg, #0f3d25 0%, #1a5c38 50%, #2d7a50 100%)",
+        }}
+      >
+        <div className="w-full max-w-sm bg-white rounded-2xl shadow-2xl overflow-hidden">
+          <div
+            className="px-8 py-8 text-center"
+            style={{
+              background: "linear-gradient(135deg, #0f3d25 0%, #1a5c38 100%)",
+            }}
+          >
             <div className="text-4xl mb-2">🛡️</div>
             <h1 className="text-2xl font-black text-white">HN Coach</h1>
-            <p className="text-teal-100 text-sm mt-1">Admin Panel</p>
+            <p className="text-green-200 text-sm mt-1">Admin Panel</p>
           </div>
           <div className="px-8 py-8 space-y-4">
             <div>
@@ -181,7 +245,7 @@ export default function AdminPanel() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleLogin()}
-                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-400 transition-all"
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-forest-500 transition-all"
                 placeholder="Enter admin password"
               />
             </div>
@@ -197,7 +261,10 @@ export default function AdminPanel() {
               data-ocid="admin.primary_button"
               type="button"
               onClick={handleLogin}
-              className="w-full bg-gradient-to-r from-teal-600 to-cyan-600 text-white font-bold py-3 rounded-xl hover:from-teal-700 hover:to-cyan-700 transition-all shadow-lg"
+              className="w-full text-white font-bold py-3 rounded-xl transition-all shadow-lg"
+              style={{
+                background: "linear-gradient(135deg, #1a5c38 0%, #2d7a50 100%)",
+              }}
             >
               Login
             </button>
@@ -208,54 +275,79 @@ export default function AdminPanel() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between shadow-sm">
+    <div className="min-h-screen bg-forest-50">
+      <header
+        className="border-b border-forest-200 px-6 py-4 flex items-center justify-between shadow-sm"
+        style={{
+          background: "linear-gradient(135deg, #0f3d25 0%, #1a5c38 100%)",
+        }}
+      >
         <div className="flex items-center gap-3">
           <img
             src="/assets/uploads/IMG-20260226-WA0000-2.jpg"
             alt="HN Coach"
-            className="w-10 h-10 rounded-full object-cover"
+            className="w-10 h-10 rounded-full object-cover border-2 border-gold-300"
           />
           <div>
-            <h1 className="text-xl font-black text-gray-900">HN Coach Admin</h1>
-            <p className="text-gray-500 text-xs">Report & Referral Dashboard</p>
+            <h1 className="text-xl font-black text-white">HN Coach Admin</h1>
+            <p className="text-green-200 text-xs">
+              Report & Referral Dashboard
+            </p>
           </div>
         </div>
-        <button
-          data-ocid="admin.secondary_button"
-          type="button"
-          onClick={() => setAuthed(false)}
-          className="text-sm text-gray-500 hover:text-red-600 transition-colors font-medium px-4 py-2 rounded-lg hover:bg-red-50"
-        >
-          Logout
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            data-ocid="admin.secondary_button"
+            type="button"
+            onClick={handleRefresh}
+            className="text-sm text-white/80 hover:text-white transition-colors font-medium px-4 py-2 rounded-lg hover:bg-white/10 border border-white/20"
+          >
+            🔄 Refresh
+          </button>
+          <button
+            data-ocid="admin.secondary_button"
+            type="button"
+            onClick={() => setAuthed(false)}
+            className="text-sm text-white/70 hover:text-red-300 transition-colors font-medium px-4 py-2 rounded-lg hover:bg-white/10"
+          >
+            Logout
+          </button>
+        </div>
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-8 space-y-6">
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
-            { label: "Total Reports", value: reports.length, icon: "📋" },
+            {
+              label: "Total Reports",
+              value: reports.length,
+              icon: "📋",
+              color: "forest",
+            },
             {
               label: "Total Revenue",
               value: `₹${stats.totalRevenue}`,
               icon: "💰",
+              color: "gold",
             },
             {
               label: "Rewards Pending",
               value: `₹${stats.rewardsPending}`,
               icon: "⏳",
+              color: "gold",
             },
             {
               label: "Rewards Paid",
               value: `₹${stats.rewardsPaid}`,
               icon: "✅",
+              color: "forest",
             },
           ].map((stat, i) => (
             <div
               // biome-ignore lint/suspicious/noArrayIndexKey: static list
               key={i}
-              className="bg-white rounded-xl p-5 shadow-sm border border-gray-100"
+              className="bg-white rounded-xl p-5 shadow-sm border border-forest-100"
             >
               <div className="text-2xl mb-1">{stat.icon}</div>
               <div className="text-2xl font-black text-gray-900">
@@ -274,9 +366,14 @@ export default function AdminPanel() {
             onClick={() => setView("table")}
             className={`px-5 py-2 rounded-lg font-semibold text-sm transition-all ${
               view === "table"
-                ? "bg-teal-600 text-white shadow-md"
-                : "bg-white text-gray-600 hover:bg-teal-50 border border-gray-200"
+                ? "text-white shadow-md"
+                : "bg-white text-gray-600 hover:bg-forest-50 border border-gray-200"
             }`}
+            style={
+              view === "table"
+                ? { background: "linear-gradient(135deg, #1a5c38, #2d7a50)" }
+                : {}
+            }
           >
             📊 Table View
           </button>
@@ -286,9 +383,14 @@ export default function AdminPanel() {
             onClick={() => setView("tree")}
             className={`px-5 py-2 rounded-lg font-semibold text-sm transition-all ${
               view === "tree"
-                ? "bg-teal-600 text-white shadow-md"
-                : "bg-white text-gray-600 hover:bg-teal-50 border border-gray-200"
+                ? "text-white shadow-md"
+                : "bg-white text-gray-600 hover:bg-forest-50 border border-gray-200"
             }`}
+            style={
+              view === "tree"
+                ? { background: "linear-gradient(135deg, #1a5c38, #2d7a50)" }
+                : {}
+            }
           >
             🌲 Tree View
           </button>
@@ -296,7 +398,7 @@ export default function AdminPanel() {
 
         {/* Table View */}
         {view === "table" && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="bg-white rounded-xl shadow-sm border border-forest-100 overflow-hidden">
             {reports.length === 0 ? (
               <div
                 data-ocid="admin.empty_state"
@@ -312,7 +414,12 @@ export default function AdminPanel() {
               <div className="overflow-x-auto">
                 <table data-ocid="admin.table" className="w-full text-sm">
                   <thead>
-                    <tr className="bg-teal-50 text-teal-800 text-left">
+                    <tr
+                      className="text-white text-left"
+                      style={{
+                        background: "linear-gradient(135deg, #1a5c38, #2d7a50)",
+                      }}
+                    >
                       <th className="px-4 py-3 font-semibold">#</th>
                       <th className="px-4 py-3 font-semibold">Name</th>
                       <th className="px-4 py-3 font-semibold">WhatsApp</th>
@@ -330,7 +437,7 @@ export default function AdminPanel() {
                         key={r.id}
                         data-ocid={`admin.row.${idx + 1}`}
                         className={`border-t border-gray-100 ${
-                          idx % 2 === 0 ? "bg-white" : "bg-gray-50"
+                          idx % 2 === 0 ? "bg-white" : "bg-forest-50/40"
                         }`}
                       >
                         <td className="px-4 py-3 text-gray-400 font-mono">
@@ -352,11 +459,11 @@ export default function AdminPanel() {
                           )}
                         </td>
                         <td className="px-4 py-3">
-                          <span className="bg-teal-50 text-teal-700 px-2 py-0.5 rounded text-xs font-medium">
+                          <span className="bg-forest-50 text-forest-700 px-2 py-0.5 rounded text-xs font-medium">
                             {r.goal}
                           </span>
                         </td>
-                        <td className="px-4 py-3 font-bold text-green-700">
+                        <td className="px-4 py-3 font-bold text-forest-700">
                           ₹{r.amount}
                         </td>
                         <td className="px-4 py-3">
@@ -365,7 +472,7 @@ export default function AdminPanel() {
                               className={`px-2 py-0.5 rounded text-xs font-medium ${
                                 r.rewardPaid
                                   ? "bg-gray-100 text-gray-400"
-                                  : "bg-yellow-50 text-yellow-700"
+                                  : "bg-gold-50 text-gold-700"
                               }`}
                             >
                               {r.rewardPaid ? "✓ " : ""}₹{r.amount * 0.5}
@@ -383,12 +490,16 @@ export default function AdminPanel() {
                               data-ocid="admin.save_button"
                               type="button"
                               onClick={() => handleMarkRewardPaid(r.id)}
-                              className="bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
+                              className="text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
+                              style={{
+                                background:
+                                  "linear-gradient(135deg, #1a5c38, #2d7a50)",
+                              }}
                             >
                               Mark Paid
                             </button>
                           ) : r.rewardPaid ? (
-                            <span className="text-green-600 text-xs font-semibold">
+                            <span className="text-forest-600 text-xs font-semibold">
                               ✓ Paid
                             </span>
                           ) : (
@@ -406,7 +517,7 @@ export default function AdminPanel() {
 
         {/* Tree View */}
         {view === "tree" && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className="bg-white rounded-xl shadow-sm border border-forest-100 p-6">
             <h2 className="text-lg font-bold text-gray-800 mb-4">
               Referral Tree
             </h2>

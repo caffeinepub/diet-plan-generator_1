@@ -15,6 +15,16 @@ export type ActivityLevel = { 'lightly_active' : null } |
   { 'extra_active' : null } |
   { 'very_active' : null } |
   { 'moderately_active' : null };
+export interface AdminReport {
+  'id' : string,
+  'goal' : string,
+  'name' : string,
+  'whatsapp' : string,
+  'referredBy' : string,
+  'rewardPaid' : boolean,
+  'amount' : number,
+  'paidAt' : string,
+}
 export interface DayPlan {
   'breakfast' : Meal,
   'lunch' : Meal,
@@ -73,13 +83,29 @@ export type StressLevel = { 'low' : null } |
   { 'very_high' : null } |
   { 'moderate' : null };
 export interface _SERVICE {
+  /**
+   * / * Admin Report Methods **
+   * / Add admin report. Public, no authentication performed!
+   */
+  'addAdminReport' : ActorMethod<[AdminReport], undefined>,
   'addDietPlan' : ActorMethod<[DietPlan], undefined>,
+  /**
+   * / * DietPlan Methods **
+   */
   'addProfile' : ActorMethod<[DietProfile], undefined>,
   'deleteWrapper' : ActorMethod<[string], string>,
+  /**
+   * / Get all admin reports. Public, no authentication performed!
+   */
+  'getAdminReports' : ActorMethod<[], Array<AdminReport>>,
   'getAllDietPlans' : ActorMethod<[], Array<DietPlan>>,
   'getAllProfiles' : ActorMethod<[], Array<DietProfile>>,
   'getDietPlan' : ActorMethod<[string], DietPlan>,
   'getProfile' : ActorMethod<[string], DietProfile>,
+  /**
+   * / Set rewardPaid flag to true. Public, no authentication performed!
+   */
+  'markRewardPaid' : ActorMethod<[string], boolean>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

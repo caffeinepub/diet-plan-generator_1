@@ -4,6 +4,7 @@ import type { DietPlan } from "./backend.d";
 import AdminPanel from "./components/AdminPanel";
 import DietForm from "./components/DietForm";
 import DietResult from "./components/DietResult";
+import { createActorWithConfig } from "./config";
 import type { FormData } from "./types/diet";
 
 declare global {
@@ -170,6 +171,22 @@ function MainApp() {
           localStorage.setItem("hn_coach_reports", JSON.stringify(reports));
         } catch (_) {}
 
+        // Also save to backend for cross-device admin panel visibility
+        createActorWithConfig()
+          .then((actor) =>
+            actor.addAdminReport({
+              id: Date.now().toString(),
+              name: pendingFormData?.name || "",
+              whatsapp: pendingFormData?.user_whatsapp || "",
+              referredBy: pendingFormData?.referrer_whatsapp || "",
+              goal: pendingFormData?.goal || "",
+              amount: price,
+              paidAt: new Date().toISOString(),
+              rewardPaid: false,
+            }),
+          )
+          .catch(() => {});
+
         setDietPlan(pendingPlan);
         setFormData(pendingFormData);
         setView("result");
@@ -185,7 +202,7 @@ function MainApp() {
         contact: pendingFormData?.user_whatsapp || "",
       },
       theme: {
-        color: "#0d9488",
+        color: "#1a5c38",
       },
     };
 
@@ -208,7 +225,7 @@ function MainApp() {
           className="min-h-screen flex items-center justify-center px-4 py-8 relative overflow-hidden"
           style={{
             background:
-              "linear-gradient(135deg, #0f0c29 0%, #302b63 40%, #0f3460 70%, #0d7377 100%)",
+              "linear-gradient(135deg, #0a2918 0%, #0f3d25 35%, #1a5c38 70%, #2d7a50 100%)",
           }}
         >
           {/* Floating sparkles */}

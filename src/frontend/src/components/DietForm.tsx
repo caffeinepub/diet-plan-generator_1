@@ -264,7 +264,7 @@ export default function DietForm({ onComplete, onViewPreviousReport }: Props) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50/60 to-teal-50/40 dark:from-background dark:via-secondary/30 dark:to-accent/20 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50/60 to-forest-50/40 dark:from-background dark:via-secondary/30 dark:to-accent/20 flex flex-col">
       {/* Header */}
       <header className="no-print border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-2xl mx-auto px-4 py-4">
@@ -535,6 +535,83 @@ function HeightInput({ data, errors = {}, update }: StepProps) {
   );
 }
 
+const TRANSFORMATION_IMAGES = [
+  "/assets/uploads/IMG-20260315-WA0011-1.jpg",
+  "/assets/uploads/IMG-20260315-WA0012-2.jpg",
+  "/assets/uploads/IMG-20260315-WA0025-3.jpg",
+  "/assets/uploads/IMG-20260315-WA0023-4.jpg",
+  "/assets/uploads/IMG-20260315-WA0020-5.jpg",
+  "/assets/uploads/IMG-20260315-WA0030-6.jpg",
+  "/assets/uploads/IMG-20260315-WA0029-7.jpg",
+  "/assets/uploads/IMG-20260315-WA0022-8.jpg",
+  "/assets/uploads/IMG-20260315-WA0017-9.jpg",
+  "/assets/uploads/IMG-20260315-WA0027-10.jpg",
+  "/assets/uploads/IMG-20260315-WA0018-11.jpg",
+  "/assets/uploads/IMG-20260315-WA0032-12.jpg",
+];
+
+function TransformationSlideshow() {
+  const [current, setCurrent] = useState(0);
+  const [fade, setFade] = useState(true);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setFade(false);
+      setTimeout(() => {
+        setCurrent((prev) => (prev + 1) % TRANSFORMATION_IMAGES.length);
+        setFade(true);
+      }, 400);
+    }, 3500);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div className="rounded-2xl overflow-hidden shadow-lg mb-4 relative">
+      <div
+        className="text-center py-2 px-4 text-white font-bold text-sm tracking-wide"
+        style={{
+          background: "linear-gradient(135deg, #0f3d25 0%, #1a5c38 100%)",
+        }}
+      >
+        ✨ Real Transformations — Real People ✨
+      </div>
+      <div className="relative bg-black" style={{ height: "340px" }}>
+        <img
+          src={TRANSFORMATION_IMAGES[current]}
+          alt={`Transformation ${current + 1}`}
+          className="w-full h-full object-contain transition-opacity duration-400"
+          style={{ opacity: fade ? 1 : 0, transition: "opacity 0.4s ease" }}
+        />
+        {/* Dot indicators */}
+        <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1.5 flex-wrap px-4">
+          {TRANSFORMATION_IMAGES.map((img, i) => (
+            <button
+              type="button"
+              key={img}
+              onClick={() => {
+                setFade(false);
+                setTimeout(() => {
+                  setCurrent(i);
+                  setFade(true);
+                }, 300);
+              }}
+              className="w-2 h-2 rounded-full transition-all duration-300"
+              style={{
+                background: i === current ? "#facc15" : "rgba(255,255,255,0.5)",
+              }}
+              aria-label={`Go to slide ${i + 1}`}
+            />
+          ))}
+        </div>
+        {/* Counter */}
+        <div className="absolute top-2 right-2 bg-black/50 text-white text-xs px-2 py-0.5 rounded-full">
+          {current + 1} / {TRANSFORMATION_IMAGES.length}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function DownloadCountBar() {
   const [count, setCount] = useState(53);
 
@@ -611,7 +688,7 @@ function Step1({ data, errors = {}, update }: StepProps) {
         className="relative overflow-hidden rounded-2xl shadow-xl"
         style={{
           background:
-            "linear-gradient(135deg, #7c3aed 0%, #db2777 50%, #f97316 100%)",
+            "linear-gradient(135deg, #0f3d25 0%, #1a5c38 50%, #2d7a50 100%)",
         }}
       >
         {/* Shimmer overlay */}
@@ -625,14 +702,14 @@ function Step1({ data, errors = {}, update }: StepProps) {
           }}
         />
         <div
-          className="absolute top-1 right-1 text-xs font-black text-purple-900 rotate-45 translate-x-1 -translate-y-1"
+          className="absolute top-1 right-1 text-xs font-black text-forest-900 rotate-45 translate-x-1 -translate-y-1"
           style={{ fontSize: "9px" }}
         >
           FREE!
         </div>
         <div className="relative p-5 text-center">
           {/* EXCLUSIVE OFFER badge */}
-          <div className="inline-block bg-yellow-400 text-purple-900 text-xs font-black px-3 py-1 rounded-full tracking-widest uppercase mb-3 shadow-md">
+          <div className="inline-block bg-yellow-400 text-forest-900 text-xs font-black px-3 py-1 rounded-full tracking-widest uppercase mb-3 shadow-md">
             ✨ Exclusive Offer ✨
           </div>
           <div className="text-3xl mb-2">✨ 🎁 ✨</div>
@@ -645,6 +722,7 @@ function Step1({ data, errors = {}, update }: StepProps) {
         </div>
       </div>
       <DownloadCountBar />
+      <TransformationSlideshow />
       <div className="mb-4 rounded-xl overflow-hidden">
         <img
           src="/assets/generated/fit-india-banner.dim_800x200.jpg"

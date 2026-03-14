@@ -8,6 +8,16 @@
 
 import { IDL } from '@icp-sdk/core/candid';
 
+export const AdminReport = IDL.Record({
+  'id' : IDL.Text,
+  'goal' : IDL.Text,
+  'name' : IDL.Text,
+  'whatsapp' : IDL.Text,
+  'referredBy' : IDL.Text,
+  'rewardPaid' : IDL.Bool,
+  'amount' : IDL.Float64,
+  'paidAt' : IDL.Text,
+});
 export const MacronutrientBreakdown = IDL.Record({
   'carbs' : IDL.Float64,
   'fats' : IDL.Float64,
@@ -77,18 +87,31 @@ export const DietProfile = IDL.Record({
 });
 
 export const idlService = IDL.Service({
+  'addAdminReport' : IDL.Func([AdminReport], [], []),
   'addDietPlan' : IDL.Func([DietPlan], [], []),
   'addProfile' : IDL.Func([DietProfile], [], []),
   'deleteWrapper' : IDL.Func([IDL.Text], [IDL.Text], ['query']),
+  'getAdminReports' : IDL.Func([], [IDL.Vec(AdminReport)], ['query']),
   'getAllDietPlans' : IDL.Func([], [IDL.Vec(DietPlan)], ['query']),
   'getAllProfiles' : IDL.Func([], [IDL.Vec(DietProfile)], ['query']),
   'getDietPlan' : IDL.Func([IDL.Text], [DietPlan], ['query']),
   'getProfile' : IDL.Func([IDL.Text], [DietProfile], ['query']),
+  'markRewardPaid' : IDL.Func([IDL.Text], [IDL.Bool], []),
 });
 
 export const idlInitArgs = [];
 
 export const idlFactory = ({ IDL }) => {
+  const AdminReport = IDL.Record({
+    'id' : IDL.Text,
+    'goal' : IDL.Text,
+    'name' : IDL.Text,
+    'whatsapp' : IDL.Text,
+    'referredBy' : IDL.Text,
+    'rewardPaid' : IDL.Bool,
+    'amount' : IDL.Float64,
+    'paidAt' : IDL.Text,
+  });
   const MacronutrientBreakdown = IDL.Record({
     'carbs' : IDL.Float64,
     'fats' : IDL.Float64,
@@ -158,13 +181,16 @@ export const idlFactory = ({ IDL }) => {
   });
   
   return IDL.Service({
+    'addAdminReport' : IDL.Func([AdminReport], [], []),
     'addDietPlan' : IDL.Func([DietPlan], [], []),
     'addProfile' : IDL.Func([DietProfile], [], []),
     'deleteWrapper' : IDL.Func([IDL.Text], [IDL.Text], ['query']),
+    'getAdminReports' : IDL.Func([], [IDL.Vec(AdminReport)], ['query']),
     'getAllDietPlans' : IDL.Func([], [IDL.Vec(DietPlan)], ['query']),
     'getAllProfiles' : IDL.Func([], [IDL.Vec(DietProfile)], ['query']),
     'getDietPlan' : IDL.Func([IDL.Text], [DietPlan], ['query']),
     'getProfile' : IDL.Func([IDL.Text], [DietProfile], ['query']),
+    'markRewardPaid' : IDL.Func([IDL.Text], [IDL.Bool], []),
   });
 };
 

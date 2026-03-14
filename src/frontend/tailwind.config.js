@@ -70,6 +70,29 @@ export default {
           border: "oklch(var(--sidebar-border))",
           ring: "oklch(var(--sidebar-ring))",
         },
+        /* Deep Forest Green + Gold custom palette */
+        forest: {
+          50: "#f0faf5",
+          100: "#dcf5e7",
+          200: "#b9ebcf",
+          300: "#7dd5a8",
+          400: "#4ab87e",
+          500: "#2d9a5f",
+          600: "#1a5c38",
+          700: "#154d2f",
+          800: "#0f3d25",
+          900: "#0a2918",
+        },
+        gold: {
+          50: "#fef3c7",
+          100: "#fde68a",
+          200: "#fcd34d",
+          300: "#fbbf24",
+          400: "#f59e0b",
+          500: "#d4a017",
+          600: "#b8860b",
+          700: "#92640a",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -78,7 +101,8 @@ export default {
       },
       boxShadow: {
         xs: "0 1px 2px 0 rgba(0,0,0,0.05)",
-        green: "0 4px 24px -4px oklch(0.52 0.17 145 / 0.2)",
+        green: "0 4px 24px -4px rgba(26,92,56,0.3)",
+        gold: "0 4px 24px -4px rgba(212,160,23,0.4)",
       },
       keyframes: {
         "accordion-down": {

@@ -174,7 +174,27 @@ export function generateHealthTips(
     );
   }
 
-  return tips.slice(0, 8);
+  // Motivation & Mindset
+  tips.push(
+    "Discipline is not about being perfect — it's about showing up every single day, even when you don't feel like it. Start small, stay consistent.",
+  );
+  tips.push(
+    "Every healthy meal you eat is a vote for the person you want to become. Your body is listening to every choice you make.",
+  );
+  tips.push(
+    "Consistency beats intensity every time. You don't need to be extreme — you just need to keep going, day after day, week after week.",
+  );
+  tips.push(
+    "Self-discipline is the bridge between your goals and your accomplishments. Build it one meal, one habit, one day at a time.",
+  );
+  tips.push(
+    "Progress is not always visible in the mirror — but it's happening inside your cells, your energy, and your health every single day. Trust the process.",
+  );
+  tips.push(
+    "Motivation gets you started; discipline keeps you going. Once healthy eating becomes a habit, it stops feeling like effort — it becomes your lifestyle.",
+  );
+
+  return tips.slice(0, 14);
 }
 
 export function generateDietPlan(data: FormData, profileId: string): DietPlan {
