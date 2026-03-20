@@ -87,6 +87,13 @@ function MainApp() {
   const [pendingFormData, setPendingFormData] = useState<FormData | null>(null);
   const [isPaymentLoading, setIsPaymentLoading] = useState(false);
   const [currentPrice, setCurrentPrice] = useState(getCurrentPrice);
+  const [hasPreviousReport, setHasPreviousReport] = useState(() => {
+    try {
+      return !!localStorage.getItem("hn_coach_last_report");
+    } catch (_) {
+      return false;
+    }
+  });
 
   useEffect(() => {
     setCurrentPrice(getCurrentPrice());
@@ -149,6 +156,7 @@ function MainApp() {
         // Payment successful
         try {
           localStorage.setItem(LS_PAID_KEY, "true");
+          setHasPreviousReport(true);
           const count = getDownloadCount();
           localStorage.setItem(LS_DOWNLOAD_COUNT_KEY, String(count + 1));
         } catch (_) {}
@@ -202,7 +210,7 @@ function MainApp() {
         contact: pendingFormData?.user_whatsapp || "",
       },
       theme: {
-        color: "#1a5c38",
+        color: "#6d28d9",
       },
     };
 
@@ -218,6 +226,7 @@ function MainApp() {
         <DietForm
           onComplete={handlePlanGenerated}
           onViewPreviousReport={handleViewPreviousReport}
+          hasPreviousReport={hasPreviousReport}
         />
       )}
       {view === "payment" && (
@@ -225,7 +234,7 @@ function MainApp() {
           className="min-h-screen flex items-center justify-center px-4 py-8 relative overflow-hidden"
           style={{
             background:
-              "linear-gradient(135deg, #0a2918 0%, #0f3d25 35%, #1a5c38 70%, #2d7a50 100%)",
+              "linear-gradient(135deg, #0d0520 0%, #1a0533 35%, #2d1066 70%, #4c1d95 100%)",
           }}
         >
           {/* Floating sparkles */}

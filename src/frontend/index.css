@@ -271,4 +271,13 @@
   .referral-section {
     display: none !important;
   }
+
+  /* Prevent boxes/cards from being cropped across pages */
+  .bg-white.rounded-xl,
+  .rounded-2xl,
+  [data-ocid],
+  .print\:break-inside-avoid {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
 }

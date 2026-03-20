@@ -70,18 +70,18 @@ export default {
           border: "oklch(var(--sidebar-border))",
           ring: "oklch(var(--sidebar-ring))",
         },
-        /* Deep Forest Green + Gold custom palette */
+        /* Deep Purple custom palette — replaces forest greens */
         forest: {
-          50: "#f0faf5",
-          100: "#dcf5e7",
-          200: "#b9ebcf",
-          300: "#7dd5a8",
-          400: "#4ab87e",
-          500: "#2d9a5f",
-          600: "#1a5c38",
-          700: "#154d2f",
-          800: "#0f3d25",
-          900: "#0a2918",
+          50: "#f5f0ff",
+          100: "#ede0ff",
+          200: "#d8b4fe",
+          300: "#c084fc",
+          400: "#a855f7",
+          500: "#8b5cf6",
+          600: "#7c3aed",
+          700: "#6d28d9",
+          800: "#5b21b6",
+          900: "#4c1d95",
         },
         gold: {
           50: "#fef3c7",
@@ -101,8 +101,9 @@ export default {
       },
       boxShadow: {
         xs: "0 1px 2px 0 rgba(0,0,0,0.05)",
-        green: "0 4px 24px -4px rgba(26,92,56,0.3)",
+        green: "0 4px 24px -4px rgba(109,40,217,0.4)",
         gold: "0 4px 24px -4px rgba(212,160,23,0.4)",
+        purple: "0 8px 32px rgba(109,40,217,0.35)",
       },
       keyframes: {
         "accordion-down": {
@@ -117,11 +118,27 @@ export default {
           from: { opacity: "0", transform: "translateY(10px)" },
           to: { opacity: "1", transform: "translateY(0)" },
         },
+        gradientShift: {
+          "0%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" },
+          "100%": { backgroundPosition: "0% 50%" },
+        },
+        shimmer: {
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(200%)" },
+        },
+        glowPulse: {
+          "0%, 100%": { boxShadow: "0 0 20px rgba(139,92,246,0.4)" },
+          "50%": { boxShadow: "0 0 40px rgba(139,92,246,0.8), 0 0 60px rgba(109,40,217,0.4)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "fade-in": "fade-in 0.4s ease-out",
+        "gradient-shift": "gradientShift 8s ease infinite",
+        shimmer: "shimmer 2.5s infinite",
+        "glow-pulse": "glowPulse 2s ease-in-out infinite",
       },
     },
   },

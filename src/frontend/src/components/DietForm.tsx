@@ -79,21 +79,19 @@ const STEP_META = [
 interface Props {
   onComplete: (plan: DietPlan, data: FormData) => void;
   onViewPreviousReport?: () => void;
+  hasPreviousReport?: boolean;
 }
 
-export default function DietForm({ onComplete, onViewPreviousReport }: Props) {
+export default function DietForm({
+  onComplete,
+  onViewPreviousReport,
+  hasPreviousReport,
+}: Props) {
   const [step, setStep] = useState(1);
   const [direction, setDirection] = useState(1);
   const [data, setData] = useState<FormData>(defaultFormData);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isGenerating, setIsGenerating] = useState(false);
-  const [hasPreviousReport] = useState(() => {
-    try {
-      return !!localStorage.getItem("hn_coach_last_report");
-    } catch (_) {
-      return false;
-    }
-  });
   const { actor } = useActor();
 
   // Track referral from URL param on mount
@@ -264,9 +262,20 @@ export default function DietForm({ onComplete, onViewPreviousReport }: Props) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50/60 to-forest-50/40 dark:from-background dark:via-secondary/30 dark:to-accent/20 flex flex-col">
+    <div
+      className="min-h-screen flex flex-col"
+      style={{
+        background:
+          "linear-gradient(135deg, #0d0520 0%, #1a0533 40%, #2d1066 100%)",
+        backgroundSize: "200% 200%",
+        animation: "gradientShift 8s ease infinite",
+      }}
+    >
       {/* Header */}
-      <header className="no-print border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-10">
+      <header
+        className="no-print border-b border-violet-800/30 sticky top-0 z-10 backdrop-blur-xl"
+        style={{ background: "rgba(13,5,32,0.85)" }}
+      >
         <div className="max-w-2xl mx-auto px-4 py-4">
           <div className="flex items-center gap-3 mb-4">
             <img
@@ -275,10 +284,10 @@ export default function DietForm({ onComplete, onViewPreviousReport }: Props) {
               className="w-10 h-10 rounded-full object-cover shadow-sm"
             />
             <div>
-              <span className="font-display font-bold text-lg text-foreground">
+              <span className="font-display font-bold text-lg text-white">
                 HN Coach
               </span>
-              <div className="text-xs text-muted-foreground leading-none">
+              <div className="text-xs text-violet-300 leading-none">
                 Diet & Nutrition Plan
               </div>
             </div>
@@ -299,13 +308,19 @@ export default function DietForm({ onComplete, onViewPreviousReport }: Props) {
         <div className="w-full max-w-2xl">
           {/* Step Header */}
           <div className="mb-8 text-center">
-            <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10 mb-4">
-              <StepIcon className="w-6 h-6 text-primary" />
+            <div
+              className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-4"
+              style={{
+                background: "rgba(109,40,217,0.2)",
+                border: "1px solid rgba(167,139,250,0.3)",
+              }}
+            >
+              <StepIcon className="w-6 h-6 text-violet-300" />
             </div>
-            <h1 className="text-2xl sm:text-3xl font-display font-bold text-foreground">
+            <h1 className="text-2xl sm:text-3xl font-display font-bold text-white">
               {meta.title}
             </h1>
-            <p className="text-muted-foreground mt-1">{meta.subtitle}</p>
+            <p className="text-violet-300 mt-1">{meta.subtitle}</p>
           </div>
 
           {/* Animated Step Content */}
@@ -319,7 +334,7 @@ export default function DietForm({ onComplete, onViewPreviousReport }: Props) {
               animate="center"
               exit="exit"
               transition={{ duration: 0.25, ease: "easeInOut" }}
-              className="bg-card/95 backdrop-blur-sm rounded-2xl border border-border/80 p-6 sm:p-8 shadow-lg shadow-green-100/50 dark:shadow-none"
+              className="rounded-2xl p-6 sm:p-8 float-3d glass-card"
             >
               {step === 1 && (
                 <Step1 data={data} errors={errors} update={update} />
@@ -344,21 +359,46 @@ export default function DietForm({ onComplete, onViewPreviousReport }: Props) {
 
           {/* View Previous Report */}
           {step === 1 && hasPreviousReport && onViewPreviousReport && (
-            <div className="mt-4 text-center">
+            <div className="mt-5">
               <button
                 type="button"
                 data-ocid="home.view_previous_report_button"
                 onClick={onViewPreviousReport}
-                className="inline-flex items-center gap-2 text-sm text-primary hover:text-primary/80 font-medium underline underline-offset-4 transition-colors"
+                className="w-full flex items-center justify-between gap-3 px-5 py-4 rounded-2xl font-bold text-sm transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg"
+                style={{
+                  background:
+                    "linear-gradient(135deg, #1a0533 0%, #6d28d9 100%)",
+                  border: "2px solid rgba(218,165,32,0.7)",
+                  boxShadow:
+                    "0 4px 20px rgba(218,165,32,0.25), 0 2px 10px rgba(0,0,0,0.2)",
+                  color: "#facc15",
+                }}
               >
-                <span>📋</span> View Previous Report
+                <span className="flex items-center gap-3">
+                  <span className="text-2xl">📋</span>
+                  <span>
+                    <span
+                      className="block text-base font-black"
+                      style={{ color: "#facc15" }}
+                    >
+                      View Previous Report
+                    </span>
+                    <span
+                      className="block text-xs font-normal"
+                      style={{ color: "rgba(255,255,255,0.6)" }}
+                    >
+                      Access your last generated diet plan — FREE
+                    </span>
+                  </span>
+                </span>
+                <span className="text-xl">→</span>
               </button>
             </div>
           )}
 
           {/* Error messages */}
           {Object.keys(errors).length > 0 && (
-            <div className="mt-4 bg-destructive/10 border border-destructive/20 rounded-xl px-4 py-3 space-y-1">
+            <div className="mt-4 rounded-xl px-4 py-3 space-y-1 border rounded-xl px-4 py-3 space-y-1">
               {Object.values(errors).map((err) => (
                 <p key={err} className="text-sm text-destructive font-medium">
                   {err}
@@ -466,7 +506,7 @@ function HeightInput({ data, errors = {}, update }: StepProps) {
           type="button"
           data-ocid="height.unit.select"
           onClick={() => handleUnitChange("cm")}
-          className={`px-3 py-1.5 rounded-lg border text-sm font-medium transition-all ${unit === "cm" ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:border-primary/50"}`}
+          className={`px-3 py-1.5 rounded-lg border text-sm font-medium transition-all ${unit === "cm" ? "border-violet-400 bg-violet-500/20 text-violet-200" : "border-border text-muted-foreground hover:border-primary/50"}`}
         >
           cm
         </button>
@@ -474,7 +514,7 @@ function HeightInput({ data, errors = {}, update }: StepProps) {
           type="button"
           data-ocid="height.unit.select"
           onClick={() => handleUnitChange("feet")}
-          className={`px-3 py-1.5 rounded-lg border text-sm font-medium transition-all ${unit === "feet" ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:border-primary/50"}`}
+          className={`px-3 py-1.5 rounded-lg border text-sm font-medium transition-all ${unit === "feet" ? "border-violet-400 bg-violet-500/20 text-violet-200" : "border-border text-muted-foreground hover:border-primary/50"}`}
         >
           Feet &amp; Inches
         </button>
@@ -504,9 +544,7 @@ function HeightInput({ data, errors = {}, update }: StepProps) {
               onChange={(e) => handleFeetChange(Number(e.target.value))}
               className={errors.height ? "border-destructive" : ""}
             />
-            <span className="text-xs text-muted-foreground mt-1 block">
-              feet
-            </span>
+            <span className="text-xs text-violet-300 mt-1 block">feet</span>
           </div>
           <div className="flex-1">
             <Input
@@ -519,9 +557,7 @@ function HeightInput({ data, errors = {}, update }: StepProps) {
               onChange={(e) => handleInchesChange(Number(e.target.value))}
               className={errors.height ? "border-destructive" : ""}
             />
-            <span className="text-xs text-muted-foreground mt-1 block">
-              inches
-            </span>
+            <span className="text-xs text-violet-300 mt-1 block">inches</span>
           </div>
         </div>
       )}
@@ -539,13 +575,11 @@ const TRANSFORMATION_IMAGES = [
   "/assets/uploads/IMG-20260315-WA0011-1.jpg",
   "/assets/uploads/IMG-20260315-WA0012-2.jpg",
   "/assets/uploads/IMG-20260315-WA0025-3.jpg",
-  "/assets/uploads/IMG-20260315-WA0023-4.jpg",
   "/assets/uploads/IMG-20260315-WA0020-5.jpg",
   "/assets/uploads/IMG-20260315-WA0030-6.jpg",
   "/assets/uploads/IMG-20260315-WA0029-7.jpg",
   "/assets/uploads/IMG-20260315-WA0022-8.jpg",
   "/assets/uploads/IMG-20260315-WA0017-9.jpg",
-  "/assets/uploads/IMG-20260315-WA0027-10.jpg",
   "/assets/uploads/IMG-20260315-WA0018-11.jpg",
   "/assets/uploads/IMG-20260315-WA0032-12.jpg",
 ];
@@ -570,7 +604,7 @@ function TransformationSlideshow() {
       <div
         className="text-center py-2 px-4 text-white font-bold text-sm tracking-wide"
         style={{
-          background: "linear-gradient(135deg, #0f3d25 0%, #1a5c38 100%)",
+          background: "linear-gradient(135deg, #1a0533 0%, #6d28d9 100%)",
         }}
       >
         ✨ Real Transformations — Real People ✨
@@ -688,7 +722,7 @@ function Step1({ data, errors = {}, update }: StepProps) {
         className="relative overflow-hidden rounded-2xl shadow-xl"
         style={{
           background:
-            "linear-gradient(135deg, #0f3d25 0%, #1a5c38 50%, #2d7a50 100%)",
+            "linear-gradient(135deg, #0d0520 0%, #1a0533 50%, #6d28d9 100%)",
         }}
       >
         {/* Shimmer overlay */}
@@ -783,7 +817,7 @@ function Step1({ data, errors = {}, update }: StepProps) {
                 onClick={() => update("gender", g)}
                 className={`p-2.5 rounded-lg border-2 text-sm font-medium capitalize transition-all ${
                   data.gender === g
-                    ? "border-primary bg-primary/10 text-primary"
+                    ? "border-violet-400 bg-violet-500/20 text-violet-200"
                     : "border-border text-muted-foreground hover:border-primary/50"
                 }`}
               >
@@ -940,7 +974,7 @@ function Step2({ data, update }: StepProps) {
             className={`p-4 rounded-xl border-2 text-left transition-all ${
               data.goal === g.value
                 ? "border-primary bg-primary/10"
-                : "border-border hover:border-primary/40 hover:bg-secondary/50"
+                : "border-violet-800/50 hover:border-violet-500/60 hover:bg-violet-800/20 text-white"
             }`}
           >
             <div className="text-2xl mb-2">{g.emoji}</div>
@@ -1148,7 +1182,7 @@ function StepBmrTdee({ data, update }: StepProps) {
         </div>
       </div>
       {(data.bmr_manual > 0 || data.tdee_manual > 0) && (
-        <div className="bg-primary/5 rounded-xl p-4 grid grid-cols-2 gap-3 text-center">
+        <div className="rounded-xl p-4 grid grid-cols-2 gap-3 text-center">
           <div>
             <div className="text-xl font-bold text-blue-600">
               {data.bmr_manual || "—"}
@@ -1196,7 +1230,7 @@ function Step6({ data, update }: StepProps) {
             className={`p-5 rounded-xl border-2 text-center transition-all ${
               data.meal_gap === opt.value
                 ? "border-primary bg-primary/10"
-                : "border-border hover:border-primary/40 hover:bg-secondary/50"
+                : "border-violet-800/50 hover:border-violet-500/60 hover:bg-violet-800/20 text-white"
             }`}
           >
             <div className="text-3xl mb-2">{opt.emoji}</div>
@@ -1250,7 +1284,7 @@ function Step8({ data, toggleArrayItem }: StepProps) {
           <div
             key={condition}
             data-ocid={`conditions.checkbox.${i + 1}`}
-            className="flex items-center gap-3 p-3 rounded-xl border border-border hover:bg-secondary/50 cursor-pointer transition-colors"
+            className="flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-colors"
           >
             <Checkbox
               checked={data.health_conditions.includes(condition)}
@@ -1382,7 +1416,7 @@ function Step10({ data, update }: StepProps) {
           />
         </div>
       </div>
-      <div className="bg-primary/5 rounded-xl p-4 grid grid-cols-3 gap-3 text-center">
+      <div className="rounded-xl p-4 grid grid-cols-3 gap-3 text-center">
         <div>
           <div className="text-xl font-bold text-green-600">
             {data.protein_target || "—"}g

@@ -80,7 +80,7 @@ function TreeNode({ node, depth }: { node: TreeNodeData; depth: number }) {
     <div style={{ marginLeft: depth > 0 ? 24 : 0 }}>
       <button
         type="button"
-        className="w-full flex items-center gap-2 py-2 px-3 rounded-lg hover:bg-forest-50 transition-colors cursor-pointer border border-transparent hover:border-forest-100 text-left"
+        className="w-full flex items-center gap-2 py-2 px-3 rounded-lg hover:bg-violet-900/30 transition-colors cursor-pointer border border-transparent hover:border-violet-700/30 text-left"
         onClick={toggle}
         data-ocid="admin.tree.row"
       >
@@ -91,14 +91,14 @@ function TreeNode({ node, depth }: { node: TreeNodeData; depth: number }) {
         )}
         {node.children.length === 0 && <span className="w-4" />}
         <div className="flex-1 flex flex-wrap items-center gap-x-4 gap-y-1">
-          <span className="font-semibold text-gray-800 text-sm">
+          <span className="font-semibold text-white text-sm">
             {node.entry.name}
           </span>
-          <span className="text-gray-500 text-xs">{node.entry.whatsapp}</span>
-          <span className="bg-forest-50 text-forest-700 text-xs px-2 py-0.5 rounded-full font-medium">
+          <span className="text-violet-400 text-xs">{node.entry.whatsapp}</span>
+          <span className="bg-violet-900/40 text-violet-300 text-xs px-2 py-0.5 rounded-full font-medium">
             {node.entry.goal}
           </span>
-          <span className="text-green-700 text-xs font-bold">
+          <span className="text-yellow-400 text-xs font-bold">
             ₹{node.entry.amount} paid
           </span>
           {reward > 0 && (
@@ -216,14 +216,14 @@ export default function AdminPanel() {
         className="min-h-screen flex items-center justify-center px-4"
         style={{
           background:
-            "linear-gradient(135deg, #0f3d25 0%, #1a5c38 50%, #2d7a50 100%)",
+            "linear-gradient(135deg, #0d0520 0%, #1a0533 50%, #4c1d95 100%)",
         }}
       >
-        <div className="w-full max-w-sm bg-white rounded-2xl shadow-2xl overflow-hidden">
+        <div className="w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden glass-card">
           <div
             className="px-8 py-8 text-center"
             style={{
-              background: "linear-gradient(135deg, #0f3d25 0%, #1a5c38 100%)",
+              background: "linear-gradient(135deg, #0d0520 0%, #6d28d9 100%)",
             }}
           >
             <div className="text-4xl mb-2">🛡️</div>
@@ -234,7 +234,7 @@ export default function AdminPanel() {
             <div>
               <label
                 htmlFor="admin-password"
-                className="block text-sm font-semibold text-gray-700 mb-2"
+                className="block text-sm font-semibold text-violet-200 mb-2"
               >
                 Password
               </label>
@@ -245,7 +245,7 @@ export default function AdminPanel() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleLogin()}
-                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-forest-500 transition-all"
+                className="w-full rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all border border-violet-700/30 bg-violet-900/30"
                 placeholder="Enter admin password"
               />
             </div>
@@ -263,7 +263,7 @@ export default function AdminPanel() {
               onClick={handleLogin}
               className="w-full text-white font-bold py-3 rounded-xl transition-all shadow-lg"
               style={{
-                background: "linear-gradient(135deg, #1a5c38 0%, #2d7a50 100%)",
+                background: "linear-gradient(135deg, #6d28d9 0%, #4c1d95 100%)",
               }}
             >
               Login
@@ -275,11 +275,14 @@ export default function AdminPanel() {
   }
 
   return (
-    <div className="min-h-screen bg-forest-50">
+    <div
+      className="min-h-screen"
+      style={{ background: "linear-gradient(135deg, #0d0520, #1a0533)" }}
+    >
       <header
         className="border-b border-forest-200 px-6 py-4 flex items-center justify-between shadow-sm"
         style={{
-          background: "linear-gradient(135deg, #0f3d25 0%, #1a5c38 100%)",
+          background: "linear-gradient(135deg, #0d0520 0%, #6d28d9 100%)",
         }}
       >
         <div className="flex items-center gap-3">
@@ -347,13 +350,11 @@ export default function AdminPanel() {
             <div
               // biome-ignore lint/suspicious/noArrayIndexKey: static list
               key={i}
-              className="bg-white rounded-xl p-5 shadow-sm border border-forest-100"
+              className="rounded-xl p-5 border border-violet-700/30 float-3d"
             >
               <div className="text-2xl mb-1">{stat.icon}</div>
-              <div className="text-2xl font-black text-gray-900">
-                {stat.value}
-              </div>
-              <div className="text-gray-500 text-sm">{stat.label}</div>
+              <div className="text-2xl font-black text-white">{stat.value}</div>
+              <div className="text-violet-300 text-sm">{stat.label}</div>
             </div>
           ))}
         </div>
@@ -371,7 +372,7 @@ export default function AdminPanel() {
             }`}
             style={
               view === "table"
-                ? { background: "linear-gradient(135deg, #1a5c38, #2d7a50)" }
+                ? { background: "linear-gradient(135deg, #7c3aed, #5b21b6)" }
                 : {}
             }
           >
@@ -388,7 +389,7 @@ export default function AdminPanel() {
             }`}
             style={
               view === "tree"
-                ? { background: "linear-gradient(135deg, #1a5c38, #2d7a50)" }
+                ? { background: "linear-gradient(135deg, #7c3aed, #5b21b6)" }
                 : {}
             }
           >
@@ -398,11 +399,11 @@ export default function AdminPanel() {
 
         {/* Table View */}
         {view === "table" && (
-          <div className="bg-white rounded-xl shadow-sm border border-forest-100 overflow-hidden">
+          <div className="rounded-xl border border-violet-700/30 overflow-hidden">
             {reports.length === 0 ? (
               <div
                 data-ocid="admin.empty_state"
-                className="text-center py-16 text-gray-400"
+                className="text-center py-16 text-violet-400"
               >
                 <div className="text-5xl mb-3">📭</div>
                 <p className="font-semibold">No reports yet</p>
@@ -417,7 +418,7 @@ export default function AdminPanel() {
                     <tr
                       className="text-white text-left"
                       style={{
-                        background: "linear-gradient(135deg, #1a5c38, #2d7a50)",
+                        background: "linear-gradient(135deg, #7c3aed, #5b21b6)",
                       }}
                     >
                       <th className="px-4 py-3 font-semibold">#</th>
@@ -481,7 +482,7 @@ export default function AdminPanel() {
                             <span className="text-gray-300 text-xs">—</span>
                           )}
                         </td>
-                        <td className="px-4 py-3 text-gray-500 text-xs whitespace-nowrap">
+                        <td className="px-4 py-3 text-violet-400 text-xs whitespace-nowrap">
                           {new Date(r.paidAt).toLocaleDateString("en-IN")}
                         </td>
                         <td className="px-4 py-3">
@@ -493,7 +494,7 @@ export default function AdminPanel() {
                               className="text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
                               style={{
                                 background:
-                                  "linear-gradient(135deg, #1a5c38, #2d7a50)",
+                                  "linear-gradient(135deg, #7c3aed, #5b21b6)",
                               }}
                             >
                               Mark Paid
@@ -517,14 +518,12 @@ export default function AdminPanel() {
 
         {/* Tree View */}
         {view === "tree" && (
-          <div className="bg-white rounded-xl shadow-sm border border-forest-100 p-6">
-            <h2 className="text-lg font-bold text-gray-800 mb-4">
-              Referral Tree
-            </h2>
+          <div className="rounded-xl border border-violet-700/30 p-6">
+            <h2 className="text-lg font-bold text-white mb-4">Referral Tree</h2>
             {tree.length === 0 ? (
               <div
                 data-ocid="admin.empty_state"
-                className="text-center py-16 text-gray-400"
+                className="text-center py-16 text-violet-400"
               >
                 <div className="text-5xl mb-3">🌱</div>
                 <p className="font-semibold">No referral data yet</p>
