@@ -660,7 +660,7 @@ function DownloadCountBar() {
     setCount(current);
   }, []);
 
-  const total = 1000;
+  const total = 100;
   const pct = Math.min((count / total) * 100, 100);
   const earlyBirdActive = count <= 100;
 
