@@ -671,7 +671,7 @@ export default function DietResult({
             <img
               src="/assets/generated/hn-nutrition-philosophy.dim_800x600.png"
               alt="HN Coach Nutrition Philosophy"
-              className="w-full rounded-xl shadow-md"
+              className="w-4/5 rounded-xl shadow-md mx-auto"
             />
             <p className="text-xs italic text-gray-500 text-center leading-relaxed">
               &ldquo;7 days to practice, 14 days to feel the change, 21 days to
@@ -862,45 +862,40 @@ export default function DietResult({
 
         {/* ── ENROLLMENT SECTION ── */}
         <div
-          className="rounded-xl border border-violet-300 bg-violet-50 p-3 flex flex-col gap-2 shadow-sm print:p-1 print:text-[8px]"
+          className="rounded-xl border border-violet-300 bg-violet-50 p-3 flex items-center gap-3 shadow-sm print:p-1 print:text-[8px]"
           data-ocid="result.coaching.section"
         >
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-violet-600 flex items-center justify-center flex-shrink-0 print:w-6 print:h-6">
-              <span className="text-xl print:text-xs">🏆</span>
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-violet-800 leading-tight print:text-[8px]">
-                Personal Coaching Program
-              </p>
-              <p className="text-xs text-violet-600 print:text-[7px]">
-                ✅ Result Guaranteed &nbsp;·&nbsp; 1-on-1 Expert Coach
-                &nbsp;·&nbsp; Customized Plans
-              </p>
-              <p className="text-xs text-gray-500 italic print:text-[7px]">
-                After enrollment your coach will contact you as soon as
-                possible.
-              </p>
-            </div>
+          <div className="w-10 h-10 rounded-full bg-violet-600 flex items-center justify-center flex-shrink-0 print:w-6 print:h-6">
+            <span className="text-xl print:text-xs">🏆</span>
           </div>
-          <div className="flex justify-center">
-            <a
-              href={`https://hn-coach-plans-jw1.caffeine.xyz${formData.referrer_whatsapp ? `?ref=${formData.referrer_whatsapp}` : ""}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              data-ocid="result.coaching.primary_button"
-              className="inline-flex items-center gap-1 px-6 py-2.5 rounded-lg font-extrabold text-sm transition-all hover:scale-105 active:scale-95 shadow-md animate-pulse"
-              style={{
-                background: "linear-gradient(135deg, #f5c842, #ff9500)",
-                color: "#4c1d95",
-                boxShadow:
-                  "0 0 12px rgba(212,175,55,0.7), 0 2px 8px rgba(0,0,0,0.3)",
-              }}
-            >
-              <Star className="w-3 h-3" />
-              Enroll Now
-            </a>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold text-violet-800 leading-tight print:text-[8px]">
+              Personal Coaching Program
+            </p>
+            <p className="text-xs text-violet-600 print:text-[7px]">
+              ✅ Result Guaranteed &nbsp;·&nbsp; 1-on-1 Expert Coach
+              &nbsp;·&nbsp; Customized Plans
+            </p>
+            <p className="text-xs text-gray-500 italic print:text-[7px]">
+              After enrollment your coach will contact you as soon as possible.
+            </p>
           </div>
+          <a
+            href={`https://hn-coach-plans-jw1.caffeine.xyz${formData.referrer_whatsapp ? `?ref=${formData.referrer_whatsapp}` : ""}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-ocid="result.coaching.primary_button"
+            className="inline-flex items-center gap-1 px-4 py-2 rounded-lg font-extrabold text-sm transition-all hover:scale-105 active:scale-95 shadow-md animate-pulse flex-shrink-0 print:px-2 print:py-0.5 print:text-[7px]"
+            style={{
+              background: "linear-gradient(135deg, #f5c842, #ff9500)",
+              color: "#4c1d95",
+              boxShadow:
+                "0 0 12px rgba(212,175,55,0.7), 0 2px 8px rgba(0,0,0,0.3)",
+            }}
+          >
+            <Star className="w-3 h-3" />
+            Enroll Now
+          </a>
         </div>
 
         {/* ── BODY SCIENCE INFO CARDS ── */}
@@ -1034,48 +1029,31 @@ export default function DietResult({
               </div>
             </div>
 
-            {/* Micronutrients Table */}
+            {/* Micronutrients Grid — 2-column like macronutrients */}
             <div>
               <h3 className="text-sm font-bold text-gray-800 mb-1 flex items-center gap-2 uppercase tracking-wide">
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block" />
                 Micronutrients — Daily RDA for Indians
               </h3>
-              <div className="overflow-x-auto rounded-lg border border-amber-200">
-                <table className="w-full text-xs print:text-[6px]">
-                  <thead>
-                    <tr className="bg-amber-500 text-white">
-                      <th className="py-1.5 px-2 print:p-[2px] text-left font-semibold">
-                        Nutrient
-                      </th>
-                      <th className="py-1.5 px-2 print:p-[2px] text-left font-semibold">
-                        Daily RDA
-                      </th>
-                      <th className="py-1.5 px-2 print:p-[2px] text-left font-semibold">
-                        Role
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {MICRO_RDA.map((row, i) => (
-                      <tr
-                        key={row.nutrient}
-                        className={
-                          i % 2 === 0 ? "bg-amber-50" : "bg-transparent"
-                        }
-                      >
-                        <td className="py-1.5 px-2 print:p-[2px] font-semibold text-gray-800">
-                          {row.nutrient}
-                        </td>
-                        <td className="py-1.5 px-2 print:p-[2px] text-amber-700 font-medium whitespace-nowrap">
-                          {row.rda}
-                        </td>
-                        <td className="py-1.5 px-2 print:p-[2px] text-violet-600">
-                          {row.role}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              <div className="grid grid-cols-2 gap-1 print:gap-0.5">
+                {MICRO_RDA.map((row, i) => (
+                  <div
+                    key={row.nutrient}
+                    className={`flex items-start gap-1.5 rounded border px-2 py-1 print:px-1 print:py-0.5 ${i % 2 === 0 ? "bg-amber-50 border-amber-200" : "bg-white border-amber-100"}`}
+                  >
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[10px] print:text-[7px] font-bold text-gray-800 leading-tight truncate">
+                        {row.nutrient}
+                      </p>
+                      <p className="text-[9px] print:text-[6px] text-amber-600 font-semibold leading-tight">
+                        {row.rda}
+                      </p>
+                      <p className="text-[9px] print:text-[6px] text-gray-500 leading-tight line-clamp-2">
+                        {row.role}
+                      </p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
