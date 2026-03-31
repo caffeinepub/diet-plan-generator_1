@@ -175,10 +175,16 @@
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
     background: white !important;
-    color: black !important;
+    color: #111 !important;
+    font-size: 10pt !important;
   }
   .page-break-avoid {
     break-inside: avoid;
     page-break-inside: avoid;
+  }
+  /* Compact spacing for print */
+  .print-compact {
+    padding: 8px !important;
+    margin: 4px !important;
   }
 }
