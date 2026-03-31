@@ -645,7 +645,7 @@ export default function DietResult({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start py-4 print:grid-cols-2"
+          className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-center py-4 print:grid-cols-2"
         >
           {/* Left: Name & Diet Plan Heading */}
           <div className="flex flex-col items-start justify-center gap-3 pl-2">
@@ -665,19 +665,36 @@ export default function DietResult({
             <span className="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-semibold text-violet-700 bg-violet-50 border border-violet-200">
               {GOAL_LABELS[formData.goal]}
             </span>
+            {/* Header illustrations below heading */}
+            <div className="flex gap-2 mt-2">
+              <img
+                src="/assets/generated/report-header-left-transparent.dim_200x300.png"
+                alt=""
+                className="w-20 md:w-28 opacity-90 pointer-events-none"
+              />
+              <img
+                src="/assets/generated/report-header-right-transparent.dim_200x300.png"
+                alt=""
+                className="w-20 md:w-28 opacity-90 pointer-events-none"
+              />
+            </div>
           </div>
           {/* Right: Nutrition Philosophy Image + Quotes */}
-          <div className="flex flex-col items-center gap-2">
+          <div className="flex flex-col items-center gap-3">
+            <div className="relative w-full text-center px-4 py-2">
+              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-12 rounded-full bg-violet-400 opacity-50" />
+              <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-12 rounded-full bg-violet-400 opacity-50" />
+              <p className="text-sm italic font-medium text-gray-600 leading-relaxed px-4">
+                &ldquo;7 days to practice, 14 days to feel the change, 21 days
+                to build the habit, 90 days to transform your life. 🚀&rdquo;
+              </p>
+            </div>
             <img
               src="/assets/generated/hn-nutrition-philosophy.dim_800x600.png"
               alt="HN Coach Nutrition Philosophy"
-              className="w-full rounded-xl shadow-md"
+              className="w-full max-w-sm rounded-2xl shadow-md"
             />
-            <p className="text-xs italic text-gray-500 text-center leading-relaxed">
-              &ldquo;7 days to practice, 14 days to feel the change, 21 days to
-              build the habit, 90 days to transform your life. 🚀&rdquo;
-            </p>
-            <p className="text-xs font-semibold text-violet-600 italic text-center">
+            <p className="text-sm font-semibold text-violet-600 italic text-center">
               &quot;You don&apos;t need to eat less — You only need to eat
               right&quot;
             </p>
@@ -1260,6 +1277,10 @@ export default function DietResult({
                           {dayLabel}
                         </td>
                         <td className="print:p-[2px] p-2 border border-gray-200 align-top">
+                          <div className="text-[10px] italic text-violet-500 bg-gray-100 rounded px-1.5 py-0.5 mb-1 inline-block">
+                            💊 HN Digestion — for better digestion &amp;
+                            absorption
+                          </div>
                           <div className="font-semibold text-violet-700">
                             HN Shake — {flavour}
                           </div>
@@ -1286,6 +1307,7 @@ export default function DietResult({
                             {Math.round(midSnackGrams / 2)}g Sprouts +
                             Vegetables
                           </div>
+                          <div className="text-violet-500 mt-0.5">+ HN Tea</div>
                         </td>
                         <td
                           className={`p-2 border border-gray-200 align-top ${isRewardDay ? "bg-gradient-to-br from-yellow-100 via-amber-50 to-orange-100 border-amber-400 border-2" : ""}`}
@@ -1305,6 +1327,10 @@ export default function DietResult({
                             </div>
                           ) : (
                             <div>
+                              <div className="text-[10px] italic text-violet-500 bg-gray-100 rounded px-1.5 py-0.5 mb-1 inline-block">
+                                💊 HN Digestion — for better digestion &amp;
+                                absorption
+                              </div>
                               <div className="font-semibold text-orange-700">
                                 Rice 100g + Chapati 2pc
                               </div>
@@ -1324,6 +1350,10 @@ export default function DietResult({
                           </div>
                         </td>
                         <td className="print:p-[2px] p-2 border border-gray-200 align-top">
+                          <div className="text-[10px] italic text-violet-500 bg-gray-100 rounded px-1.5 py-0.5 mb-1 inline-block">
+                            💊 HN Digestion — for better digestion &amp;
+                            absorption
+                          </div>
                           <div className="font-semibold text-blue-700 print:text-gray-900">
                             Rice 100g + Chapati 2pc
                           </div>
