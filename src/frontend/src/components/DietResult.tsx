@@ -640,39 +640,65 @@ export default function DietResult({
       </header>
 
       <main className="max-w-5xl mx-auto px-4 py-5 space-y-5">
-        {/* Hero Section */}
+        {/* Hero Section – 2-column: name/heading left, nutrition image + quotes right */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="relative flex items-center justify-center py-4"
+          className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-center py-4 print:grid-cols-2"
         >
-          {/* Left illustration */}
-          <img
-            src="/assets/generated/report-header-left-transparent.dim_200x300.png"
-            alt=""
-            className="hidden sm:block absolute left-0 top-1/2 -translate-y-1/2 w-40 md:w-56 opacity-100 pointer-events-none print:w-32"
-          />
-          {/* Center content */}
-          <div className="text-center px-4 sm:px-40">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4">
-              <UtensilsCrossed className="w-7 h-7 text-violet-600" />
-            </div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">
-              {formData.name}&apos;s Diet Plan
-            </h1>
-            <div className="flex items-center justify-center gap-2 mt-3 flex-wrap">
-              <span className="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-semibold text-violet-700 bg-violet-50 border border-violet-200">
-                {GOAL_LABELS[formData.goal]}
+          {/* Left: Name & Diet Plan Heading */}
+          <div className="flex flex-col items-start justify-center gap-3 pl-2">
+            <div className="flex items-center gap-3">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-violet-50 border border-violet-200">
+                <UtensilsCrossed className="w-6 h-6 text-violet-600" />
+              </div>
+              <span className="text-xs font-semibold uppercase tracking-widest text-violet-500">
+                HN Coach
               </span>
             </div>
+            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight">
+              {formData.name}&apos;s
+              <br />
+              Diet Plan
+            </h1>
+            <span className="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-semibold text-violet-700 bg-violet-50 border border-violet-200">
+              {GOAL_LABELS[formData.goal]}
+            </span>
+            {/* Header illustrations below heading */}
+            <div className="flex gap-2 mt-2">
+              <img
+                src="/assets/generated/report-header-left-transparent.dim_200x300.png"
+                alt=""
+                className="w-20 md:w-28 opacity-90 pointer-events-none"
+              />
+              <img
+                src="/assets/generated/report-header-right-transparent.dim_200x300.png"
+                alt=""
+                className="w-20 md:w-28 opacity-90 pointer-events-none"
+              />
+            </div>
           </div>
-          {/* Right illustration */}
-          <img
-            src="/assets/generated/report-header-right-transparent.dim_200x300.png"
-            alt=""
-            className="hidden sm:block absolute right-0 top-1/2 -translate-y-1/2 w-40 md:w-56 opacity-100 pointer-events-none print:w-32"
-          />
+          {/* Right: Nutrition Philosophy Image + Quotes */}
+          <div className="flex flex-col items-center gap-3">
+            <div className="relative w-full text-center px-4 py-2">
+              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-12 rounded-full bg-violet-400 opacity-50" />
+              <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-12 rounded-full bg-violet-400 opacity-50" />
+              <p className="text-sm italic font-medium text-gray-600 leading-relaxed px-4">
+                &ldquo;7 days to practice, 14 days to feel the change, 21 days
+                to build the habit, 90 days to transform your life. 🚀&rdquo;
+              </p>
+            </div>
+            <img
+              src="/assets/generated/hn-nutrition-philosophy.dim_800x600.png"
+              alt="HN Coach Nutrition Philosophy"
+              className="w-full max-w-sm rounded-2xl shadow-md"
+            />
+            <p className="text-sm font-semibold text-violet-600 italic text-center">
+              &quot;You don&apos;t need to eat less — You only need to eat
+              right&quot;
+            </p>
+          </div>
         </motion.div>
 
         {/* ── PERSONAL DETAILS ── */}
@@ -997,48 +1023,31 @@ export default function DietResult({
               </p>
             </div>
 
-            {/* Macronutrients Table */}
+            {/* Macronutrients Table — 2-column grid */}
             <div className="mb-2 print:mb-1">
               <h3 className="text-sm font-bold text-gray-800 mb-1 flex items-center gap-2 uppercase tracking-wide">
                 <span className="w-2.5 h-2.5 rounded-full bg-violet-600 inline-block" />
                 Macronutrients — Daily RDA for Indians
               </h3>
-              <div className="overflow-x-auto rounded-lg border border-violet-200">
-                <table className="w-full text-xs print:text-[6px]">
-                  <thead>
-                    <tr className="bg-violet-600 text-white">
-                      <th className="py-1.5 px-2 print:p-[2px] text-left font-semibold">
-                        Nutrient
-                      </th>
-                      <th className="py-1.5 px-2 print:p-[2px] text-left font-semibold">
-                        Daily RDA
-                      </th>
-                      <th className="py-1.5 px-2 print:p-[2px] text-left font-semibold">
-                        Role
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {macroRDA.map((row, i) => (
-                      <tr
-                        key={row.nutrient}
-                        className={
-                          i % 2 === 0 ? "bg-violet-50" : "bg-transparent"
-                        }
-                      >
-                        <td className="py-1.5 px-2 print:p-[2px] font-semibold text-gray-800">
-                          {row.nutrient}
-                        </td>
-                        <td className="py-1.5 px-2 print:p-[2px] text-violet-600 font-medium whitespace-nowrap">
-                          {row.rda}
-                        </td>
-                        <td className="py-1.5 px-2 print:p-[2px] text-violet-600">
-                          {row.role}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              <div className="grid grid-cols-2 gap-1 print:gap-0.5">
+                {macroRDA.map((row, i) => (
+                  <div
+                    key={row.nutrient}
+                    className={`flex items-start gap-1.5 rounded border px-2 py-1 print:px-1 print:py-0.5 ${i % 2 === 0 ? "bg-violet-50 border-violet-200" : "bg-white border-violet-100"}`}
+                  >
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[10px] print:text-[7px] font-bold text-gray-800 leading-tight truncate">
+                        {row.nutrient}
+                      </p>
+                      <p className="text-[9px] print:text-[6px] text-violet-600 font-semibold leading-tight">
+                        {row.rda}
+                      </p>
+                      <p className="text-[9px] print:text-[6px] text-gray-500 leading-tight line-clamp-2">
+                        {row.role}
+                      </p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -1096,55 +1105,6 @@ export default function DietResult({
               </p>
             </div>
           </ReportCard>
-        </motion.div>
-
-        {/* ── Motivational Quote ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.28 }}
-          className="relative text-center py-3 px-8"
-        >
-          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-16 rounded-full bg-violet-600 opacity-60" />
-          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-16 rounded-full bg-violet-600 opacity-60" />
-          <span className="text-4xl text-forest-300 font-bold leading-none select-none absolute -top-2 left-8">
-            &ldquo;
-          </span>
-          <p className="text-base sm:text-lg italic font-medium text-gray-600 leading-relaxed max-w-3xl mx-auto px-6">
-            7 days to practice, 14 days to feel the change, 21 days to build the
-            habit, 90 days to transform your life.{" "}
-            <span className="not-italic">🚀</span>
-          </p>
-          <span className="text-4xl text-forest-300 font-bold leading-none select-none absolute -bottom-4 right-8">
-            &rdquo;
-          </span>
-        </motion.div>
-
-        {/* ── Nutrition Philosophy Image ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.32 }}
-          className="flex justify-center my-4"
-        >
-          <img
-            src="/assets/generated/hn-nutrition-philosophy.dim_800x600.png"
-            alt="HN Coach Nutrition Philosophy"
-            className="max-w-xs sm:max-w-sm md:max-w-md rounded-2xl shadow-md"
-          />
-        </motion.div>
-
-        {/* ── Second Quote ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.34 }}
-          className="text-center py-2 px-8"
-        >
-          <p className="text-base sm:text-lg font-semibold text-violet-600 italic">
-            &quot;You don&apos;t need to eat less — You only need to eat
-            right&quot;
-          </p>
         </motion.div>
 
         {/* ── POST-SUNDAY CALORIE GUIDANCE ── */}
