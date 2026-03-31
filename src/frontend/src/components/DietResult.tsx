@@ -457,7 +457,11 @@ const CONDITION_AVOID_FOODS: Record<
   ],
 };
 
-export default function DietResult({ plan, formData, onStartOver }: Props) {
+export default function DietResult({
+  plan,
+  formData,
+  onStartOver: _onStartOver,
+}: Props) {
   const [referralCount, setReferralCount] = useState(0);
   const [copied, setCopied] = useState(false);
 
@@ -630,16 +634,6 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
             >
               <Printer className="w-4 h-4" />
               <span className="hidden sm:inline">Print Plan</span>
-            </Button>
-            <Button
-              data-ocid="result.start_over_button"
-              variant="outline"
-              size="sm"
-              onClick={onStartOver}
-              className="gap-2 no-print"
-            >
-              <RefreshCw className="w-4 h-4" />
-              <span className="hidden sm:inline">Generate New Report</span>
             </Button>
           </div>
         </div>
@@ -859,40 +853,45 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
 
         {/* ── ENROLLMENT SECTION ── */}
         <div
-          className="rounded-xl border border-violet-300 bg-violet-50 p-3 flex items-center gap-3 shadow-sm print:p-1 print:text-[8px]"
+          className="rounded-xl border border-violet-300 bg-violet-50 p-3 flex flex-col gap-2 shadow-sm print:p-1 print:text-[8px]"
           data-ocid="result.coaching.section"
         >
-          <div className="w-10 h-10 rounded-full bg-violet-600 flex items-center justify-center flex-shrink-0 print:w-6 print:h-6">
-            <span className="text-xl print:text-xs">🏆</span>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-violet-600 flex items-center justify-center flex-shrink-0 print:w-6 print:h-6">
+              <span className="text-xl print:text-xs">🏆</span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold text-violet-800 leading-tight print:text-[8px]">
+                Personal Coaching Program
+              </p>
+              <p className="text-xs text-violet-600 print:text-[7px]">
+                ✅ Result Guaranteed &nbsp;·&nbsp; 1-on-1 Expert Coach
+                &nbsp;·&nbsp; Customized Plans
+              </p>
+              <p className="text-xs text-gray-500 italic print:text-[7px]">
+                After enrollment your coach will contact you as soon as
+                possible.
+              </p>
+            </div>
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold text-violet-800 leading-tight print:text-[8px]">
-              Personal Coaching Program
-            </p>
-            <p className="text-xs text-violet-600 print:text-[7px]">
-              ✅ Result Guaranteed &nbsp;·&nbsp; 1-on-1 Expert Coach
-              &nbsp;·&nbsp; Customized Plans
-            </p>
-            <p className="text-xs text-gray-500 italic print:text-[7px]">
-              After enrollment your coach will contact you as soon as possible.
-            </p>
+          <div className="flex justify-center">
+            <a
+              href={`https://hn-coach-plans-jw1.caffeine.xyz${formData.referrer_whatsapp ? `?ref=${formData.referrer_whatsapp}` : ""}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-ocid="result.coaching.primary_button"
+              className="inline-flex items-center gap-1 px-6 py-2.5 rounded-lg font-extrabold text-sm transition-all hover:scale-105 active:scale-95 shadow-md animate-pulse"
+              style={{
+                background: "linear-gradient(135deg, #f5c842, #ff9500)",
+                color: "#4c1d95",
+                boxShadow:
+                  "0 0 12px rgba(212,175,55,0.7), 0 2px 8px rgba(0,0,0,0.3)",
+              }}
+            >
+              <Star className="w-3 h-3" />
+              Enroll Now
+            </a>
           </div>
-          <a
-            href={`https://hn-coach-plans-jw1.caffeine.xyz${formData.referrer_whatsapp ? `?ref=${formData.referrer_whatsapp}` : ""}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            data-ocid="result.coaching.primary_button"
-            className="inline-flex items-center gap-1 px-4 py-2.5 rounded-lg font-extrabold text-sm transition-all hover:scale-105 active:scale-95 shadow-md flex-shrink-0 print:hidden animate-pulse"
-            style={{
-              background: "linear-gradient(135deg, #f5c842, #ff9500)",
-              color: "#4c1d95",
-              boxShadow:
-                "0 0 12px rgba(212,175,55,0.7), 0 2px 8px rgba(0,0,0,0.3)",
-            }}
-          >
-            <Star className="w-3 h-3" />
-            Enroll
-          </a>
         </div>
 
         {/* ── BODY SCIENCE INFO CARDS ── */}
@@ -900,7 +899,7 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.55 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-3 print:break-before-page print:break-inside-avoid"
+          className="grid grid-cols-2 md:grid-cols-4 gap-3 print:break-inside-avoid"
         >
           {/* Card 1 – Human Body Cells */}
           <div className="rounded-lg border border-violet-200 overflow-hidden bg-white print:bg-white print:border-gray-200">
@@ -1179,178 +1178,6 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
           </div>
         </motion.div>
 
-        {/* ── DAILY WELLNESS — DO NOT CHANGE ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.38 }}
-          className="bg-white rounded-2xl border border-gray-200 p-3 shadow-sm"
-          data-ocid="result.daily_wellness.section"
-        >
-          <h2 className="text-sm font-bold text-gray-900 mb-2 flex items-center gap-2">
-            <span className="text-lg">🌿</span>
-            Daily Wellness
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {/* Hydration */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg px-2 py-1.5 flex items-center gap-2 print:bg-gray-50 print:border-gray-200">
-              <span className="text-base flex-shrink-0">💧</span>
-              <span className="text-xs font-semibold text-blue-700 flex-shrink-0 print:text-gray-800">
-                Hydration
-              </span>
-              <span className="text-sm font-bold text-gray-900 ml-auto">
-                {(formData.weight / 18).toFixed(1)}{" "}
-                <span className="text-xs font-normal text-gray-500">L/day</span>
-              </span>
-            </div>
-            {/* Walking */}
-            <div className="bg-violet-50 border border-violet-200 rounded-lg px-2 py-1.5 flex items-center gap-2 print:bg-gray-50 print:border-gray-200">
-              <span className="text-base flex-shrink-0">🚶</span>
-              <span className="text-xs font-semibold text-violet-700 flex-shrink-0 print:text-gray-800">
-                Daily Walking
-              </span>
-              <span className="text-sm font-bold text-gray-900 ml-auto">
-                {Math.round(formData.weight * 110).toLocaleString()}{" "}
-                <span className="text-xs font-normal text-gray-500">
-                  steps/day
-                </span>
-              </span>
-            </div>
-            {/* Exercise */}
-            <div className="bg-orange-50 border border-orange-200 rounded-lg px-2 py-1.5 flex items-center gap-2 print:bg-gray-50 print:border-gray-200">
-              <span className="text-base flex-shrink-0">🏋️</span>
-              <span className="text-xs font-semibold text-orange-700 flex-shrink-0 print:text-gray-800">
-                Exercise
-              </span>
-              <span className="text-sm font-bold text-gray-900 ml-auto">
-                {Math.round((formData.weight * 45) / 60)}{" "}
-                <span className="text-xs font-normal text-gray-500">
-                  min/day
-                </span>
-              </span>
-            </div>
-            {/* Sleep */}
-            <div className="bg-purple-50 border border-purple-200 rounded-lg px-2 py-1.5 flex items-center gap-2 print:bg-gray-50 print:border-gray-200">
-              <span className="text-base flex-shrink-0">🌙</span>
-              <span className="text-xs font-semibold text-purple-700 flex-shrink-0 print:text-gray-800">
-                Sleep
-              </span>
-              <span className="text-sm font-bold text-gray-900 ml-auto">
-                {formData.age <= 1
-                  ? "14–17"
-                  : formData.age <= 2
-                    ? "12–15"
-                    : formData.age <= 5
-                      ? "10–13"
-                      : formData.age <= 13
-                        ? "9–11"
-                        : formData.age <= 17
-                          ? "8–10"
-                          : formData.age <= 64
-                            ? "7–9"
-                            : "7–8"}{" "}
-                <span className="text-xs font-normal text-gray-500">
-                  hrs/night
-                </span>
-              </span>
-            </div>
-
-            {/* Protein */}
-            <div className="bg-rose-50 border border-rose-200 rounded-lg px-2 py-1.5 flex items-center gap-2 print:bg-gray-50 print:border-gray-200">
-              <span className="text-base flex-shrink-0">🥩</span>
-              <span className="text-xs font-semibold text-rose-700 flex-shrink-0 print:text-gray-800">
-                Protein
-              </span>
-              <span className="text-sm font-bold text-gray-900 ml-auto">
-                {formData.protein_target > 0
-                  ? formData.protein_target
-                  : Math.round(1.2 * formData.weight)}{" "}
-                <span className="text-xs font-normal text-gray-500">g/day</span>
-              </span>
-            </div>
-
-            {/* Carbohydrates */}
-            <div className="bg-amber-50 border border-amber-200 rounded-lg px-2 py-1.5 flex items-center gap-2 print:bg-gray-50 print:border-gray-200">
-              <span className="text-base flex-shrink-0">🌾</span>
-              <span className="text-xs font-semibold text-amber-700 flex-shrink-0 print:text-gray-800">
-                Carbs
-              </span>
-              <span className="text-sm font-bold text-gray-900 ml-auto">
-                {formData.carbs_target > 0
-                  ? formData.carbs_target
-                  : Math.round(
-                      (0.4 *
-                        (formData.tdee_manual > 0
-                          ? formData.tdee_manual
-                          : plan.tdee)) /
-                        4,
-                    )}{" "}
-                <span className="text-xs font-normal text-gray-500">g/day</span>
-              </span>
-            </div>
-
-            {/* Dietary Fat */}
-            <div className="bg-violet-50 border border-violet-200 rounded-lg px-2 py-1.5 flex items-center gap-2 print:bg-gray-50 print:border-gray-200">
-              <span className="text-base flex-shrink-0">🥑</span>
-              <span className="text-xs font-semibold text-violet-700 flex-shrink-0 print:text-gray-800">
-                Fat
-              </span>
-              <span className="text-sm font-bold text-gray-900 ml-auto">
-                {formData.fat_target > 0
-                  ? formData.fat_target
-                  : Math.round(
-                      (0.25 *
-                        (formData.bmr_manual > 0
-                          ? formData.bmr_manual
-                          : plan.bmr)) /
-                        9,
-                    )}{" "}
-                <span className="text-xs font-normal text-gray-500">g/day</span>
-              </span>
-            </div>
-
-            {/* Dietary Fibre */}
-            <div className="bg-green-50 border border-green-200 rounded-lg px-2 py-1.5 flex items-center gap-2 print:bg-gray-50 print:border-gray-200">
-              <span className="text-base flex-shrink-0">🥦</span>
-              <span className="text-xs font-semibold text-green-700 flex-shrink-0 print:text-gray-800">
-                Fibre
-              </span>
-              <span className="text-sm font-bold text-gray-900 ml-auto">
-                25–40{" "}
-                <span className="text-xs font-normal text-gray-500">g/day</span>
-              </span>
-            </div>
-
-            {/* Meditation */}
-            <div className="bg-purple-50 border border-purple-200 rounded-lg px-2 py-1.5 flex items-center gap-2 print:bg-gray-50 print:border-gray-200">
-              <span className="text-base flex-shrink-0">🧘</span>
-              <span className="text-xs font-semibold text-purple-700 flex-shrink-0 print:text-gray-800">
-                Meditation
-              </span>
-              <span className="text-sm font-bold text-gray-900 ml-auto">
-                10{" "}
-                <span className="text-xs font-normal text-gray-500">
-                  mins/day
-                </span>
-              </span>
-            </div>
-
-            {/* Spiritual Wellness */}
-            <div className="bg-amber-50 border border-amber-200 rounded-lg px-2 py-1.5 flex items-center gap-2 print:bg-gray-50 print:border-gray-200">
-              <span className="text-base flex-shrink-0">🙏</span>
-              <span className="text-xs font-semibold text-amber-700 flex-shrink-0 print:text-gray-800">
-                Worship & Gratitude
-              </span>
-              <span className="text-sm font-bold text-gray-900 ml-auto">
-                10{" "}
-                <span className="text-xs font-normal text-gray-500">
-                  mins/day
-                </span>
-              </span>
-            </div>
-          </div>
-        </motion.div>
-
         {/* ── 7-Day Meal Plan ── */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -1584,6 +1411,178 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
           </ReportCard>
         </motion.div>
 
+        {/* ── DAILY WELLNESS — DO NOT CHANGE ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.38 }}
+          className="bg-white rounded-2xl border border-gray-200 p-3 shadow-sm"
+          data-ocid="result.daily_wellness.section"
+        >
+          <h2 className="text-sm font-bold text-gray-900 mb-2 flex items-center gap-2">
+            <span className="text-lg">🌿</span>
+            Daily Wellness
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {/* Hydration */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg px-2 py-1.5 flex items-center gap-2 print:bg-gray-50 print:border-gray-200">
+              <span className="text-base flex-shrink-0">💧</span>
+              <span className="text-xs font-semibold text-blue-700 flex-shrink-0 print:text-gray-800">
+                Hydration
+              </span>
+              <span className="text-sm font-bold text-gray-900 ml-auto">
+                {(formData.weight / 18).toFixed(1)}{" "}
+                <span className="text-xs font-normal text-gray-500">L/day</span>
+              </span>
+            </div>
+            {/* Walking */}
+            <div className="bg-violet-50 border border-violet-200 rounded-lg px-2 py-1.5 flex items-center gap-2 print:bg-gray-50 print:border-gray-200">
+              <span className="text-base flex-shrink-0">🚶</span>
+              <span className="text-xs font-semibold text-violet-700 flex-shrink-0 print:text-gray-800">
+                Daily Walking
+              </span>
+              <span className="text-sm font-bold text-gray-900 ml-auto">
+                {Math.round(formData.weight * 110).toLocaleString()}{" "}
+                <span className="text-xs font-normal text-gray-500">
+                  steps/day
+                </span>
+              </span>
+            </div>
+            {/* Exercise */}
+            <div className="bg-orange-50 border border-orange-200 rounded-lg px-2 py-1.5 flex items-center gap-2 print:bg-gray-50 print:border-gray-200">
+              <span className="text-base flex-shrink-0">🏋️</span>
+              <span className="text-xs font-semibold text-orange-700 flex-shrink-0 print:text-gray-800">
+                Exercise
+              </span>
+              <span className="text-sm font-bold text-gray-900 ml-auto">
+                {Math.round((formData.weight * 45) / 60)}{" "}
+                <span className="text-xs font-normal text-gray-500">
+                  min/day
+                </span>
+              </span>
+            </div>
+            {/* Sleep */}
+            <div className="bg-purple-50 border border-purple-200 rounded-lg px-2 py-1.5 flex items-center gap-2 print:bg-gray-50 print:border-gray-200">
+              <span className="text-base flex-shrink-0">🌙</span>
+              <span className="text-xs font-semibold text-purple-700 flex-shrink-0 print:text-gray-800">
+                Sleep
+              </span>
+              <span className="text-sm font-bold text-gray-900 ml-auto">
+                {formData.age <= 1
+                  ? "14–17"
+                  : formData.age <= 2
+                    ? "12–15"
+                    : formData.age <= 5
+                      ? "10–13"
+                      : formData.age <= 13
+                        ? "9–11"
+                        : formData.age <= 17
+                          ? "8–10"
+                          : formData.age <= 64
+                            ? "7–9"
+                            : "7–8"}{" "}
+                <span className="text-xs font-normal text-gray-500">
+                  hrs/night
+                </span>
+              </span>
+            </div>
+
+            {/* Protein */}
+            <div className="bg-rose-50 border border-rose-200 rounded-lg px-2 py-1.5 flex items-center gap-2 print:bg-gray-50 print:border-gray-200">
+              <span className="text-base flex-shrink-0">🥩</span>
+              <span className="text-xs font-semibold text-rose-700 flex-shrink-0 print:text-gray-800">
+                Protein
+              </span>
+              <span className="text-sm font-bold text-gray-900 ml-auto">
+                {formData.protein_target > 0
+                  ? formData.protein_target
+                  : Math.round(1.2 * formData.weight)}{" "}
+                <span className="text-xs font-normal text-gray-500">g/day</span>
+              </span>
+            </div>
+
+            {/* Carbohydrates */}
+            <div className="bg-amber-50 border border-amber-200 rounded-lg px-2 py-1.5 flex items-center gap-2 print:bg-gray-50 print:border-gray-200">
+              <span className="text-base flex-shrink-0">🌾</span>
+              <span className="text-xs font-semibold text-amber-700 flex-shrink-0 print:text-gray-800">
+                Carbs
+              </span>
+              <span className="text-sm font-bold text-gray-900 ml-auto">
+                {formData.carbs_target > 0
+                  ? formData.carbs_target
+                  : Math.round(
+                      (0.4 *
+                        (formData.tdee_manual > 0
+                          ? formData.tdee_manual
+                          : plan.tdee)) /
+                        4,
+                    )}{" "}
+                <span className="text-xs font-normal text-gray-500">g/day</span>
+              </span>
+            </div>
+
+            {/* Dietary Fat */}
+            <div className="bg-violet-50 border border-violet-200 rounded-lg px-2 py-1.5 flex items-center gap-2 print:bg-gray-50 print:border-gray-200">
+              <span className="text-base flex-shrink-0">🥑</span>
+              <span className="text-xs font-semibold text-violet-700 flex-shrink-0 print:text-gray-800">
+                Fat
+              </span>
+              <span className="text-sm font-bold text-gray-900 ml-auto">
+                {formData.fat_target > 0
+                  ? formData.fat_target
+                  : Math.round(
+                      (0.25 *
+                        (formData.bmr_manual > 0
+                          ? formData.bmr_manual
+                          : plan.bmr)) /
+                        9,
+                    )}{" "}
+                <span className="text-xs font-normal text-gray-500">g/day</span>
+              </span>
+            </div>
+
+            {/* Dietary Fibre */}
+            <div className="bg-green-50 border border-green-200 rounded-lg px-2 py-1.5 flex items-center gap-2 print:bg-gray-50 print:border-gray-200">
+              <span className="text-base flex-shrink-0">🥦</span>
+              <span className="text-xs font-semibold text-green-700 flex-shrink-0 print:text-gray-800">
+                Fibre
+              </span>
+              <span className="text-sm font-bold text-gray-900 ml-auto">
+                25–40{" "}
+                <span className="text-xs font-normal text-gray-500">g/day</span>
+              </span>
+            </div>
+
+            {/* Meditation */}
+            <div className="bg-purple-50 border border-purple-200 rounded-lg px-2 py-1.5 flex items-center gap-2 print:bg-gray-50 print:border-gray-200">
+              <span className="text-base flex-shrink-0">🧘</span>
+              <span className="text-xs font-semibold text-purple-700 flex-shrink-0 print:text-gray-800">
+                Meditation
+              </span>
+              <span className="text-sm font-bold text-gray-900 ml-auto">
+                10{" "}
+                <span className="text-xs font-normal text-gray-500">
+                  mins/day
+                </span>
+              </span>
+            </div>
+
+            {/* Spiritual Wellness */}
+            <div className="bg-amber-50 border border-amber-200 rounded-lg px-2 py-1.5 flex items-center gap-2 print:bg-gray-50 print:border-gray-200">
+              <span className="text-base flex-shrink-0">🙏</span>
+              <span className="text-xs font-semibold text-amber-700 flex-shrink-0 print:text-gray-800">
+                Worship & Gratitude
+              </span>
+              <span className="text-sm font-bold text-gray-900 ml-auto">
+                10{" "}
+                <span className="text-xs font-normal text-gray-500">
+                  mins/day
+                </span>
+              </span>
+            </div>
+          </div>
+        </motion.div>
+
         {/* ── FOODS TO AVOID ── */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -1766,7 +1765,7 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
               <div className="font-bold text-sm leading-tight">
                 Refer &amp; Earn Full Refund!
               </div>
-              <div className="text-sm text-gray-600 mt-1">
+              <div className="text-sm text-white mt-1">
                 Help <strong>2 friends</strong> download their HN Coach report
                 and get a <strong>100% full refund</strong>.
               </div>

@@ -647,18 +647,7 @@ function TransformationSlideshow() {
 }
 
 function DownloadCountBar() {
-  const [count, setCount] = useState(99);
-
-  useEffect(() => {
-    const stored = localStorage.getItem("hncoach_download_count");
-    let current = stored ? Number.parseInt(stored, 10) : 99;
-    if (!localStorage.getItem("hncoach_visited")) {
-      current = current + 1;
-      localStorage.setItem("hncoach_visited", "1");
-      localStorage.setItem("hncoach_download_count", String(current));
-    }
-    setCount(current);
-  }, []);
+  const [count] = useState(99);
 
   const total = 100;
   const pct = Math.min((count / total) * 100, 100);
@@ -666,17 +655,17 @@ function DownloadCountBar() {
 
   return (
     <div className="rounded-2xl overflow-hidden shadow-md mb-5 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500">
-      <div className="px-4 pt-3 pb-2 text-white">
+      <div className="px-3 py-1.5 text-white">
         <div className="flex items-center justify-between mb-1">
-          <span className="font-bold text-base tracking-wide">
+          <span className="font-semibold text-xs tracking-wide">
             🔥 {count.toLocaleString()} Plans Generated!
           </span>
-          <span className="text-xs bg-white/20 rounded-full px-2 py-0.5 font-semibold">
+          <span className="text-[10px] bg-white/20 rounded-full px-1.5 py-0 font-semibold">
             {total - count} slots left at discounted price
           </span>
         </div>
         {/* Progress Bar */}
-        <div className="relative h-4 bg-white/30 rounded-full overflow-hidden mb-2">
+        <div className="relative h-1.5 bg-white/30 rounded-full overflow-hidden mb-1">
           <div
             className="absolute left-0 top-0 h-full bg-white rounded-full transition-all duration-700"
             style={{ width: `${pct}%` }}
@@ -688,7 +677,7 @@ function DownloadCountBar() {
           />
         </div>
         {/* Price milestones */}
-        <div className="flex items-center gap-2 flex-wrap text-sm">
+        <div className="flex items-center gap-1 flex-nowrap text-[10px]">
           <span className="line-through text-white/60 font-medium">₹1,000</span>
           <span className="text-white/40">→</span>
           {earlyBirdActive ? (
