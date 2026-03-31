@@ -486,7 +486,7 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
   }
 
   const allSupplements = [
-    ...formData.supplements,
+    ...(formData.supplements || []),
     ...(formData.other_supplements
       ? formData.other_supplements
           .split(",")
@@ -500,8 +500,8 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
         .split(",")
         .map((s) => s.trim())
         .filter(Boolean)
-    : formData.food_allergies.length > 0
-      ? formData.food_allergies
+    : (formData.food_allergies || []).length > 0
+      ? formData.food_allergies || []
       : [];
 
   let _sleepDurationText = "—";
@@ -555,7 +555,7 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
     }
   }
 
-  const _dietPref = formData.dietary_preferences[0] || "vegetarian";
+  const _dietPref = (formData.dietary_preferences || [])[0] || "vegetarian";
 
   // Health conditions (filter out "None")
   const activeConditions = (formData.health_conditions || []).filter(
@@ -757,8 +757,8 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
                 <ReportField
                   label="Health"
                   value={
-                    formData.health_conditions.length > 0
-                      ? formData.health_conditions.join(", ")
+                    (formData.health_conditions || []).length > 0
+                      ? (formData.health_conditions || []).join(", ")
                       : "None"
                   }
                 />

@@ -5,6 +5,7 @@ import AdminPanel from "./components/AdminPanel";
 import DietForm from "./components/DietForm";
 import DietResult from "./components/DietResult";
 import { createActorWithConfig } from "./config";
+import { defaultFormData } from "./types/diet";
 import type { FormData } from "./types/diet";
 
 declare global {
@@ -126,11 +127,18 @@ function MainApp() {
       const saved = localStorage.getItem(LS_KEY);
       if (saved) {
         const { plan, formData: savedFormData } = JSON.parse(saved);
+        // Merge with defaults so missing fields from old cached data don't crash DietResult
+        const mergedFormData = { ...defaultFormData, ...savedFormData };
         setDietPlan(plan);
-        setFormData(savedFormData);
+        setFormData(mergedFormData);
         setView("result");
       }
-    } catch (_) {}
+    } catch (_) {
+      // Clear corrupted data
+      try {
+        localStorage.removeItem(LS_KEY);
+      } catch (_e) {}
+    }
   }
 
   async function handleProceedToPay() {
