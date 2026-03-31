@@ -647,11 +647,11 @@ function TransformationSlideshow() {
 }
 
 function DownloadCountBar() {
-  const [count, setCount] = useState(53);
+  const [count, setCount] = useState(99);
 
   useEffect(() => {
     const stored = localStorage.getItem("hncoach_download_count");
-    let current = stored ? Number.parseInt(stored, 10) : 53;
+    let current = stored ? Number.parseInt(stored, 10) : 99;
     if (!localStorage.getItem("hncoach_visited")) {
       current = current + 1;
       localStorage.setItem("hncoach_visited", "1");

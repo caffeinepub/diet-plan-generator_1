@@ -882,10 +882,12 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
             target="_blank"
             rel="noopener noreferrer"
             data-ocid="result.coaching.primary_button"
-            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg font-bold text-xs transition-all hover:scale-105 active:scale-95 shadow-md flex-shrink-0 print:hidden"
+            className="inline-flex items-center gap-1 px-4 py-2.5 rounded-lg font-extrabold text-sm transition-all hover:scale-105 active:scale-95 shadow-md flex-shrink-0 print:hidden animate-pulse"
             style={{
-              background: "linear-gradient(135deg, #d4af37, #f5c842)",
+              background: "linear-gradient(135deg, #f5c842, #ff9500)",
               color: "#4c1d95",
+              boxShadow:
+                "0 0 12px rgba(212,175,55,0.7), 0 2px 8px rgba(0,0,0,0.3)",
             }}
           >
             <Star className="w-3 h-3" />
@@ -1152,43 +1154,26 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.41 }}
         >
-          <div className="rounded-xl border border-violet-200 bg-violet-50 px-3 py-2 shadow-sm">
-            <p className="text-sm font-semibold text-gray-600 mb-2 print:text-gray-900">
-              📅 Daily Calorie Guide
+          <div className="rounded-lg border border-violet-200 bg-violet-50 px-3 py-1.5 shadow-sm flex flex-col gap-0.5">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5">
+              <span className="text-xs font-bold text-violet-800">
+                📅 Daily Calorie Guide
+              </span>
+              <span className="text-xs text-gray-700">
+                Working Days:{" "}
+                <strong className="text-violet-700">{tdee} kcal</strong>
+              </span>
+              <span className="text-xs text-gray-400">|</span>
+              <span className="text-xs text-gray-700">
+                Rest Days:{" "}
+                <strong className="text-emerald-700">{bmr} kcal</strong>
+              </span>
+            </div>
+            <p className="text-[10px] text-gray-500 leading-tight">
+              📈 More calories → gain &nbsp;|&nbsp; 🔥 Less calories → lose
+              weight &amp; fat &nbsp;|&nbsp; ✅ Complete requirement → maintain
             </p>
-            <div className="grid sm:grid-cols-2 gap-3">
-              <div className="bg-violet-50 rounded-lg border border-violet-200 px-3 py-1.5 text-center print:bg-gray-50 print:border-gray-200">
-                <div className="text-xs text-violet-600 mb-1 font-medium uppercase tracking-wide print:text-gray-700">
-                  Working Days
-                </div>
-                <div className="text-lg font-bold text-violet-600 print:text-gray-900">
-                  {tdee}{" "}
-                  <span className="text-sm font-normal text-violet-600">
-                    kcal
-                  </span>
-                </div>
-              </div>
-              <div className="bg-violet-50 rounded-lg border border-violet-200 px-3 py-1.5 text-center print:bg-gray-50 print:border-gray-200">
-                <div className="text-xs text-violet-600 mb-1 font-medium uppercase tracking-wide print:text-gray-700">
-                  Holidays &amp; Rest Days
-                </div>
-                <div className="text-lg font-bold text-emerald-700">
-                  {bmr}{" "}
-                  <span className="text-sm font-normal text-violet-600">
-                    kcal
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div className="mt-3 p-2 bg-violet-50 rounded-lg border border-violet-200">
-              <p className="text-xs text-gray-700 font-medium text-center leading-relaxed">
-                📈 Eat <strong>more</strong> calories → gain weight
-                &nbsp;|&nbsp; 🔥 Eat <strong>less</strong> calories → lose
-                weight &amp; fat &nbsp;|&nbsp; ✅ <strong>Complete</strong> your
-                daily requirement → maintain
-              </p>
-            </div>
-            <p className="text-xs text-violet-600 mt-2 text-center">
+            <p className="text-[10px] italic text-violet-500 leading-tight">
               Contact us for personalized guidance and personal coaching.
             </p>
           </div>
@@ -1692,35 +1677,6 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
                 })}
               </div>
             )}
-          </ReportCard>
-        </motion.div>
-
-        {/* ── HEALTH TIPS ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-        >
-          <ReportCard
-            title="Personalized Health Tips"
-            icon={<Heart className="w-4 h-4" />}
-          >
-            <div className="space-y-1.5">
-              {plan.health_tips.map((tip, i) => (
-                <motion.div
-                  key={tip.slice(0, 30)}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.5 + i * 0.06 }}
-                  className="flex gap-2 p-1.5 rounded-xl bg-violet-50 border border-violet-200"
-                >
-                  <CheckCircle2 className="w-5 h-5 text-violet-600 shrink-0 mt-0.5" />
-                  <p className="text-xs text-gray-600 leading-relaxed print:text-gray-800">
-                    {tip}
-                  </p>
-                </motion.div>
-              ))}
-            </div>
           </ReportCard>
         </motion.div>
 
