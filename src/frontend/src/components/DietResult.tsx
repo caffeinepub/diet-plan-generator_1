@@ -762,7 +762,7 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
                   />
                 )}
                 {formData.referrer_whatsapp && (
-                  <div className="flex items-center gap-3 border-b border-gray-100 py-2 last:border-b-0">
+                  <div className="flex items-center gap-3 border-b border-gray-100 py-1 last:border-b-0">
                     <span className="bg-violet-50 text-violet-600 text-xs font-semibold uppercase rounded-full px-3 py-1 min-w-[100px] text-center shrink-0">
                       Referred By
                     </span>
@@ -830,7 +830,7 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
                 ].map((item) => (
                   <div
                     key={item.rate}
-                    className={`rounded-xl border p-4 text-center ${item.bg}`}
+                    className={`rounded-xl border p-2 text-center ${item.bg}`}
                     data-ocid={`result.timeline.item.${item.rate / 2}`}
                   >
                     <div className={`text-lg font-bold ${item.color}`}>
@@ -843,7 +843,7 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
                 ))}
               </div>
               {isLoss && targetBellyInches > 0 && (
-                <div className="mt-4 bg-violet-50 border border-violet-200 rounded-xl p-4 text-sm text-violet-600">
+                <div className="mt-2 bg-violet-50 border border-violet-200 rounded-xl p-2 text-xs text-violet-600">
                   <span className="font-semibold text-gray-800">
                     Belly fat target:
                   </span>{" "}
@@ -903,14 +903,14 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
           {/* Card 1 – Human Body Cells */}
           <div className="rounded-xl border border-violet-200 overflow-hidden bg-white print:bg-white print:border-gray-200">
             <div className="h-1 bg-violet-600 w-full" />
-            <div className="p-3 print:p-1 flex flex-col items-center text-center gap-2">
+            <div className="p-2 print:p-1 flex flex-col items-center text-center gap-2">
               <div className="w-8 h-8 rounded-full bg-violet-50 border border-violet-200 flex items-center justify-center">
                 <Atom className="w-4 h-4 text-violet-600" />
               </div>
               <p className="text-xs font-bold uppercase tracking-widest text-violet-600 print:text-gray-700">
                 Human Body Cells
               </p>
-              <p className="text-2xl font-bold text-white print:text-gray-900 leading-none">
+              <p className="text-lg font-bold text-white print:text-gray-900 leading-none">
                 37.2{" "}
                 <span className="text-base font-semibold text-violet-600">
                   Trillion
@@ -926,14 +926,14 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
           {/* Card 2 - Body Tissues */}
           <div className="rounded-xl border border-rose-200 overflow-hidden bg-white print:bg-white print:border-gray-200">
             <div className="h-1 bg-rose-500 w-full" />
-            <div className="p-3 print:p-1 flex flex-col items-center text-center gap-2">
+            <div className="p-2 print:p-1 flex flex-col items-center text-center gap-2">
               <div className="w-8 h-8 rounded-full bg-rose-50 border border-rose-200 flex items-center justify-center">
                 <span className="text-lg">🔬</span>
               </div>
               <p className="text-xs font-bold uppercase tracking-widest text-rose-600 print:text-gray-700">
                 Types of Body Tissues
               </p>
-              <p className="text-2xl font-bold text-white print:text-gray-900 leading-none">
+              <p className="text-lg font-bold text-white print:text-gray-900 leading-none">
                 4{" "}
                 <span className="text-base font-semibold text-rose-500">
                   Types
@@ -949,14 +949,14 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
           {/* Card 3 - Body Organs */}
           <div className="rounded-xl border border-purple-700/30 overflow-hidden glass-card">
             <div className="h-1 bg-purple-500 w-full" />
-            <div className="p-3 print:p-1 flex flex-col items-center text-center gap-2">
+            <div className="p-2 print:p-1 flex flex-col items-center text-center gap-2">
               <div className="w-8 h-8 rounded-full bg-purple-50 border border-purple-200 flex items-center justify-center">
                 <span className="text-lg">🫀</span>
               </div>
               <p className="text-xs font-bold uppercase tracking-widest text-purple-600">
                 Organs in Human Body
               </p>
-              <p className="text-2xl font-bold text-white print:text-gray-900 leading-none">
+              <p className="text-lg font-bold text-white print:text-gray-900 leading-none">
                 79{" "}
                 <span className="text-base font-semibold text-purple-500">
                   Organs
@@ -971,7 +971,7 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
           {/* Card 4 – Daily Nutrient Requirements */}
           <div className="rounded-xl border border-amber-200 overflow-hidden bg-white print:bg-white print:border-gray-200">
             <div className="h-1 bg-amber-500 w-full" />
-            <div className="p-3 print:p-1 flex flex-col items-center text-center gap-2">
+            <div className="p-2 print:p-1 flex flex-col items-center text-center gap-2">
               <div className="w-8 h-8 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center">
                 <Layers className="w-4 h-4 text-amber-600" />
               </div>
@@ -980,25 +980,25 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
               </p>
               <div className="flex gap-3 items-center justify-center flex-wrap mt-1">
                 <div className="flex flex-col items-center">
-                  <span className="text-2xl font-extrabold text-violet-600">
+                  <span className="text-lg font-extrabold text-violet-600">
                     5
                   </span>
                   <span className="text-xs text-violet-600">
                     Macronutrients
                   </span>
                 </div>
-                <span className="text-2xl font-bold text-gray-300">+</span>
+                <span className="text-lg font-bold text-gray-300">+</span>
                 <div className="flex flex-col items-center">
-                  <span className="text-2xl font-extrabold text-amber-600">
+                  <span className="text-lg font-extrabold text-amber-600">
                     20
                   </span>
                   <span className="text-xs text-violet-600">
                     Micronutrients
                   </span>
                 </div>
-                <span className="text-2xl font-bold text-gray-300">=</span>
+                <span className="text-lg font-bold text-gray-300">=</span>
                 <div className="flex flex-col items-center">
-                  <span className="text-2xl font-extrabold text-white">25</span>
+                  <span className="text-lg font-extrabold text-white">25</span>
                   <span className="text-xs text-violet-600">
                     Essential Total
                   </span>
@@ -1122,7 +1122,7 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
               </div>
             </div>
 
-            <div className="mt-5 bg-gradient-to-r from-violet-50 to-amber-50 border border-violet-200 rounded-xl p-4 text-center">
+            <div className="mt-3 bg-gradient-to-r from-violet-50 to-amber-50 border border-violet-200 rounded-xl p-2 text-center">
               <p className="text-sm font-medium text-gray-600">
                 ✨ <strong className="text-violet-700">Remember:</strong> No
                 single food provides all nutrients. A diverse, balanced diet is
@@ -1188,27 +1188,27 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.41 }}
         >
-          <div className="rounded-xl border border-violet-200 bg-violet-50 px-5 py-4 shadow-sm">
+          <div className="rounded-xl border border-violet-200 bg-violet-50 px-3 py-2 shadow-sm">
             <p className="text-sm font-semibold text-gray-600 mb-2 print:text-gray-900">
               📅 Daily Calorie Guide
             </p>
             <div className="grid sm:grid-cols-2 gap-3">
-              <div className="bg-violet-50 rounded-lg border border-violet-200 px-4 py-3 text-center print:bg-gray-50 print:border-gray-200">
+              <div className="bg-violet-50 rounded-lg border border-violet-200 px-3 py-1.5 text-center print:bg-gray-50 print:border-gray-200">
                 <div className="text-xs text-violet-600 mb-1 font-medium uppercase tracking-wide print:text-gray-700">
                   Working Days
                 </div>
-                <div className="text-2xl font-bold text-violet-600 print:text-gray-900">
+                <div className="text-lg font-bold text-violet-600 print:text-gray-900">
                   {tdee}{" "}
                   <span className="text-sm font-normal text-violet-600">
                     kcal
                   </span>
                 </div>
               </div>
-              <div className="bg-violet-50 rounded-lg border border-violet-200 px-4 py-3 text-center print:bg-gray-50 print:border-gray-200">
+              <div className="bg-violet-50 rounded-lg border border-violet-200 px-3 py-1.5 text-center print:bg-gray-50 print:border-gray-200">
                 <div className="text-xs text-violet-600 mb-1 font-medium uppercase tracking-wide print:text-gray-700">
                   Holidays &amp; Rest Days
                 </div>
-                <div className="text-2xl font-bold text-emerald-700">
+                <div className="text-lg font-bold text-emerald-700">
                   {bmr}{" "}
                   <span className="text-sm font-normal text-violet-600">
                     kcal
@@ -1235,22 +1235,22 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.38 }}
-          className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm"
+          className="bg-white rounded-2xl border border-gray-200 p-3 shadow-sm"
           data-ocid="result.daily_wellness.section"
         >
-          <h2 className="text-xl font-display font-bold text-gray-900 mb-5 flex items-center gap-2">
-            <span className="text-2xl">🌿</span>
+          <h2 className="text-sm font-bold text-gray-900 mb-2 flex items-center gap-2">
+            <span className="text-lg">🌿</span>
             Daily Wellness
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {/* Hydration */}
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex gap-3 items-start">
-              <div className="text-2xl mt-0.5">💧</div>
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-2.5 flex gap-2 items-center">
+              <div className="text-xl">💧</div>
               <div>
                 <div className="text-xs font-semibold text-blue-700 uppercase tracking-wide mb-1 print:text-gray-700">
                   Hydration
                 </div>
-                <div className="text-2xl font-bold text-gray-900">
+                <div className="text-base font-bold text-gray-900">
                   {(formData.weight / 18).toFixed(1)} L
                   <span className="text-sm font-normal text-violet-600 print:text-gray-700">
                     /day
@@ -1262,13 +1262,13 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
               </div>
             </div>
             {/* Walking */}
-            <div className="bg-violet-50 border border-violet-200 rounded-xl p-4 flex gap-3 items-start">
-              <div className="text-2xl mt-0.5">🚶</div>
+            <div className="bg-violet-50 border border-violet-200 rounded-xl p-2.5 flex gap-2 items-center">
+              <div className="text-xl">🚶</div>
               <div>
                 <div className="text-xs font-semibold text-violet-600 uppercase tracking-wide mb-1 print:text-gray-700">
                   Daily Walking
                 </div>
-                <div className="text-2xl font-bold text-gray-900">
+                <div className="text-base font-bold text-gray-900">
                   {Math.round(formData.weight * 110).toLocaleString()}
                   <span className="text-sm font-normal text-violet-600">
                     {" "}
@@ -1281,13 +1281,13 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
               </div>
             </div>
             {/* Exercise */}
-            <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 flex gap-3 items-start">
-              <div className="text-2xl mt-0.5">🏋️</div>
+            <div className="bg-orange-50 border border-orange-200 rounded-xl p-2.5 flex gap-2 items-center">
+              <div className="text-xl">🏋️</div>
               <div>
                 <div className="text-xs font-semibold text-orange-700 uppercase tracking-wide mb-1 print:text-gray-700">
                   General Exercise
                 </div>
-                <div className="text-2xl font-bold text-gray-900">
+                <div className="text-base font-bold text-gray-900">
                   {Math.round((formData.weight * 45) / 60)}
                   <span className="text-sm font-normal text-violet-600">
                     {" "}
@@ -1300,13 +1300,13 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
               </div>
             </div>
             {/* Sleep */}
-            <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 flex gap-3 items-start">
-              <div className="text-2xl mt-0.5">🌙</div>
+            <div className="bg-purple-50 border border-purple-200 rounded-xl p-2.5 flex gap-2 items-center">
+              <div className="text-xl">🌙</div>
               <div>
                 <div className="text-xs font-semibold text-purple-300 uppercase tracking-wide mb-1 print:text-gray-700">
                   Sleep (WHO Recommendation)
                 </div>
-                <div className="text-2xl font-bold text-gray-900">
+                <div className="text-base font-bold text-gray-900">
                   {formData.age <= 1
                     ? "14–17"
                     : formData.age <= 2
@@ -1334,13 +1334,13 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
             </div>
 
             {/* Protein */}
-            <div className="bg-rose-50 border border-rose-200 rounded-xl p-4 flex gap-3 items-start">
-              <div className="text-2xl mt-0.5">🥩</div>
+            <div className="bg-rose-50 border border-rose-200 rounded-xl p-2.5 flex gap-2 items-center">
+              <div className="text-xl">🥩</div>
               <div>
                 <div className="text-xs font-semibold text-rose-700 uppercase tracking-wide mb-1 print:text-gray-700">
                   Daily Protein
                 </div>
-                <div className="text-2xl font-bold text-gray-900">
+                <div className="text-base font-bold text-gray-900">
                   {formData.protein_target > 0
                     ? formData.protein_target
                     : Math.round(1.2 * formData.weight)}
@@ -1356,13 +1356,13 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
             </div>
 
             {/* Carbohydrates */}
-            <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl p-4 flex gap-3 items-start">
-              <div className="text-2xl mt-0.5">🌾</div>
+            <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl p-2.5 flex gap-2 items-center">
+              <div className="text-xl">🌾</div>
               <div>
                 <div className="text-xs font-semibold text-amber-600 dark:text-amber-600 uppercase tracking-wide mb-1">
                   Daily Carbs
                 </div>
-                <div className="text-2xl font-bold text-gray-900">
+                <div className="text-base font-bold text-gray-900">
                   {formData.carbs_target > 0
                     ? formData.carbs_target
                     : Math.round(
@@ -1384,13 +1384,13 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
             </div>
 
             {/* Dietary Fat */}
-            <div className="bg-violet-50 border border-violet-200 rounded-xl p-4 flex gap-3 items-start">
-              <div className="text-2xl mt-0.5">🥑</div>
+            <div className="bg-violet-50 border border-violet-200 rounded-xl p-2.5 flex gap-2 items-center">
+              <div className="text-xl">🥑</div>
               <div>
                 <div className="text-xs font-semibold text-violet-600 uppercase tracking-wide mb-1 print:text-gray-700">
                   Daily Fat
                 </div>
-                <div className="text-2xl font-bold text-gray-900">
+                <div className="text-base font-bold text-gray-900">
                   {formData.fat_target > 0
                     ? formData.fat_target
                     : Math.round(
@@ -1412,13 +1412,13 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
             </div>
 
             {/* Dietary Fibre */}
-            <div className="bg-violet-50 border border-violet-200 rounded-xl p-4 flex gap-3 items-start">
-              <div className="text-2xl mt-0.5">🥦</div>
+            <div className="bg-violet-50 border border-violet-200 rounded-xl p-2.5 flex gap-2 items-center">
+              <div className="text-xl">🥦</div>
               <div>
                 <div className="text-xs font-semibold text-violet-600 uppercase tracking-wide mb-1 print:text-gray-700">
                   Daily Fibre
                 </div>
-                <div className="text-2xl font-bold text-gray-900">
+                <div className="text-base font-bold text-gray-900">
                   25–40
                   <span className="text-sm font-normal text-violet-600">
                     {" "}
@@ -1432,13 +1432,13 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
             </div>
 
             {/* Meditation */}
-            <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 flex gap-3 items-start">
-              <div className="text-2xl mt-0.5">🧘</div>
+            <div className="bg-purple-50 border border-purple-200 rounded-xl p-2.5 flex gap-2 items-center">
+              <div className="text-xl">🧘</div>
               <div>
                 <div className="text-xs font-semibold text-purple-300 uppercase tracking-wide mb-1 print:text-gray-700">
                   Daily Meditation
                 </div>
-                <div className="text-2xl font-bold text-gray-900">
+                <div className="text-base font-bold text-gray-900">
                   10
                   <span className="text-sm font-normal text-violet-600">
                     {" "}
@@ -1452,13 +1452,13 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
             </div>
 
             {/* Spiritual Wellness */}
-            <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl p-4 flex gap-3 items-start">
-              <div className="text-2xl mt-0.5">🙏</div>
+            <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl p-2.5 flex gap-2 items-center">
+              <div className="text-xl">🙏</div>
               <div>
                 <div className="text-xs font-semibold text-amber-600 dark:text-amber-600 uppercase tracking-wide mb-1">
                   Daily Spiritual Wellness
                 </div>
-                <div className="text-2xl font-bold text-gray-900">
+                <div className="text-base font-bold text-gray-900">
                   10
                   <span className="text-sm font-normal text-violet-600">
                     {" "}
@@ -1731,7 +1731,7 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
               {GENERAL_AVOID_FOODS.map((item) => (
                 <div
                   key={item.name}
-                  className="flex items-start gap-3 p-3 rounded-xl bg-red-50 border border-red-100"
+                  className="flex items-start gap-2 p-2 rounded-xl bg-red-50 border border-red-100"
                 >
                   <XCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
                   <div>
@@ -1754,7 +1754,7 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
                   if (!foods) return null;
                   return (
                     <div key={condition}>
-                      <div className="flex items-center gap-2 mb-3 p-3 bg-amber-50 border border-amber-200 rounded-xl">
+                      <div className="flex items-center gap-2 mb-2 p-2 bg-amber-50 border border-amber-200 rounded-xl">
                         <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
                         <span className="text-sm font-semibold text-amber-800">
                           Based on Your Health Condition: {condition}
@@ -1819,10 +1819,10 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.5 + i * 0.06 }}
-                  className="flex gap-3 p-3 rounded-xl bg-violet-50 border border-violet-200"
+                  className="flex gap-2 p-2 rounded-xl bg-violet-50 border border-violet-200"
                 >
                   <CheckCircle2 className="w-5 h-5 text-violet-600 shrink-0 mt-0.5" />
-                  <p className="text-sm text-gray-600 leading-relaxed print:text-gray-800">
+                  <p className="text-xs text-gray-600 leading-relaxed print:text-gray-800">
                     {tip}
                   </p>
                 </motion.div>
@@ -2031,7 +2031,7 @@ function ReportCard({
         className || ""
       }`}
     >
-      <div className="border-l-4 border-violet-500 px-5 py-5">
+      <div className="border-l-4 border-violet-500 px-3 py-3">
         {title && (
           <div className="flex items-center gap-2 mb-4">
             {icon && <span className="text-violet-600 shrink-0">{icon}</span>}
@@ -2055,7 +2055,7 @@ function ReportField({
   value: string | ReactNode;
 }) {
   return (
-    <div className="flex items-center gap-3 border-b border-gray-100 py-2 last:border-b-0">
+    <div className="flex items-center gap-3 border-b border-gray-100 py-1 last:border-b-0">
       <span className="bg-violet-50 text-violet-700 text-xs font-semibold uppercase rounded-full px-3 py-1 min-w-[100px] text-center shrink-0">
         {label}
       </span>
@@ -2079,7 +2079,7 @@ function MealCard({
         className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-100 transition-colors"
       >
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+          <div className="w-6 h-6 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
             <UtensilsCrossed className="w-4 h-4 text-violet-600" />
           </div>
           <div>
@@ -2175,7 +2175,7 @@ function MidMorningSnackCard({
     <div className="bg-white rounded-xl border border-violet-200 overflow-hidden">
       <div className="p-4">
         <div className="flex items-start gap-3">
-          <div className="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900/50 flex items-center justify-center shrink-0">
+          <div className="w-6 h-6 rounded-md bg-green-100 dark:bg-green-900/50 flex items-center justify-center shrink-0">
             <span className="text-base">🍎</span>
           </div>
           <div className="flex-1 min-w-0">
@@ -2239,7 +2239,7 @@ function EveningSnackCard({
     <div className="bg-amber-50 dark:bg-amber-950/30 rounded-xl border border-amber-200 dark:border-amber-800 overflow-hidden">
       <div className="p-4">
         <div className="flex items-start gap-3">
-          <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center shrink-0">
+          <div className="w-6 h-6 rounded-md bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center shrink-0">
             <span className="text-base">🫘</span>
           </div>
           <div className="flex-1 min-w-0">

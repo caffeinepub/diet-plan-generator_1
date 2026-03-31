@@ -1,33 +1,38 @@
-# HN Coach – Diet & Nutrition Plan
+# HN Coach – Diet Plan Generator
 
 ## Current State
-- 7-day meal plan rendered as 7 separate full-width tables (one per day), each with rows for HN Digestion, main meals, HN Tea
-- HN Digestion and HN Tea rows have no visual distinction from main meal rows (same size/style)
-- Step 1 form has a generic illustration banner
-- No logo photo used; HN Coach branding uses a teal leaf icon
+The report (DietResult.tsx) has cards with varying sizes and spacing. Daily Wellness cards use `p-4` padding with `text-2xl` numbers and emoji icons at `text-2xl`. Body science cards (cells, tissues, organs, nutrients) use `p-3`. ReportCard sections use generous inner spacing. The personal coaching card was previously made compact (slim row). All other cards remain large and inconsistent.
 
 ## Requested Changes (Diff)
 
 ### Add
-- Logo: use uploaded user photo `/assets/uploads/IMG-20260226-WA0000-2.jpg` as the HN Coach logo in the header (both screen and print), replacing the teal leaf icon
-- Fit India Movement banner on Step 1 of the form using generated image `/assets/generated/fit-india-banner.dim_800x200.jpg`
+- Nothing new to add.
 
 ### Modify
-- **HN Digestion & HN Tea rows**: render these rows visually smaller and distinct -- smaller font (text-xs), muted gray/light background (bg-gray-50), italic text, pill/badge style label, clearly distinguishable from main meal rows (Breakfast, Lunch, Dinner, Snacks)
-- **7-day diet plan layout**: redesign to show all 7 days in a compact, organized banner/grid view inspired by the uploaded 1200-calorie diet plan reference image. Use a compact table with Day as rows and meal types (HN Digestion, Breakfast, Mid-Morning Snack, Lunch, Evening Snack, Dinner) as columns. Each cell shows the key food items concisely. This takes far less space than 7 separate full tables. HN Digestion and HN Tea cells styled differently (smaller, muted). The motivational quote banner stays above this compact plan.
+- **Daily Wellness cards**: Reduce to `p-2.5` padding, icon `text-lg`, number `text-lg font-bold`, label `text-[10px]`, description `text-[10px]`. Keep 2-column grid.
+- **Body science cards** (cells, tissues, organs, nutrients): Reduce icon size, font sizes, and padding to match the compact style.
+- **ReportCard inner content**: Tighten padding to `p-3` (from `p-5` or `p-6`).
+- **ReportField rows**: Reduce vertical padding.
+- **Goal Timeline milestone rows**: Compact font and padding.
+- **Daily Calorie Guide boxes**: Compact padding and font.
+- **Personal Details fields**: Compact row spacing.
+- **Foods to Avoid cards**: Compact padding.
+- **Health Tips**: Compact card padding.
+- **Macro/Micro tables**: Already compact, maintain.
+- **Coaching enrollment card**: Keep existing slim row (already done).
+- **Referral card**: Compact.
+- **All print:* classes** must remain to ensure white print background and no cropping.
 
 ### Remove
-- Nothing removed
+- Excessive padding/margin on all cards in the report.
 
 ## Implementation Plan
-1. Replace header logo icon with the user's uploaded photo (`/assets/uploads/IMG-20260226-WA0000-2.jpg`) in DietResult.tsx header and print header. Use rounded-full img tag, ~40px
-2. In DietForm.tsx Step 1, add Fit India banner image at the top using `/assets/generated/fit-india-banner.dim_800x200.jpg`
-3. In DietResult.tsx, refactor the 7-day meal plan section from 7 separate tables to a single compact banner-style table:
-   - Rows = Days (Monday to Sunday)
-   - Columns = Meal types: HN Digestion (before meals note), Breakfast, Mid-Morning Snack, Lunch, Evening Snack, Dinner
-   - Each cell shows food items in compact text
-   - HN Tea shown as a small note/row or footnote below the table
-   - Sunday lunch cell highlighted as Reward Meal
-   - Colored column headers (teal for main meals, gray for supplements)
-4. Style HN Digestion column cells and HN Tea rows/footnote with: text-xs, italic, muted background, pill styling
-5. Ensure compact table fits well in print layout
+1. In DietResult.tsx, update Daily Wellness card grid: change all 10 wellness cards to use `p-2.5 gap-2`, `text-[10px]` labels, `text-lg font-bold` values, `text-[10px]` descriptions, `text-xl` emoji, keep color borders.
+2. Update the ReportCard component's inner padding class (if defined inline) to `p-3`.
+3. Tighten ReportField border-b rows padding from `py-2.5` to `py-1.5`.
+4. Compact body science 4-cards grid: `p-2`, `text-xs` everywhere, smaller icon.
+5. Compact Daily Calorie Guide section padding.
+6. Compact timeline milestone items.
+7. Compact foods-to-avoid grid cards.
+8. Compact health tips cards.
+9. Validate and build.
