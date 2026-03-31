@@ -188,7 +188,7 @@ const HN_SHAKE_FLAVOURS = [
   "Kulfi",
 ];
 
-const NON_VEG_OPTIONS = [
+const _NON_VEG_OPTIONS = [
   { protein: "Egg Curry" },
   { protein: "Fish Kabab" },
   { protein: "Chicken Tikka" },
@@ -647,24 +647,104 @@ export default function DietResult({
           transition={{ duration: 0.5 }}
           className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start py-4 print:grid-cols-2"
         >
-          {/* Left: Name & Diet Plan Heading */}
-          <div className="flex flex-col items-start justify-center gap-3 pl-2">
+          {/* Left: Name, Diet Plan Heading & Personal Details */}
+          <div className="flex flex-col items-start justify-start gap-2 pl-2">
             <div className="flex items-center gap-3">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-violet-50 border border-violet-200">
-                <UtensilsCrossed className="w-6 h-6 text-violet-600" />
+              <div className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-violet-50 border border-violet-200">
+                <UtensilsCrossed className="w-5 h-5 text-violet-600" />
               </div>
               <span className="text-xs font-semibold uppercase tracking-widest text-violet-500">
                 HN Coach
               </span>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight">
-              {formData.name}&apos;s
-              <br />
-              Diet Plan
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">
+              {formData.name}&apos;s Diet Plan
             </h1>
-            <span className="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-semibold text-violet-700 bg-violet-50 border border-violet-200">
+            <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold text-violet-700 bg-violet-50 border border-violet-200">
               {GOAL_LABELS[formData.goal]}
             </span>
+            {/* Personal Details inline */}
+            <div className="w-full mt-1 border-t border-violet-100 pt-2">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-violet-500 mb-1.5 flex items-center gap-1">
+                <User className="w-3 h-3" /> Personal Details
+              </p>
+              <div className="grid grid-cols-2 gap-x-3 gap-y-0.5 text-xs">
+                <div className="flex gap-1">
+                  <span className="text-gray-400 shrink-0">Name:</span>
+                  <span className="font-semibold text-gray-800 truncate">
+                    {formData.name}
+                  </span>
+                </div>
+                <div className="flex gap-1">
+                  <span className="text-gray-400 shrink-0">Age:</span>
+                  <span className="font-semibold text-gray-800">
+                    {formData.age} yrs
+                  </span>
+                </div>
+                <div className="flex gap-1">
+                  <span className="text-gray-400 shrink-0">Gender:</span>
+                  <span className="font-semibold text-gray-800 capitalize">
+                    {formData.gender}
+                  </span>
+                </div>
+                <div className="flex gap-1">
+                  <span className="text-gray-400 shrink-0">Height:</span>
+                  <span className="font-semibold text-gray-800">
+                    {formData.height} cm
+                  </span>
+                </div>
+                <div className="flex gap-1">
+                  <span className="text-gray-400 shrink-0">Weight:</span>
+                  <span className="font-semibold text-gray-800">
+                    {formData.weight} kg
+                  </span>
+                </div>
+                <div className="flex gap-1">
+                  <span className="text-gray-400 shrink-0">Goal:</span>
+                  <span className="font-semibold text-gray-800 truncate">
+                    {GOAL_LABELS[formData.goal]}
+                  </span>
+                </div>
+                {formData.target_weight_kg > 0 && (
+                  <div className="flex gap-1 col-span-2">
+                    <span className="text-gray-400 shrink-0">Target:</span>
+                    <span className="font-semibold text-gray-800">
+                      {formData.target_weight_kg} kg
+                      {formData.goal === "weight_loss" &&
+                      formData.target_belly_inches > 0
+                        ? ` · ${formData.target_belly_inches}" belly`
+                        : ""}
+                    </span>
+                  </div>
+                )}
+                <div className="flex gap-1">
+                  <span className="text-gray-400 shrink-0">Meal Gap:</span>
+                  <span className="font-semibold text-gray-800">
+                    {formData.meal_gap} hrs
+                  </span>
+                </div>
+                {(formData.health_conditions || []).length > 0 && (
+                  <div className="flex gap-1 col-span-2">
+                    <span className="text-gray-400 shrink-0">Health:</span>
+                    <span className="font-semibold text-gray-800 truncate">
+                      {(formData.health_conditions || []).join(", ")}
+                    </span>
+                  </div>
+                )}
+                {formData.referrer_whatsapp && (
+                  <div className="flex gap-1 col-span-2 items-center">
+                    <span className="text-gray-400 shrink-0">Referred By:</span>
+                    <span className="font-semibold text-gray-800 flex items-center gap-1">
+                      <Lock className="w-3 h-3 text-violet-500 shrink-0" />
+                      +91 {formData.referrer_whatsapp}
+                      <span className="text-[9px] bg-violet-50 text-violet-600 rounded-full px-1.5 py-0.5 font-semibold">
+                        Verified ✓
+                      </span>
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
           {/* Right: Nutrition Philosophy Image + Quotes */}
           <div className="flex flex-col items-center gap-2">
@@ -682,105 +762,6 @@ export default function DietResult({
               right&quot;
             </p>
           </div>
-        </motion.div>
-
-        {/* ── PERSONAL DETAILS ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.05 }}
-        >
-          <ReportCard
-            title="Personal Details"
-            icon={<User className="w-4 h-4" />}
-          >
-            <div className="grid sm:grid-cols-2 gap-x-8">
-              <div>
-                <ReportField label="Name" value={formData.name} />
-                <ReportField label="Age" value={`${formData.age} years`} />
-                <ReportField
-                  label="Gender"
-                  value={
-                    formData.gender.charAt(0).toUpperCase() +
-                    formData.gender.slice(1)
-                  }
-                />
-                <ReportField label="Height" value={`${formData.height} cm`} />
-                <ReportField label="Weight" value={`${formData.weight} kg`} />
-              </div>
-              <div>
-                <ReportField label="Goal" value={GOAL_LABELS[formData.goal]} />
-                {formData.target_weight_kg > 0 && (
-                  <ReportField
-                    label={
-                      formData.goal === "weight_loss"
-                        ? "Target Loss"
-                        : formData.goal === "muscle_gain"
-                          ? "Target Gain"
-                          : "Target"
-                    }
-                    value={
-                      formData.goal === "weight_loss" ||
-                      formData.goal === "muscle_gain"
-                        ? `${formData.target_weight_kg} kg${
-                            formData.goal === "weight_loss" &&
-                            formData.target_belly_inches > 0
-                              ? ` · ${formData.target_belly_inches}" belly`
-                              : ""
-                          }`
-                        : ""
-                    }
-                  />
-                )}
-                {(formData.bmr_manual > 0 || formData.tdee_manual > 0) && (
-                  <ReportField
-                    label="BMR / TDEE"
-                    value={`${
-                      formData.bmr_manual > 0
-                        ? `${formData.bmr_manual} kcal`
-                        : "—"
-                    } / ${
-                      formData.tdee_manual > 0
-                        ? `${formData.tdee_manual} kcal`
-                        : "—"
-                    }`}
-                  />
-                )}
-                <ReportField
-                  label="Meal Gap"
-                  value={`${formData.meal_gap} hours`}
-                />
-                <ReportField
-                  label="Health"
-                  value={
-                    (formData.health_conditions || []).length > 0
-                      ? (formData.health_conditions || []).join(", ")
-                      : "None"
-                  }
-                />
-                {allSupplements.length > 0 && (
-                  <ReportField
-                    label="Supplements"
-                    value={allSupplements.join(", ")}
-                  />
-                )}
-                {formData.referrer_whatsapp && (
-                  <div className="flex items-center gap-3 border-b border-gray-100 py-0.5 last:border-b-0">
-                    <span className="bg-violet-50 text-violet-600 text-xs font-semibold uppercase rounded-full px-3 py-1 min-w-[100px] text-center shrink-0">
-                      Referred By
-                    </span>
-                    <span className="flex items-center gap-1.5 text-white font-medium text-sm print:text-gray-900">
-                      <Lock className="w-3.5 h-3.5 text-violet-600 shrink-0" />
-                      +91 {formData.referrer_whatsapp}
-                      <span className="ml-1 text-xs bg-forest-100 text-gray-600 rounded-full px-2 py-0.5 font-semibold">
-                        Verified ✓
-                      </span>
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </ReportCard>
         </motion.div>
 
         {/* ── GOAL TIMELINE ── */}
@@ -862,39 +843,42 @@ export default function DietResult({
 
         {/* ── ENROLLMENT SECTION ── */}
         <div
-          className="rounded-xl border border-violet-300 bg-violet-50 p-3 flex items-center gap-3 shadow-sm print:p-1 print:text-[8px]"
+          className="rounded-xl border border-violet-300 bg-violet-50 p-3 flex flex-col gap-2 shadow-sm print:p-1 print:text-[8px]"
           data-ocid="result.coaching.section"
         >
-          <div className="w-10 h-10 rounded-full bg-violet-600 flex items-center justify-center flex-shrink-0 print:w-6 print:h-6">
-            <span className="text-xl print:text-xs">🏆</span>
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold text-violet-800 leading-tight print:text-[8px]">
-              Personal Coaching Program
-            </p>
-            <p className="text-xs text-violet-600 print:text-[7px]">
-              ✅ Result Guaranteed &nbsp;·&nbsp; 1-on-1 Expert Coach
-              &nbsp;·&nbsp; Customized Plans
-            </p>
-            <p className="text-xs text-gray-500 italic print:text-[7px]">
-              After enrollment your coach will contact you as soon as possible.
-            </p>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-violet-600 flex items-center justify-center flex-shrink-0 print:w-6 print:h-6">
+              <span className="text-xl print:text-xs">🏆</span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold text-violet-800 leading-tight print:text-[8px]">
+                Personal Coaching Program
+              </p>
+              <p className="text-xs text-violet-600 print:text-[7px]">
+                ✅ Result Guaranteed &nbsp;·&nbsp; 1-on-1 Expert Coach
+                &nbsp;·&nbsp; Customized Plans
+              </p>
+              <p className="text-xs text-gray-500 italic print:text-[7px]">
+                After enrollment your coach will contact you as soon as
+                possible.
+              </p>
+            </div>
           </div>
           <a
             href={`https://hn-coach-plans-jw1.caffeine.xyz${formData.referrer_whatsapp ? `?ref=${formData.referrer_whatsapp}` : ""}`}
             target="_blank"
             rel="noopener noreferrer"
             data-ocid="result.coaching.primary_button"
-            className="inline-flex items-center gap-1 px-4 py-2 rounded-lg font-extrabold text-sm transition-all hover:scale-105 active:scale-95 shadow-md animate-pulse flex-shrink-0 print:px-2 print:py-0.5 print:text-[7px]"
+            className="w-full inline-flex items-center justify-center gap-2 py-3 rounded-lg font-extrabold text-base transition-all hover:scale-[1.02] active:scale-95 shadow-md animate-pulse print:py-1 print:text-[7px]"
             style={{
               background: "linear-gradient(135deg, #f5c842, #ff9500)",
               color: "#4c1d95",
               boxShadow:
-                "0 0 12px rgba(212,175,55,0.7), 0 2px 8px rgba(0,0,0,0.3)",
+                "0 0 16px rgba(212,175,55,0.7), 0 2px 8px rgba(0,0,0,0.3)",
             }}
           >
-            <Star className="w-3 h-3" />
-            Enroll Now
+            <Star className="w-4 h-4" />
+            Enroll Now — Get Personal Coach
           </a>
         </div>
 
@@ -1035,7 +1019,7 @@ export default function DietResult({
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block" />
                 Micronutrients — Daily RDA for Indians
               </h3>
-              <div className="grid grid-cols-2 gap-1 print:gap-0.5">
+              <div className="grid grid-cols-3 gap-1 print:gap-0.5">
                 {MICRO_RDA.map((row, i) => (
                   <div
                     key={row.nutrient}
@@ -1097,6 +1081,102 @@ export default function DietResult({
               Contact us for personalized guidance and personal coaching.
             </p>
           </div>
+        </motion.div>
+
+        {/* ── FOODS TO AVOID ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.42 }}
+          data-ocid="result.foods_avoid.section"
+        >
+          <ReportCard
+            title="Foods to Avoid"
+            icon={<XCircle className="w-4 h-4" />}
+          >
+            <p className="text-sm text-violet-600 mb-2">
+              Eliminating these foods accelerates your health goals and prevents
+              nutrient deficiencies.
+            </p>
+
+            {/* General Avoid List */}
+            <h3 className="text-xs font-bold text-gray-600 mb-1 uppercase tracking-widest flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-red-500 inline-block" />
+              General Foods to Avoid
+            </h3>
+            <div className="grid sm:grid-cols-2 gap-2 mb-3">
+              {GENERAL_AVOID_FOODS.map((item) => (
+                <div
+                  key={item.name}
+                  className="flex items-start gap-2 p-1.5 rounded-xl bg-red-50 border border-red-100"
+                >
+                  <XCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+                  <div>
+                    <div className="font-semibold text-gray-800 text-sm">
+                      {item.name}
+                    </div>
+                    <div className="text-xs text-violet-600 mt-0.5">
+                      {item.desc}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Condition-Specific Avoid List */}
+            {activeConditions.length > 0 && (
+              <div className="space-y-2">
+                {activeConditions.map((condition) => {
+                  const foods = CONDITION_AVOID_FOODS[condition];
+                  if (!foods) return null;
+                  return (
+                    <div key={condition}>
+                      <div className="flex items-center gap-2 mb-2 p-2 bg-amber-50 border border-amber-200 rounded-xl">
+                        <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                        <span className="text-sm font-semibold text-amber-800">
+                          Based on Your Health Condition: {condition}
+                        </span>
+                      </div>
+                      <div className="overflow-x-auto rounded-xl border border-violet-200">
+                        <Table>
+                          <TableHeader>
+                            <TableRow className="bg-violet-50 hover:bg-violet-50">
+                              <TableHead className="font-bold text-gray-600">
+                                Food to Avoid
+                              </TableHead>
+                              <TableHead className="font-bold text-gray-600">
+                                Reason
+                              </TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {foods.map((f, idx) => (
+                              <TableRow
+                                key={f.food}
+                                className={
+                                  idx % 2 === 0 ? "bg-white" : "bg-violet-50"
+                                }
+                              >
+                                <TableCell className="font-medium text-gray-800 text-sm print:text-gray-900">
+                                  <span className="flex items-center gap-2">
+                                    <XCircle className="w-3.5 h-3.5 text-red-400 shrink-0" />
+                                    {f.food}
+                                  </span>
+                                </TableCell>
+                                <TableCell className="text-sm text-violet-600 print:text-gray-700">
+                                  {f.reason}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </ReportCard>
         </motion.div>
 
         {/* ── 7-Day Meal Plan ── */}
@@ -1178,143 +1258,147 @@ export default function DietResult({
               </div>
             )}
 
-            {/* Compact 7-day banner table */}
-            <div className="overflow-x-auto print-color-exact print:overflow-visible">
-              <table
-                className="w-full text-xs border-collapse print:text-[5px]"
-                style={{
-                  WebkitPrintColorAdjust: "exact",
-                  printColorAdjust: "exact",
-                }}
-              >
-                <thead>
-                  <tr>
-                    <th className="print:p-[2px] p-2 border border-gray-300 font-bold text-center bg-gray-700 text-white min-w-[48px] print:bg-gray-200 print:text-gray-900">
-                      Day
-                    </th>
-                    <th className="print:p-[2px] p-2 border border-gray-300 text-white font-bold text-left bg-violet-600 min-w-[130px] print:bg-violet-100 print:text-gray-900">
-                      🥤 Breakfast
-                    </th>
-                    <th className="print:p-[2px] p-2 border border-gray-300 text-white font-bold text-left bg-forest-600 min-w-[120px] print:bg-green-100 print:text-gray-900">
-                      🍎 Mid-Morning
-                    </th>
-                    <th className="print:p-[2px] p-2 border border-gray-300 text-white font-bold text-left bg-orange-500 min-w-[150px] print:bg-orange-100 print:text-gray-900">
-                      🍽️ Lunch
-                    </th>
-                    <th className="print:p-[2px] p-2 border border-gray-300 text-white font-bold text-left bg-rose-500 min-w-[120px] print:bg-rose-100 print:text-gray-900">
-                      🫘 Evening Snack
-                    </th>
-                    <th className="print:p-[2px] p-2 border border-gray-300 text-white font-bold text-left bg-blue-600 min-w-[150px] print:bg-blue-100 print:text-gray-900">
-                      🌙 Dinner
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {DAYS_OF_WEEK.map((day, dayIdx) => {
-                    const opt = MEAL_OPTIONS[dayIdx];
-                    const flavour = HN_SHAKE_FLAVOURS[dayIdx];
-                    const eveningSnack =
-                      EVENING_SNACKS[dayIdx % EVENING_SNACKS.length];
-                    const midSnackGrams = Math.round(formData.weight * 10);
-                    const dayLabel = [
-                      "Mon",
-                      "Tue",
-                      "Wed",
-                      "Thu",
-                      "Fri",
-                      "Sat",
-                      "Sun",
-                    ][dayIdx];
-                    const isRewardDay = dayIdx === 6;
-                    const rowBg =
-                      dayIdx % 2 === 0 ? "bg-transparent" : "bg-violet-50";
-                    return (
-                      <tr
-                        key={day}
-                        data-ocid={`result.day_plan.item.${dayIdx + 1}`}
-                        className={rowBg}
+            {/* Day Cards — 1 card per day */}
+            <div className="space-y-3">
+              {DAYS_OF_WEEK.map((day, dayIdx) => {
+                const opt = MEAL_OPTIONS[dayIdx];
+                const flavour = HN_SHAKE_FLAVOURS[dayIdx];
+                const eveningSnack =
+                  EVENING_SNACKS[dayIdx % EVENING_SNACKS.length];
+                const midSnackGrams = Math.round(formData.weight * 10);
+                const dayLabels = [
+                  "Monday",
+                  "Tuesday",
+                  "Wednesday",
+                  "Thursday",
+                  "Friday",
+                  "Saturday",
+                  "Sunday",
+                ];
+                const isRewardDay = dayIdx === 6;
+                const shuffledFruits = seededShuffle(
+                  FRUIT_COMBOS,
+                  getVegSeed(formData.name, formData.weight),
+                );
+
+                return (
+                  <div
+                    key={day}
+                    data-ocid={`result.day_plan.item.${dayIdx + 1}`}
+                    className={`rounded-xl border overflow-hidden print:break-inside-avoid ${isRewardDay ? "border-amber-400 shadow-md" : "border-violet-200 shadow-sm"}`}
+                  >
+                    {/* Day header bar */}
+                    <div
+                      className={`px-3 py-2 flex items-center gap-2 ${isRewardDay ? "bg-gradient-to-r from-amber-400 to-orange-400" : "bg-violet-600"}`}
+                    >
+                      <span className="text-white font-extrabold text-sm">
+                        {dayLabels[dayIdx]}
+                      </span>
+                      {isRewardDay && (
+                        <span className="text-white text-xs font-bold ml-auto">
+                          🏆 REWARD DAY!
+                        </span>
+                      )}
+                    </div>
+                    {/* Meal columns */}
+                    <div className="grid grid-cols-1 sm:grid-cols-5 divide-y sm:divide-y-0 sm:divide-x divide-gray-100 bg-white print:bg-white print:grid-cols-5">
+                      {/* Breakfast */}
+                      <div className="px-2 py-2">
+                        <div className="text-[10px] font-bold text-violet-500 uppercase tracking-wide mb-1">
+                          🥤 Breakfast
+                        </div>
+                        <div className="text-xs font-semibold text-violet-700">
+                          HN Shake — {flavour}
+                        </div>
+                        <div className="text-[10px] text-gray-500 mt-0.5">
+                          230 kcal · C:24g P:19.75g F:3g
+                        </div>
+                      </div>
+                      {/* Mid-Morning */}
+                      <div className="px-2 py-2">
+                        <div className="text-[10px] font-bold text-green-600 uppercase tracking-wide mb-1">
+                          🍎 Mid-Morning
+                        </div>
+                        {dayIdx % 2 === 0 ? (
+                          <>
+                            <div className="text-xs font-semibold text-green-700">
+                              {Math.round(midSnackGrams / 2)}g Fruits
+                            </div>
+                            <div className="text-[10px] text-gray-500 mt-0.5 italic">
+                              {shuffledFruits[dayIdx % FRUIT_COMBOS.length]}
+                            </div>
+                            <div className="text-[10px] text-green-600 mt-0.5">
+                              + 2 Egg Whites
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="text-xs font-semibold text-green-700">
+                              {Math.round(midSnackGrams / 2)}g Sprouts + Veg
+                            </div>
+                            <div className="text-[10px] text-green-600 mt-0.5">
+                              + 2 Egg Whites
+                            </div>
+                          </>
+                        )}
+                      </div>
+                      {/* Lunch */}
+                      <div
+                        className={`px-2 py-2 ${isRewardDay ? "bg-amber-50" : ""}`}
                       >
-                        <td className="print:p-[2px] p-2 border border-gray-200 font-bold text-violet-600 bg-violet-50 text-center align-top print:bg-gray-100 print:text-gray-900">
-                          {dayLabel}
-                        </td>
-                        <td className="print:p-[2px] p-2 border border-gray-200 align-top">
-                          <div className="font-semibold text-violet-700">
-                            HN Shake — {flavour}
-                          </div>
-                          <div className="text-violet-500 mt-0.5">
-                            230 kcal · C:24g P:19.75g F:3g
-                          </div>
-                        </td>
-                        <td className="print:p-[2px] p-2 border border-gray-200 align-top">
-                          <div className="font-semibold text-violet-600 text-xs print:text-gray-800">
-                            🍎 {Math.round(midSnackGrams / 2)}g Fruits:
-                          </div>
-                          <div className="text-violet-600 text-[10px] mt-0.5 italic print:text-gray-700">
-                            {
-                              seededShuffle(
-                                FRUIT_COMBOS,
-                                getVegSeed(formData.name, formData.weight),
-                              )[dayIdx % FRUIT_COMBOS.length]
-                            }
-                          </div>
-                          <div className="text-violet-500 mt-0.5 text-[10px]">
-                            + 2 Egg Whites
-                          </div>
-                          <div className="font-semibold text-violet-600 mt-1 print:text-gray-800">
-                            {Math.round(midSnackGrams / 2)}g Sprouts +
-                            Vegetables
-                          </div>
-                        </td>
-                        <td
-                          className={`p-2 border border-gray-200 align-top ${isRewardDay ? "bg-gradient-to-br from-yellow-100 via-amber-50 to-orange-100 border-amber-400 border-2" : ""}`}
-                        >
-                          {isRewardDay ? (
-                            <div className="text-center">
-                              <div className="text-lg font-extrabold text-amber-600 animate-pulse">
-                                🏆 REWARD MEAL! 🎉
-                              </div>
-                              <div className="text-xs font-bold text-orange-600 bg-amber-200 rounded-full px-2 py-0.5 inline-block mt-1">
-                                ★ You Earned It! ★
-                              </div>
-                              <div className="text-gray-600 mt-1 text-xs">
-                                Have 1 of your favourite meals today — celebrate
-                                your dedication! 💪🌟
-                              </div>
+                        <div className="text-[10px] font-bold text-orange-500 uppercase tracking-wide mb-1">
+                          🍽️ Lunch
+                        </div>
+                        {isRewardDay ? (
+                          <div className="text-center">
+                            <div className="text-xs font-extrabold text-amber-600 animate-pulse">
+                              🏆 REWARD MEAL! 🎉
                             </div>
-                          ) : (
-                            <div>
-                              <div className="font-semibold text-orange-700">
-                                Rice 100g + Chapati 2pc
-                              </div>
-                              <div className="text-violet-600 mt-0.5">
-                                {opt.dal} / {NON_VEG_OPTIONS[dayIdx].protein} ·{" "}
-                                {lunchVegs[dayIdx]} · Salad 300g · Dahi 100g
-                              </div>
+                            <div className="text-[10px] text-orange-600 mt-0.5">
+                              Have your favourite meal — you earned it! 💪
                             </div>
-                          )}
-                        </td>
-                        <td className="print:p-[2px] p-2 border border-gray-200 align-top">
-                          <div className="font-semibold text-rose-700">
-                            {eveningSnack.name}
                           </div>
-                          <div className="text-violet-500 mt-0.5">
-                            {eveningSnack.cal} kcal · hot HN tea 2 spoon
-                          </div>
-                        </td>
-                        <td className="print:p-[2px] p-2 border border-gray-200 align-top">
-                          <div className="font-semibold text-blue-700 print:text-gray-900">
-                            Rice 100g + Chapati 2pc
-                          </div>
-                          <div className="text-violet-600 mt-0.5">
-                            {opt.dal} (80g) · {dinnerVegs[dayIdx]} (80g) · Salad
-                            240g · Dahi 80g
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                        ) : (
+                          <>
+                            <div className="text-xs font-semibold text-orange-700">
+                              Rice 100g + Chapati 2pc
+                            </div>
+                            <div className="text-[10px] text-gray-600 mt-0.5">
+                              {opt.dal} · {lunchVegs[dayIdx]} · Salad 300g ·
+                              Dahi 100g
+                            </div>
+                          </>
+                        )}
+                      </div>
+                      {/* Evening Snack */}
+                      <div className="px-2 py-2">
+                        <div className="text-[10px] font-bold text-rose-500 uppercase tracking-wide mb-1">
+                          🫘 Evening
+                        </div>
+                        <div className="text-xs font-semibold text-rose-700">
+                          {eveningSnack.name}
+                        </div>
+                        <div className="text-[10px] text-gray-500 mt-0.5">
+                          {eveningSnack.cal} kcal · HN Tea
+                        </div>
+                      </div>
+                      {/* Dinner */}
+                      <div className="px-2 py-2">
+                        <div className="text-[10px] font-bold text-blue-500 uppercase tracking-wide mb-1">
+                          🌙 Dinner
+                        </div>
+                        <div className="text-xs font-semibold text-blue-700">
+                          Rice 100g + Chapati 2pc
+                        </div>
+                        <div className="text-[10px] text-gray-600 mt-0.5">
+                          {opt.dal} (80g) · {dinnerVegs[dayIdx]} (80g) · Salad
+                          240g · Dahi 80g
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </ReportCard>
         </motion.div>
@@ -1489,102 +1573,6 @@ export default function DietResult({
               </span>
             </div>
           </div>
-        </motion.div>
-
-        {/* ── FOODS TO AVOID ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.42 }}
-          data-ocid="result.foods_avoid.section"
-        >
-          <ReportCard
-            title="Foods to Avoid"
-            icon={<XCircle className="w-4 h-4" />}
-          >
-            <p className="text-sm text-violet-600 mb-2">
-              Eliminating these foods accelerates your health goals and prevents
-              nutrient deficiencies.
-            </p>
-
-            {/* General Avoid List */}
-            <h3 className="text-xs font-bold text-gray-600 mb-1 uppercase tracking-widest flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-red-500 inline-block" />
-              General Foods to Avoid
-            </h3>
-            <div className="grid sm:grid-cols-2 gap-2 mb-3">
-              {GENERAL_AVOID_FOODS.map((item) => (
-                <div
-                  key={item.name}
-                  className="flex items-start gap-2 p-1.5 rounded-xl bg-red-50 border border-red-100"
-                >
-                  <XCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
-                  <div>
-                    <div className="font-semibold text-gray-800 text-sm">
-                      {item.name}
-                    </div>
-                    <div className="text-xs text-violet-600 mt-0.5">
-                      {item.desc}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Condition-Specific Avoid List */}
-            {activeConditions.length > 0 && (
-              <div className="space-y-2">
-                {activeConditions.map((condition) => {
-                  const foods = CONDITION_AVOID_FOODS[condition];
-                  if (!foods) return null;
-                  return (
-                    <div key={condition}>
-                      <div className="flex items-center gap-2 mb-2 p-2 bg-amber-50 border border-amber-200 rounded-xl">
-                        <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
-                        <span className="text-sm font-semibold text-amber-800">
-                          Based on Your Health Condition: {condition}
-                        </span>
-                      </div>
-                      <div className="overflow-x-auto rounded-xl border border-violet-200">
-                        <Table>
-                          <TableHeader>
-                            <TableRow className="bg-violet-50 hover:bg-violet-50">
-                              <TableHead className="font-bold text-gray-600">
-                                Food to Avoid
-                              </TableHead>
-                              <TableHead className="font-bold text-gray-600">
-                                Reason
-                              </TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {foods.map((f, idx) => (
-                              <TableRow
-                                key={f.food}
-                                className={
-                                  idx % 2 === 0 ? "bg-white" : "bg-violet-50"
-                                }
-                              >
-                                <TableCell className="font-medium text-gray-800 text-sm print:text-gray-900">
-                                  <span className="flex items-center gap-2">
-                                    <XCircle className="w-3.5 h-3.5 text-red-400 shrink-0" />
-                                    {f.food}
-                                  </span>
-                                </TableCell>
-                                <TableCell className="text-sm text-violet-600 print:text-gray-700">
-                                  {f.reason}
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </ReportCard>
         </motion.div>
 
         {/* ── SUPPLEMENTS ── */}
@@ -1803,7 +1791,7 @@ function ReportCard({
   );
 }
 
-function ReportField({
+function _ReportField({
   label,
   value,
 }: {

@@ -271,6 +271,26 @@ export default function DietForm({
         animation: "gradientShift 8s ease infinite",
       }}
     >
+      {/* View Previous Report - Sticky Top Banner */}
+      {step === 1 && hasPreviousReport && onViewPreviousReport && (
+        <button
+          type="button"
+          data-ocid="home.view_previous_report_button"
+          onClick={onViewPreviousReport}
+          className="no-print w-full flex items-center justify-between gap-2 px-4 py-2 sticky top-0 z-50 font-bold text-sm transition-all hover:brightness-110 active:brightness-90 shadow-lg"
+          style={{
+            background:
+              "linear-gradient(90deg, #b45309 0%, #d97706 40%, #facc15 100%)",
+            color: "#1a0533",
+          }}
+        >
+          <span className="flex items-center gap-2 text-xs font-black">
+            <span>📋</span>
+            <span>View Previous Report — Access your last diet plan FREE</span>
+          </span>
+          <span className="text-sm font-black shrink-0">→</span>
+        </button>
+      )}
       {/* Header */}
       <header
         className="no-print border-b border-violet-800/30 sticky top-0 z-10 backdrop-blur-xl"
@@ -356,45 +376,6 @@ export default function DietForm({
               {step === 8 && <StepBmrTdee data={data} update={update} />}
             </motion.div>
           </AnimatePresence>
-
-          {/* View Previous Report */}
-          {step === 1 && hasPreviousReport && onViewPreviousReport && (
-            <div className="mt-5">
-              <button
-                type="button"
-                data-ocid="home.view_previous_report_button"
-                onClick={onViewPreviousReport}
-                className="w-full flex items-center justify-between gap-3 px-5 py-4 rounded-2xl font-bold text-sm transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg"
-                style={{
-                  background:
-                    "linear-gradient(135deg, #1a0533 0%, #6d28d9 100%)",
-                  border: "2px solid rgba(218,165,32,0.7)",
-                  boxShadow:
-                    "0 4px 20px rgba(218,165,32,0.25), 0 2px 10px rgba(0,0,0,0.2)",
-                  color: "#facc15",
-                }}
-              >
-                <span className="flex items-center gap-3">
-                  <span className="text-2xl">📋</span>
-                  <span>
-                    <span
-                      className="block text-base font-black"
-                      style={{ color: "#facc15" }}
-                    >
-                      View Previous Report
-                    </span>
-                    <span
-                      className="block text-xs font-normal"
-                      style={{ color: "rgba(255,255,255,0.6)" }}
-                    >
-                      Access your last generated diet plan — FREE
-                    </span>
-                  </span>
-                </span>
-                <span className="text-xl">→</span>
-              </button>
-            </div>
-          )}
 
           {/* Error messages */}
           {Object.keys(errors).length > 0 && (
@@ -646,67 +627,10 @@ function TransformationSlideshow() {
   );
 }
 
-function DownloadCountBar() {
-  const [count] = useState(99);
-
-  const total = 100;
-  const pct = Math.min((count / total) * 100, 100);
-  const earlyBirdActive = count <= 100;
-
-  return (
-    <div className="rounded-2xl overflow-hidden shadow-md mb-5 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500">
-      <div className="px-3 py-1.5 text-white">
-        <div className="flex items-center justify-between mb-1">
-          <span className="font-semibold text-xs tracking-wide">
-            🔥 {count.toLocaleString()} Plans Generated!
-          </span>
-          <span className="text-[10px] bg-white/20 rounded-full px-1.5 py-0 font-semibold">
-            {total - count} slots left at discounted price
-          </span>
-        </div>
-        {/* Progress Bar */}
-        <div className="relative h-1.5 bg-white/30 rounded-full overflow-hidden mb-1">
-          <div
-            className="absolute left-0 top-0 h-full bg-white rounded-full transition-all duration-700"
-            style={{ width: `${pct}%` }}
-          />
-          {/* Milestone markers */}
-          <div
-            className="absolute top-0 h-full w-0.5 bg-yellow-300"
-            style={{ left: "10%" }}
-          />
-        </div>
-        {/* Price milestones */}
-        <div className="flex items-center gap-1 flex-nowrap text-[10px]">
-          <span className="line-through text-white/60 font-medium">₹1,000</span>
-          <span className="text-white/40">→</span>
-          {earlyBirdActive ? (
-            <>
-              <span className="bg-green-400 text-green-900 font-bold rounded-full px-3 py-0.5 text-xs animate-pulse">
-                🎉 First 100: ₹101 only!
-              </span>
-              <span className="text-white/60 text-xs">After 100: ₹299</span>
-            </>
-          ) : (
-            <>
-              <span className="text-green-300 line-through text-xs">
-                ₹101 (sold out)
-              </span>
-              <span className="bg-blue-400 text-blue-900 font-bold rounded-full px-3 py-0.5 text-xs">
-                Current Price: ₹299
-              </span>
-            </>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function Step1({ data, errors = {}, update }: StepProps) {
   return (
     <div className="space-y-5">
-      {/* Surprise offer banner - Premium Design */}
+      {/* Unified Offer + Download Count Card */}
       <div
         className="relative overflow-hidden rounded-2xl shadow-xl"
         style={{
@@ -743,8 +667,38 @@ function Step1({ data, errors = {}, update }: StepProps) {
             Worth ₹999 — absolutely FREE for you 🎉
           </p>
         </div>
+        {/* Integrated Download Count Bar */}
+        <div className="px-4 pb-3 text-white border-t border-white/10 pt-2">
+          <div className="flex items-center justify-between mb-1">
+            <span className="font-semibold text-xs tracking-wide">
+              🔥 99 Plans Generated!
+            </span>
+            <span className="text-[10px] bg-white/20 rounded-full px-2 py-0.5 font-semibold">
+              1 slot left at discounted price
+            </span>
+          </div>
+          <div className="relative h-1.5 bg-white/20 rounded-full overflow-hidden mb-1.5">
+            <div
+              className="absolute left-0 top-0 h-full bg-white rounded-full"
+              style={{ width: "99%" }}
+            />
+            <div
+              className="absolute top-0 h-full w-0.5 bg-yellow-300"
+              style={{ left: "10%" }}
+            />
+          </div>
+          <div className="flex items-center gap-1 flex-nowrap text-[10px]">
+            <span className="line-through text-white/50 font-medium">
+              ₹1,999
+            </span>
+            <span className="text-white/40">→</span>
+            <span className="bg-green-400 text-green-900 font-bold rounded-full px-2 py-0.5 text-xs animate-pulse">
+              🎉 First 100: ₹499 only!
+            </span>
+            <span className="text-white/60 text-xs ml-1">After 100: ₹999</span>
+          </div>
+        </div>
       </div>
-      <DownloadCountBar />
       <TransformationSlideshow />
       <div className="mb-4 rounded-xl overflow-hidden">
         <img

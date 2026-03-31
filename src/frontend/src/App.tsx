@@ -30,7 +30,7 @@ function getDownloadCount(): number {
 
 function getCurrentPrice(): number {
   const count = getDownloadCount();
-  return count <= 100 ? 101 : 299;
+  return count <= 100 ? 499 : 999;
 }
 
 function loadRazorpayScript(): Promise<boolean> {
@@ -339,8 +339,8 @@ function MainApp() {
                       color: "white",
                     }}
                   >
-                    🔥 YOU SAVE ₹{1000 - currentPrice}! —{" "}
-                    {currentPrice === 101
+                    🔥 YOU SAVE ₹{1999 - currentPrice}! —{" "}
+                    {currentPrice === 499
                       ? "Early Bird Special"
                       : "Limited Time"}
                   </span>
