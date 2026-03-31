@@ -762,7 +762,7 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
                   />
                 )}
                 {formData.referrer_whatsapp && (
-                  <div className="flex items-center gap-3 border-b border-gray-100 py-1 last:border-b-0">
+                  <div className="flex items-center gap-3 border-b border-gray-100 py-0.5 last:border-b-0">
                     <span className="bg-violet-50 text-violet-600 text-xs font-semibold uppercase rounded-full px-3 py-1 min-w-[100px] text-center shrink-0">
                       Referred By
                     </span>
@@ -792,7 +792,7 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
               title={isLoss ? "Weight Loss Timeline" : "Weight Gain Timeline"}
               icon={<Target className="w-4 h-4" />}
             >
-              <p className="text-sm text-violet-600 mb-4">
+              <p className="text-sm text-violet-600 mb-2">
                 {isLoss
                   ? `Your target: lose ${targetKg} kg${
                       targetBellyInches > 0
@@ -801,7 +801,7 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
                     }`
                   : `Your target: gain ${targetKg} kg`}
               </p>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {[
                   {
                     rate: 2,
@@ -903,8 +903,8 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
           {/* Card 1 – Human Body Cells */}
           <div className="rounded-xl border border-violet-200 overflow-hidden bg-white print:bg-white print:border-gray-200">
             <div className="h-1 bg-violet-600 w-full" />
-            <div className="p-2 print:p-1 flex flex-col items-center text-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-violet-50 border border-violet-200 flex items-center justify-center">
+            <div className="p-1.5 print:p-1 flex flex-col items-center text-center gap-1">
+              <div className="w-6 h-6 rounded-full bg-violet-50 border border-violet-200 flex items-center justify-center">
                 <Atom className="w-4 h-4 text-violet-600" />
               </div>
               <p className="text-xs font-bold uppercase tracking-widest text-violet-600 print:text-gray-700">
@@ -926,8 +926,8 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
           {/* Card 2 - Body Tissues */}
           <div className="rounded-xl border border-rose-200 overflow-hidden bg-white print:bg-white print:border-gray-200">
             <div className="h-1 bg-rose-500 w-full" />
-            <div className="p-2 print:p-1 flex flex-col items-center text-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-rose-50 border border-rose-200 flex items-center justify-center">
+            <div className="p-1.5 print:p-1 flex flex-col items-center text-center gap-1">
+              <div className="w-6 h-6 rounded-full bg-rose-50 border border-rose-200 flex items-center justify-center">
                 <span className="text-lg">🔬</span>
               </div>
               <p className="text-xs font-bold uppercase tracking-widest text-rose-600 print:text-gray-700">
@@ -949,8 +949,8 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
           {/* Card 3 - Body Organs */}
           <div className="rounded-xl border border-purple-700/30 overflow-hidden glass-card">
             <div className="h-1 bg-purple-500 w-full" />
-            <div className="p-2 print:p-1 flex flex-col items-center text-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-purple-50 border border-purple-200 flex items-center justify-center">
+            <div className="p-1.5 print:p-1 flex flex-col items-center text-center gap-1">
+              <div className="w-6 h-6 rounded-full bg-purple-50 border border-purple-200 flex items-center justify-center">
                 <span className="text-lg">🫀</span>
               </div>
               <p className="text-xs font-bold uppercase tracking-widest text-purple-600">
@@ -971,8 +971,8 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
           {/* Card 4 – Daily Nutrient Requirements */}
           <div className="rounded-xl border border-amber-200 overflow-hidden bg-white print:bg-white print:border-gray-200">
             <div className="h-1 bg-amber-500 w-full" />
-            <div className="p-2 print:p-1 flex flex-col items-center text-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center">
+            <div className="p-1.5 print:p-1 flex flex-col items-center text-center gap-1">
+              <div className="w-6 h-6 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center">
                 <Layers className="w-4 h-4 text-amber-600" />
               </div>
               <p className="text-xs font-bold uppercase tracking-widest text-amber-600">
@@ -1023,7 +1023,7 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
             title="Global Nutrition Philosophy"
             icon={<Globe className="w-4 h-4" />}
           >
-            <div className="text-center mb-5">
+            <div className="text-center mb-2">
               <p className="text-sm text-violet-600 max-w-2xl mx-auto">
                 A human body requires all these nutrients{" "}
                 <strong className="text-violet-700">every single day</strong> to
@@ -1033,8 +1033,8 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
             </div>
 
             {/* Macronutrients Table */}
-            <div className="mb-6 print:mb-2">
-              <h3 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2 uppercase tracking-wide">
+            <div className="mb-2 print:mb-1">
+              <h3 className="text-sm font-bold text-gray-800 mb-1 flex items-center gap-2 uppercase tracking-wide">
                 <span className="w-2.5 h-2.5 rounded-full bg-violet-600 inline-block" />
                 Macronutrients — Daily RDA for Indians
               </h3>
@@ -1079,7 +1079,7 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
 
             {/* Micronutrients Table */}
             <div>
-              <h3 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2 uppercase tracking-wide">
+              <h3 className="text-sm font-bold text-gray-800 mb-1 flex items-center gap-2 uppercase tracking-wide">
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block" />
                 Micronutrients — Daily RDA for Indians
               </h3>
@@ -1138,7 +1138,7 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.28 }}
-          className="relative text-center py-6 px-8"
+          className="relative text-center py-3 px-8"
         >
           <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-16 rounded-full bg-violet-600 opacity-60" />
           <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-16 rounded-full bg-violet-600 opacity-60" />
@@ -1174,7 +1174,7 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.34 }}
-          className="text-center py-4 px-8"
+          className="text-center py-2 px-8"
         >
           <p className="text-base sm:text-lg font-semibold text-violet-600 italic">
             &quot;You don&apos;t need to eat less — You only need to eat
@@ -1717,21 +1717,21 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
             title="Foods to Avoid"
             icon={<XCircle className="w-4 h-4" />}
           >
-            <p className="text-sm text-violet-600 mb-5">
+            <p className="text-sm text-violet-600 mb-2">
               Eliminating these foods accelerates your health goals and prevents
               nutrient deficiencies.
             </p>
 
             {/* General Avoid List */}
-            <h3 className="text-xs font-bold text-gray-600 mb-3 uppercase tracking-widest flex items-center gap-2">
+            <h3 className="text-xs font-bold text-gray-600 mb-1 uppercase tracking-widest flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-red-500 inline-block" />
               General Foods to Avoid
             </h3>
-            <div className="grid sm:grid-cols-2 gap-3 mb-6">
+            <div className="grid sm:grid-cols-2 gap-2 mb-3">
               {GENERAL_AVOID_FOODS.map((item) => (
                 <div
                   key={item.name}
-                  className="flex items-start gap-2 p-2 rounded-xl bg-red-50 border border-red-100"
+                  className="flex items-start gap-2 p-1.5 rounded-xl bg-red-50 border border-red-100"
                 >
                   <XCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
                   <div>
@@ -1748,7 +1748,7 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
 
             {/* Condition-Specific Avoid List */}
             {activeConditions.length > 0 && (
-              <div className="space-y-4">
+              <div className="space-y-2">
                 {activeConditions.map((condition) => {
                   const foods = CONDITION_AVOID_FOODS[condition];
                   if (!foods) return null;
@@ -1812,14 +1812,14 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
             title="Personalized Health Tips"
             icon={<Heart className="w-4 h-4" />}
           >
-            <div className="space-y-3">
+            <div className="space-y-1.5">
               {plan.health_tips.map((tip, i) => (
                 <motion.div
                   key={tip.slice(0, 30)}
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.5 + i * 0.06 }}
-                  className="flex gap-2 p-2 rounded-xl bg-violet-50 border border-violet-200"
+                  className="flex gap-2 p-1.5 rounded-xl bg-violet-50 border border-violet-200"
                 >
                   <CheckCircle2 className="w-5 h-5 text-violet-600 shrink-0 mt-0.5" />
                   <p className="text-xs text-gray-600 leading-relaxed print:text-gray-800">
@@ -1871,8 +1871,8 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
             title="Get Your Personal Coach"
             icon={<MessageCircle className="w-4 h-4" />}
           >
-            <div className="text-center mb-5">
-              <div className="text-3xl mb-2">👨‍⚕️</div>
+            <div className="text-center mb-2">
+              <div className="text-2xl mb-1">👨‍⚕️</div>
               <p className="text-sm text-violet-600 max-w-sm mx-auto">
                 Get 24×7 personal guidance from a dedicated coach who will help
                 you achieve your health goals faster.
@@ -1886,13 +1886,13 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
                 target="_blank"
                 rel="noopener noreferrer"
                 data-ocid="result.personal_coach.primary_button"
-                className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-[#25D366] hover:bg-[#1ebe5a] text-white font-semibold transition-colors"
+                className="flex items-center justify-center gap-2 w-full py-2 rounded-xl bg-[#25D366] hover:bg-[#1ebe5a] text-white font-semibold transition-colors"
               >
                 <MessageCircle className="w-5 h-5" />
                 Chat with My Coach on WhatsApp
               </a>
             ) : (
-              <div className="p-4 rounded-xl bg-violet-50 border border-violet-200 text-sm text-violet-700 text-center">
+              <div className="p-2 rounded-xl bg-violet-50 border border-violet-200 text-sm text-violet-700 text-center">
                 Ask the friend who referred you to HN Coach for personal
                 coaching guidance.
               </div>
@@ -1912,9 +1912,9 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
             icon={<Share2 className="w-4 h-4" />}
           >
             {/* Promo Banner */}
-            <div className="bg-gradient-to-r from-violet-600 to-emerald-600 rounded-xl p-4 mb-5 text-white text-center">
-              <div className="text-2xl mb-1">🎁</div>
-              <div className="font-bold text-lg leading-tight">
+            <div className="bg-gradient-to-r from-violet-600 to-emerald-600 rounded-xl p-2 mb-3 text-white text-center">
+              <div className="text-lg mb-0.5">🎁</div>
+              <div className="font-bold text-sm leading-tight">
                 Refer &amp; Earn Full Refund!
               </div>
               <div className="text-sm text-gray-600 mt-1">
@@ -1924,7 +1924,7 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
             </div>
 
             {formData.user_whatsapp ? (
-              <div className="space-y-4">
+              <div className="space-y-2">
                 <div className="flex gap-2">
                   <input
                     readOnly
@@ -1957,17 +1957,17 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
                   target="_blank"
                   rel="noopener noreferrer"
                   data-ocid="result.referral.primary_button"
-                  className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-[#25D366] hover:bg-[#1ebe5a] text-white font-semibold transition-colors"
+                  className="flex items-center justify-center gap-2 w-full py-2 rounded-xl bg-[#25D366] hover:bg-[#1ebe5a] text-white font-semibold transition-colors"
                 >
                   <Share2 className="w-4 h-4" />
                   Share on WhatsApp
                 </a>
 
-                <div className="text-center py-3 bg-violet-50 rounded-xl border border-violet-200">
+                <div className="text-center py-2 bg-violet-50 rounded-xl border border-violet-200">
                   <div className="text-xs text-violet-600 font-semibold uppercase tracking-wide mb-1">
                     Friends Referred
                   </div>
-                  <div className="text-3xl font-bold text-violet-600">
+                  <div className="text-xl font-bold text-violet-600">
                     {referralCount}
                     <span className="text-base font-normal text-violet-600">
                       {" "}
@@ -1991,7 +1991,7 @@ export default function DietResult({ plan, formData, onStartOver }: Props) {
                 )}
               </div>
             ) : (
-              <div className="p-4 rounded-xl bg-violet-50 border border-violet-200 text-sm text-violet-700 text-center">
+              <div className="p-2 rounded-xl bg-violet-50 border border-violet-200 text-sm text-violet-700 text-center">
                 Add your WhatsApp number when generating a report to get your
                 unique referral link.
               </div>
@@ -2031,9 +2031,9 @@ function ReportCard({
         className || ""
       }`}
     >
-      <div className="border-l-4 border-violet-500 px-3 py-3">
+      <div className="border-l-4 border-violet-500 px-3 py-2">
         {title && (
-          <div className="flex items-center gap-2 mb-4">
+          <div className="flex items-center gap-2 mb-2">
             {icon && <span className="text-violet-600 shrink-0">{icon}</span>}
             <h2 className="text-sm font-bold uppercase tracking-widest text-gray-800">
               <span className="text-violet-600 mr-1.5">—</span>
@@ -2055,7 +2055,7 @@ function ReportField({
   value: string | ReactNode;
 }) {
   return (
-    <div className="flex items-center gap-3 border-b border-gray-100 py-1 last:border-b-0">
+    <div className="flex items-center gap-3 border-b border-gray-100 py-0.5 last:border-b-0">
       <span className="bg-violet-50 text-violet-700 text-xs font-semibold uppercase rounded-full px-3 py-1 min-w-[100px] text-center shrink-0">
         {label}
       </span>

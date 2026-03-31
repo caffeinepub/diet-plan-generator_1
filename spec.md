@@ -1,38 +1,33 @@
-# HN Coach – Diet Plan Generator
+# HN Coach – Diet & Nutrition Plan
 
 ## Current State
-The report (DietResult.tsx) has cards with varying sizes and spacing. Daily Wellness cards use `p-4` padding with `text-2xl` numbers and emoji icons at `text-2xl`. Body science cards (cells, tissues, organs, nutrients) use `p-3`. ReportCard sections use generous inner spacing. The personal coaching card was previously made compact (slim row). All other cards remain large and inconsistent.
+The DietResult.tsx report has various card styles across sections: ReportCard wrapper components with large padding, body science info cards with p-2 padding and flex-col layout, calorie guide card, timeline cards, foods to avoid cards, health tips, referral section, and more. The Personal Coaching Program card is already compact: `rounded-xl border p-3 flex items-center gap-3 shadow-sm` - horizontal layout with icon + text + button, slim and tight.
 
 ## Requested Changes (Diff)
 
 ### Add
-- Nothing new to add.
+- Nothing new
 
 ### Modify
-- **Daily Wellness cards**: Reduce to `p-2.5` padding, icon `text-lg`, number `text-lg font-bold`, label `text-[10px]`, description `text-[10px]`. Keep 2-column grid.
-- **Body science cards** (cells, tissues, organs, nutrients): Reduce icon size, font sizes, and padding to match the compact style.
-- **ReportCard inner content**: Tighten padding to `p-3` (from `p-5` or `p-6`).
-- **ReportField rows**: Reduce vertical padding.
-- **Goal Timeline milestone rows**: Compact font and padding.
-- **Daily Calorie Guide boxes**: Compact padding and font.
-- **Personal Details fields**: Compact row spacing.
-- **Foods to Avoid cards**: Compact padding.
-- **Health Tips**: Compact card padding.
-- **Macro/Micro tables**: Already compact, maintain.
-- **Coaching enrollment card**: Keep existing slim row (already done).
-- **Referral card**: Compact.
-- **All print:* classes** must remain to ensure white print background and no cropping.
+- **All ReportCard sections** (Personal Details, Goal Timeline, Body Science cards, Global Nutrition Philosophy, Daily Calorie Guide, Foods to Avoid, Health Tips, Referral section, Get Your Personal Coach section): Apply compact, slim, minimal padding style consistent with the Personal Coaching Program card
+- **ReportCard wrapper component**: Reduce header padding, body padding to match slim style (px-3 py-2 or similar)
+- **Body science info cards** (cells, tissues, organs, nutrients): Make more compact, reduce internal padding, smaller text
+- **Goal timeline cards**: Smaller padding, tighter grid
+- **Foods to avoid section**: Compact rows
+- **Health tips**: Compact list items
+- **Referral section**: Slim card style
+- Both on-screen and print views
 
 ### Remove
-- Excessive padding/margin on all cards in the report.
+- Excess whitespace/padding from all cards except Daily Wellness grid (keep as-is)
 
 ## Implementation Plan
-1. In DietResult.tsx, update Daily Wellness card grid: change all 10 wellness cards to use `p-2.5 gap-2`, `text-[10px]` labels, `text-lg font-bold` values, `text-[10px]` descriptions, `text-xl` emoji, keep color borders.
-2. Update the ReportCard component's inner padding class (if defined inline) to `p-3`.
-3. Tighten ReportField border-b rows padding from `py-2.5` to `py-1.5`.
-4. Compact body science 4-cards grid: `p-2`, `text-xs` everywhere, smaller icon.
-5. Compact Daily Calorie Guide section padding.
-6. Compact timeline milestone items.
-7. Compact foods-to-avoid grid cards.
-8. Compact health tips cards.
-9. Validate and build.
+1. Update the ReportCard component style: reduce header padding to px-3 py-2, body padding to px-3 py-2
+2. Compact all section cards that use ReportCard or custom card styles
+3. Body science cards: reduce p-2 to p-1.5, tighter gap
+4. Timeline section: tighter padding on milestone boxes
+5. Foods to avoid: compact rows with less padding
+6. Health tips: tighter list
+7. Referral and coach sections: already slim, minor tuning if needed
+8. Keep Daily Wellness grid completely unchanged
+9. Validate build
