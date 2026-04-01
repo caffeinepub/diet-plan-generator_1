@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -68,6 +70,32 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: "Plus Jakarta Sans", "Bricolage Grotesque", system-ui,
+      sans-serif;
+  }
+
+  /* Custom scrollbar — purple themed */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: rgba(13, 5, 32, 0.8);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #7c3aed, #4c1d95);
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #8b5cf6, #6d28d9);
+  }
+
+  /* Input focus ring polish */
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: 2px solid rgba(139, 92, 246, 0.6);
+    outline-offset: 2px;
   }
 }
 
@@ -118,6 +146,31 @@
   box-shadow: 0 0 30px rgba(250, 204, 21, 0.5);
 }
 
+/* ── Enroll button shine effect ── */
+.enroll-shine {
+  position: relative;
+  overflow: hidden;
+}
+.enroll-shine::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.35),
+    transparent
+  );
+  transform: skewX(-20deg);
+  transition: left 0.5s ease;
+}
+.enroll-shine:hover::after {
+  left: 150%;
+}
+
 @keyframes gradientShift {
   0% {
     background-position: 0% 50%;
@@ -160,10 +213,37 @@
   }
 }
 
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .animate-shimmer {
   animation: shimmer 2.5s infinite;
 }
 
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s ease both;
+}
+
+/* ── WhatsApp button hover glow ── */
+.whatsapp-btn {
+  transition: all 0.2s ease;
+}
+.whatsapp-btn:hover {
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+  transform: translateY(-1px);
+}
+
+/* ───────────────────────────────────────────
+   PRINT STYLES — Keep report white & compact
+   ─────────────────────────────────────────── */
 @media print {
   @page {
     margin: 8mm 8mm;
@@ -178,6 +258,14 @@
   }
 
   /* ── Kill ALL dark/purple backgrounds ── */
+  html,
+  body,
+  .result-page {
+    background: white !important;
+    background-color: white !important;
+    color: #111 !important;
+  }
+
   *,
   *::before,
   *::after {
@@ -217,11 +305,11 @@
     line-height: 1.3 !important;
     margin: 0 !important;
     padding: 0 !important;
+    font-family: "Plus Jakarta Sans", Arial, sans-serif !important;
   }
 
   /* ── Result page wrapper ── */
   .result-page {
-    background: white !important;
     min-height: unset !important;
     padding: 0 !important;
   }
@@ -231,6 +319,7 @@
     padding: 4px 8px !important;
     margin-bottom: 6px !important;
     border-bottom: 1.5px solid #7c3aed !important;
+    background: white !important;
   }
   .print-only-header img {
     width: 22px !important;
@@ -318,7 +407,8 @@
   /* ── Avoid page breaks inside cards ── */
   .page-break-avoid,
   [class*="rounded-xl"],
-  [class*="rounded-2xl"] {
+  [class*="rounded-2xl"],
+  [class*="rounded-lg"] {
     break-inside: avoid;
     page-break-inside: avoid;
   }
@@ -338,5 +428,22 @@
   .print-compact {
     padding: 4px !important;
     margin: 2px !important;
+  }
+
+  /* ── Ensure no overflow clips content ── */
+  [class*="overflow-hidden"] {
+    overflow: visible !important;
+  }
+
+  /* ── Hide all animated elements ── */
+  [class*="animate-"],
+  [style*="animation"] {
+    animation: none !important;
+  }
+
+  /* ── Links: show as plain text ── */
+  a {
+    text-decoration: none !important;
+    color: #111 !important;
   }
 }

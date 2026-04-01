@@ -22,9 +22,9 @@ type AppView = "form" | "payment" | "result";
 
 function getDownloadCount(): number {
   try {
-    return Number.parseInt(localStorage.getItem(LS_DOWNLOAD_COUNT_KEY) || "53");
+    return Number.parseInt(localStorage.getItem(LS_DOWNLOAD_COUNT_KEY) || "99");
   } catch (_) {
-    return 53;
+    return 99;
   }
 }
 
@@ -101,13 +101,11 @@ function MainApp() {
   }, []);
 
   function handlePlanGenerated(plan: DietPlan, data: FormData) {
-    // Reset paid flag for new report
     try {
       localStorage.removeItem(LS_PAID_KEY);
     } catch (_) {}
     setPendingPlan(plan);
     setPendingFormData(data);
-    // Save report immediately so it can be shown after payment
     try {
       localStorage.setItem(LS_KEY, JSON.stringify({ plan, formData: data }));
     } catch (_) {}
@@ -127,14 +125,12 @@ function MainApp() {
       const saved = localStorage.getItem(LS_KEY);
       if (saved) {
         const { plan, formData: savedFormData } = JSON.parse(saved);
-        // Merge with defaults so missing fields from old cached data don't crash DietResult
         const mergedFormData = { ...defaultFormData, ...savedFormData };
         setDietPlan(plan);
         setFormData(mergedFormData);
         setView("result");
       }
     } catch (_) {
-      // Clear corrupted data
       try {
         localStorage.removeItem(LS_KEY);
       } catch (_e) {}
@@ -161,7 +157,6 @@ function MainApp() {
       description: "Personalized Diet Plan",
       image: "/assets/uploads/IMG-20260226-WA0000-2.jpg",
       handler: () => {
-        // Payment successful
         try {
           localStorage.setItem(LS_PAID_KEY, "true");
           setHasPreviousReport(true);
@@ -169,7 +164,6 @@ function MainApp() {
           localStorage.setItem(LS_DOWNLOAD_COUNT_KEY, String(count + 1));
         } catch (_) {}
 
-        // Save to global reports list for admin panel
         try {
           const reports = JSON.parse(
             localStorage.getItem("hn_coach_reports") || "[]",
@@ -187,7 +181,6 @@ function MainApp() {
           localStorage.setItem("hn_coach_reports", JSON.stringify(reports));
         } catch (_) {}
 
-        // Also save to backend for cross-device admin panel visibility
         createActorWithConfig()
           .then((actor) =>
             actor.addAdminReport({
@@ -307,7 +300,7 @@ function MainApp() {
                 </h2>
                 <p className="text-white/70 text-sm">
                   Join{" "}
-                  <span className="text-yellow-300 font-bold">53+ people</span>{" "}
+                  <span className="text-yellow-300 font-bold">99+ people</span>{" "}
                   who transformed their health with HN Coach
                 </p>
               </div>
@@ -320,7 +313,7 @@ function MainApp() {
                   </div>
                   <div className="flex items-center justify-center gap-4 mb-3">
                     <span className="text-gray-400 line-through text-2xl font-bold">
-                      ₹1,000
+                      ₹1,999
                     </span>
                     <span
                       className="text-6xl font-black"
