@@ -17,7 +17,8 @@ export default {
     extend: {
       fontFamily: {
         display: ["Bricolage Grotesque", "sans-serif"],
-        body: ["Outfit", "sans-serif"],
+        body: ["Plus Jakarta Sans", "sans-serif"],
+        mono: ["JetBrains Mono", "monospace"],
       },
       colors: {
         border: "oklch(var(--border))",
@@ -70,7 +71,7 @@ export default {
           border: "oklch(var(--sidebar-border))",
           ring: "oklch(var(--sidebar-ring))",
         },
-        /* Deep Purple custom palette — replaces forest greens */
+        /* Deep Purple custom palette */
         forest: {
           50: "#f5f0ff",
           100: "#ede0ff",
@@ -93,6 +94,25 @@ export default {
           600: "#b8860b",
           700: "#92640a",
         },
+        /* 2026 Electric Indigo palette */
+        indigo2: {
+          100: "#e0e7ff",
+          200: "#c7d2fe",
+          300: "#a5b4fc",
+          400: "#818cf8",
+          500: "#6366f1",
+          600: "#4f46e5",
+          700: "#4338ca",
+          800: "#3730a3",
+          900: "#312e81",
+        },
+        /* Near-black navy */
+        navy: {
+          950: "#020617",
+          900: "#0f0728",
+          800: "#1e1048",
+          700: "#2d1b69",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -101,9 +121,13 @@ export default {
       },
       boxShadow: {
         xs: "0 1px 2px 0 rgba(0,0,0,0.05)",
-        green: "0 4px 24px -4px rgba(109,40,217,0.4)",
+        subtle: "0 2px 8px rgba(0,0,0,0.12)",
+        indigo: "0 4px 24px -4px rgba(99,102,241,0.4)",
+        "indigo-lg": "0 8px 32px rgba(79,70,229,0.35)",
         gold: "0 4px 24px -4px rgba(212,160,23,0.4)",
         purple: "0 8px 32px rgba(109,40,217,0.35)",
+        glow: "0 0 20px rgba(129,140,248,0.25)",
+        "glow-lg": "0 0 40px rgba(129,140,248,0.35)",
       },
       keyframes: {
         "accordion-down": {
@@ -128,8 +152,17 @@ export default {
           "100%": { transform: "translateX(200%)" },
         },
         glowPulse: {
-          "0%, 100%": { boxShadow: "0 0 20px rgba(139,92,246,0.4)" },
-          "50%": { boxShadow: "0 0 40px rgba(139,92,246,0.8), 0 0 60px rgba(109,40,217,0.4)" },
+          "0%, 100%": { boxShadow: "0 0 15px rgba(129,140,248,0.3)" },
+          "50%": { boxShadow: "0 0 30px rgba(129,140,248,0.6), 0 0 50px rgba(99,102,241,0.3)" },
+        },
+        orbDrift: {
+          "0%, 100%": { transform: "translate(0, 0) scale(1)" },
+          "33%": { transform: "translate(40px, 30px) scale(1.05)" },
+          "66%": { transform: "translate(-20px, 50px) scale(0.98)" },
+        },
+        "micro-bounce": {
+          "0%, 100%": { transform: "scale(1)" },
+          "50%": { transform: "scale(0.98)" },
         },
       },
       animation: {
@@ -138,7 +171,9 @@ export default {
         "fade-in": "fade-in 0.4s ease-out",
         "gradient-shift": "gradientShift 8s ease infinite",
         shimmer: "shimmer 2.5s infinite",
-        "glow-pulse": "glowPulse 2s ease-in-out infinite",
+        "glow-pulse": "glowPulse 2.5s ease-in-out infinite",
+        "orb-drift": "orbDrift 20s ease-in-out infinite",
+        "micro-bounce": "micro-bounce 0.15s ease",
       },
     },
   },

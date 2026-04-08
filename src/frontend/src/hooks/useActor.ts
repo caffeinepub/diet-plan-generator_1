@@ -1,56 +1,32 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
-import type { backendInterface } from "../backend";
-import { createActorWithConfig } from "../config";
-import { useInternetIdentity } from "./useInternetIdentity";
+// useActor hook — provides a typed HNCoachActor for backend calls.
+// Falls back to no-op when canister is unavailable.
 
-const ACTOR_QUERY_KEY = "actor";
-export function useActor() {
-  const { identity } = useInternetIdentity();
-  const queryClient = useQueryClient();
-  const actorQuery = useQuery<backendInterface>({
-    queryKey: [ACTOR_QUERY_KEY, identity?.getPrincipal().toString()],
-    queryFn: async () => {
-      const isAuthenticated = !!identity;
+import { useEffect, useState } from "react";
+import { type HNCoachActor, createActorWithConfig } from "../config";
 
-      if (!isAuthenticated) {
-        // Return anonymous actor if not authenticated
-        return await createActorWithConfig();
-      }
+interface UseActorResult {
+  actor: HNCoachActor | null;
+  isFetching: boolean;
+}
 
-      const actorOptions = {
-        agentOptions: {
-          identity,
-        },
-      };
+export function useActor(): UseActorResult {
+  const [actor, setActor] = useState<HNCoachActor | null>(null);
+  const [isFetching, setIsFetching] = useState(true);
 
-      const actor = await createActorWithConfig(actorOptions);
-      return actor;
-    },
-    // Only refetch when identity changes
-    staleTime: Number.POSITIVE_INFINITY,
-    // This will cause the actor to be recreated when the identity changes
-    enabled: true,
-  });
-
-  // When the actor changes, invalidate dependent queries
   useEffect(() => {
-    if (actorQuery.data) {
-      queryClient.invalidateQueries({
-        predicate: (query) => {
-          return !query.queryKey.includes(ACTOR_QUERY_KEY);
-        },
+    let cancelled = false;
+    createActorWithConfig()
+      .then((a) => {
+        if (!cancelled) setActor(a);
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setIsFetching(false);
       });
-      queryClient.refetchQueries({
-        predicate: (query) => {
-          return !query.queryKey.includes(ACTOR_QUERY_KEY);
-        },
-      });
-    }
-  }, [actorQuery.data, queryClient]);
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
-  return {
-    actor: actorQuery.data || null,
-    isFetching: actorQuery.isFetching,
-  };
+  return { actor, isFetching };
 }

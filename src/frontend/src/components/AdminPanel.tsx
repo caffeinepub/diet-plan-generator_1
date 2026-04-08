@@ -18,7 +18,7 @@ function mergeReports(
 ): ReportEntry[] {
   const map = new Map<string, ReportEntry>();
   for (const r of local) map.set(r.id, r);
-  for (const r of remote) map.set(r.id, r); // remote wins on conflict
+  for (const r of remote) map.set(r.id, r);
   return Array.from(map.values()).sort(
     (a, b) => new Date(b.paidAt).getTime() - new Date(a.paidAt).getTime(),
   );
@@ -48,16 +48,13 @@ function buildTree(reports: ReportEntry[]): TreeNodeData[] {
     if (!byWhatsapp[key]) byWhatsapp[key] = [];
     byWhatsapp[key].push(r);
   }
-
   const allWhatsapps = new Set(reports.map((r) => r.whatsapp));
-
   function buildChildren(parentWhatsapp: string): TreeNodeData[] {
     return (byWhatsapp[parentWhatsapp] || []).map((entry) => ({
       entry,
       children: buildChildren(entry.whatsapp),
     }));
   }
-
   const roots: TreeNodeData[] = [];
   for (const r of reports) {
     const ref = r.referredBy?.trim() || "";
@@ -72,58 +69,86 @@ function TreeNode({ node, depth }: { node: TreeNodeData; depth: number }) {
   const [open, setOpen] = useState(true);
   const reward = node.entry.referredBy ? node.entry.amount * 0.5 : 0;
 
-  function toggle() {
-    setOpen((v) => !v);
-  }
-
   return (
     <div style={{ marginLeft: depth > 0 ? 24 : 0 }}>
       <button
         type="button"
-        className="w-full flex items-center gap-2 py-2 px-3 rounded-lg hover:bg-violet-900/30 transition-colors cursor-pointer border border-transparent hover:border-violet-700/30 text-left"
-        onClick={toggle}
+        className="w-full flex items-center gap-2 py-2.5 px-3 rounded-lg transition-all cursor-pointer text-left"
+        onClick={() => setOpen((v) => !v)}
         data-ocid="admin.tree.row"
+        style={{
+          background: "transparent",
+          border: "1px solid transparent",
+        }}
+        onMouseEnter={(e) => {
+          (e.currentTarget as HTMLButtonElement).style.background =
+            "rgba(129,140,248,0.06)";
+          (e.currentTarget as HTMLButtonElement).style.borderColor =
+            "rgba(129,140,248,0.12)";
+        }}
+        onMouseLeave={(e) => {
+          (e.currentTarget as HTMLButtonElement).style.background =
+            "transparent";
+          (e.currentTarget as HTMLButtonElement).style.borderColor =
+            "transparent";
+        }}
       >
         {node.children.length > 0 && (
-          <span className="text-forest-600 font-bold text-sm w-4">
+          <span className="text-xs font-bold w-4" style={{ color: "#818cf8" }}>
             {open ? "▼" : "▶"}
           </span>
         )}
         {node.children.length === 0 && <span className="w-4" />}
         <div className="flex-1 flex flex-wrap items-center gap-x-4 gap-y-1">
-          <span className="font-semibold text-white text-sm">
+          <span className="font-semibold text-sm" style={{ color: "#f1f5f9" }}>
             {node.entry.name}
           </span>
-          <span className="text-violet-400 text-xs">{node.entry.whatsapp}</span>
-          <span className="bg-violet-900/40 text-violet-300 text-xs px-2 py-0.5 rounded-full font-medium">
+          <span className="text-xs" style={{ color: "#818cf8" }}>
+            {node.entry.whatsapp}
+          </span>
+          <span
+            className="text-xs px-2 py-0.5 rounded-full font-medium"
+            style={{ background: "rgba(99,102,241,0.15)", color: "#a5b4fc" }}
+          >
             {node.entry.goal}
           </span>
-          <span className="text-yellow-400 text-xs font-bold">
+          <span className="text-xs font-bold" style={{ color: "#fbbf24" }}>
             ₹{node.entry.amount} paid
           </span>
           {reward > 0 && (
             <span
-              className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                node.entry.rewardPaid
-                  ? "bg-gray-100 text-gray-400 line-through"
-                  : "bg-gold-50 text-gold-700"
-              }`}
+              className="text-xs px-2 py-0.5 rounded-full font-medium"
+              style={{
+                background: node.entry.rewardPaid
+                  ? "rgba(100,116,139,0.15)"
+                  : "rgba(250,204,21,0.1)",
+                color: node.entry.rewardPaid ? "#64748b" : "#fcd34d",
+                textDecoration: node.entry.rewardPaid ? "line-through" : "none",
+              }}
             >
               Reward: ₹{reward}
             </span>
           )}
           {node.entry.referredBy && (
-            <span className="text-gray-400 text-xs">
+            <span className="text-xs" style={{ color: "#475569" }}>
               ← {node.entry.referredBy}
             </span>
           )}
         </div>
-        <span className="text-gray-400 text-xs whitespace-nowrap">
+        <span
+          className="text-xs whitespace-nowrap"
+          style={{ color: "#64748b" }}
+        >
           {new Date(node.entry.paidAt).toLocaleDateString("en-IN")}
         </span>
       </button>
       {open && node.children.length > 0 && (
-        <div className="border-l-2 border-forest-100 ml-5">
+        <div
+          style={{
+            borderLeft: "1.5px solid rgba(129,140,248,0.15)",
+            marginLeft: 20,
+          }}
+        >
           {node.children.map((child) => (
             <TreeNode key={child.entry.id} node={child} depth={depth + 1} />
           ))}
@@ -140,7 +165,6 @@ export default function AdminPanel() {
   const [view, setView] = useState<"table" | "tree">("table");
   const [reports, setReports] = useState<ReportEntry[]>(loadReports);
 
-  // Load from backend on mount
   useEffect(() => {
     createActorWithConfig()
       .then((actor) => actor.getAdminReports())
@@ -150,7 +174,6 @@ export default function AdminPanel() {
       .catch(() => {});
   }, []);
 
-  // Reload reports when window gains focus
   useEffect(() => {
     function handleFocus() {
       const local = loadReports();
@@ -205,7 +228,8 @@ export default function AdminPanel() {
     const rewardsPending = reports
       .filter((r) => !r.rewardPaid && r.referredBy)
       .reduce((s, r) => s + r.amount * 0.5, 0);
-    return { totalRevenue, rewardsPaid, rewardsPending };
+    const referredCount = reports.filter((r) => r.referredBy).length;
+    return { totalRevenue, rewardsPaid, rewardsPending, referredCount };
   }, [reports]);
 
   const tree = useMemo(() => buildTree(reports), [reports]);
@@ -216,25 +240,48 @@ export default function AdminPanel() {
         className="min-h-screen flex items-center justify-center px-4"
         style={{
           background:
-            "linear-gradient(135deg, #0d0520 0%, #1a0533 50%, #4c1d95 100%)",
+            "linear-gradient(145deg, #020617 0%, #0f0728 50%, #1e1048 100%)",
         }}
       >
-        <div className="w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden glass-card">
+        <div className="mesh-orb" />
+        <div className="w-full max-w-sm rounded-2xl overflow-hidden relative z-10 glass-card">
+          {/* Status gradient top */}
+          <div className="status-bar-gradient" />
           <div
             className="px-8 py-8 text-center"
             style={{
-              background: "linear-gradient(135deg, #0d0520 0%, #6d28d9 100%)",
+              background:
+                "linear-gradient(135deg, rgba(129,140,248,0.1) 0%, rgba(99,102,241,0.06) 100%)",
             }}
           >
-            <div className="text-4xl mb-2">🛡️</div>
-            <h1 className="text-2xl font-black text-white">HN Coach</h1>
-            <p className="text-green-200 text-sm mt-1">Admin Panel</p>
+            <div
+              className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-4 mx-auto"
+              style={{
+                background: "rgba(129,140,248,0.12)",
+                border: "1px solid rgba(129,140,248,0.25)",
+              }}
+            >
+              <span className="text-2xl">🛡️</span>
+            </div>
+            <h1
+              className="text-xl font-black"
+              style={{ color: "#f1f5f9", letterSpacing: "-0.02em" }}
+            >
+              HN Coach
+            </h1>
+            <p
+              className="text-xs mt-1 uppercase tracking-widest font-medium"
+              style={{ color: "#818cf8" }}
+            >
+              Admin Panel
+            </p>
           </div>
           <div className="px-8 py-8 space-y-4">
             <div>
               <label
                 htmlFor="admin-password"
-                className="block text-sm font-semibold text-violet-200 mb-2"
+                className="block text-xs font-semibold mb-2 uppercase tracking-widest"
+                style={{ color: "#94a3b8" }}
               >
                 Password
               </label>
@@ -245,14 +292,15 @@ export default function AdminPanel() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleLogin()}
-                className="w-full rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all border border-violet-700/30 bg-violet-900/30"
+                className="w-full rounded-xl px-4 py-3 text-sm form-input-2026"
                 placeholder="Enter admin password"
               />
             </div>
             {error && (
               <p
                 data-ocid="admin.error_state"
-                className="text-red-600 text-sm font-medium"
+                className="text-sm font-medium"
+                style={{ color: "#f87171" }}
               >
                 {error}
               </p>
@@ -261,12 +309,9 @@ export default function AdminPanel() {
               data-ocid="admin.primary_button"
               type="button"
               onClick={handleLogin}
-              className="w-full text-white font-bold py-3 rounded-xl transition-all shadow-lg"
-              style={{
-                background: "linear-gradient(135deg, #6d28d9 0%, #4c1d95 100%)",
-              }}
+              className="w-full text-white font-bold py-3 rounded-xl neo-button transition-all"
             >
-              Login
+              Sign In
             </button>
           </div>
         </div>
@@ -277,23 +322,39 @@ export default function AdminPanel() {
   return (
     <div
       className="min-h-screen"
-      style={{ background: "linear-gradient(135deg, #0d0520, #1a0533)" }}
+      style={{
+        background: "linear-gradient(145deg, #020617 0%, #0f0728 100%)",
+      }}
     >
+      {/* Status bar */}
+      <div className="status-bar-gradient" />
+
       <header
-        className="border-b border-forest-200 px-6 py-4 flex items-center justify-between shadow-sm"
+        className="border-b px-6 py-4 flex items-center justify-between"
         style={{
-          background: "linear-gradient(135deg, #0d0520 0%, #6d28d9 100%)",
+          background: "rgba(2,6,23,0.9)",
+          borderColor: "rgba(129,140,248,0.1)",
+          backdropFilter: "blur(20px)",
         }}
       >
         <div className="flex items-center gap-3">
           <img
             src="/assets/uploads/IMG-20260226-WA0000-2.jpg"
             alt="HN Coach"
-            className="w-10 h-10 rounded-full object-cover border-2 border-gold-300"
+            className="w-9 h-9 rounded-full object-cover"
+            style={{ boxShadow: "0 0 0 2px rgba(129,140,248,0.3)" }}
           />
           <div>
-            <h1 className="text-xl font-black text-white">HN Coach Admin</h1>
-            <p className="text-green-200 text-xs">
+            <h1
+              className="text-base font-black"
+              style={{ color: "#f1f5f9", letterSpacing: "-0.02em" }}
+            >
+              HN Coach Admin
+            </h1>
+            <p
+              className="text-[10px] uppercase tracking-widest font-medium"
+              style={{ color: "#818cf8" }}
+            >
               Report & Referral Dashboard
             </p>
           </div>
@@ -303,7 +364,12 @@ export default function AdminPanel() {
             data-ocid="admin.secondary_button"
             type="button"
             onClick={handleRefresh}
-            className="text-sm text-white/80 hover:text-white transition-colors font-medium px-4 py-2 rounded-lg hover:bg-white/10 border border-white/20"
+            className="text-xs font-medium px-3 py-1.5 rounded-lg transition-all"
+            style={{
+              background: "rgba(129,140,248,0.08)",
+              border: "1px solid rgba(129,140,248,0.15)",
+              color: "#a5b4fc",
+            }}
           >
             🔄 Refresh
           </button>
@@ -311,7 +377,14 @@ export default function AdminPanel() {
             data-ocid="admin.secondary_button"
             type="button"
             onClick={() => setAuthed(false)}
-            className="text-sm text-white/70 hover:text-red-300 transition-colors font-medium px-4 py-2 rounded-lg hover:bg-white/10"
+            className="text-xs font-medium px-3 py-1.5 rounded-lg transition-all"
+            style={{ color: "#64748b" }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.color = "#f87171";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.color = "#64748b";
+            }}
           >
             Logout
           </button>
@@ -319,95 +392,110 @@ export default function AdminPanel() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-8 space-y-6">
-        {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {/* Bento Stats Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {[
             {
               label: "Total Reports",
-              value: reports.length,
+              value: reports.length.toString(),
               icon: "📋",
-              color: "forest",
+              accent: "#818cf8",
+              bg: "rgba(99,102,241,0.08)",
             },
             {
               label: "Total Revenue",
-              value: `₹${stats.totalRevenue}`,
+              value: `₹${stats.totalRevenue.toLocaleString()}`,
               icon: "💰",
-              color: "gold",
+              accent: "#fbbf24",
+              bg: "rgba(250,204,21,0.06)",
             },
             {
               label: "Rewards Pending",
-              value: `₹${stats.rewardsPending}`,
+              value: `₹${stats.rewardsPending.toLocaleString()}`,
               icon: "⏳",
-              color: "gold",
+              accent: "#fb923c",
+              bg: "rgba(249,115,22,0.07)",
             },
             {
-              label: "Rewards Paid",
-              value: `₹${stats.rewardsPaid}`,
-              icon: "✅",
-              color: "forest",
+              label: "Referral Signups",
+              value: stats.referredCount.toString(),
+              icon: "🔗",
+              accent: "#4ade80",
+              bg: "rgba(74,222,128,0.06)",
             },
-          ].map((stat, i) => (
+          ].map((stat) => (
             <div
-              // biome-ignore lint/suspicious/noArrayIndexKey: static list
-              key={i}
-              className="rounded-xl p-5 border border-violet-700/30 float-3d"
+              key={stat.label}
+              className="bento-stat rounded-xl p-4"
+              style={{ borderTop: `2px solid ${stat.accent}30` }}
             >
-              <div className="text-2xl mb-1">{stat.icon}</div>
-              <div className="text-2xl font-black text-white">{stat.value}</div>
-              <div className="text-violet-300 text-sm">{stat.label}</div>
+              <div className="flex items-start justify-between mb-3">
+                <span className="text-xl">{stat.icon}</span>
+                <div
+                  className="w-1.5 h-1.5 rounded-full mt-1"
+                  style={{ background: stat.accent }}
+                />
+              </div>
+              <div
+                className="text-2xl font-black mb-0.5"
+                style={{ color: "#f1f5f9", letterSpacing: "-0.02em" }}
+              >
+                {stat.value}
+              </div>
+              <div className="text-xs font-medium" style={{ color: "#64748b" }}>
+                {stat.label}
+              </div>
             </div>
           ))}
         </div>
 
         {/* View Toggle */}
-        <div className="flex gap-2">
-          <button
-            data-ocid="admin.tab"
-            type="button"
-            onClick={() => setView("table")}
-            className={`px-5 py-2 rounded-lg font-semibold text-sm transition-all ${
-              view === "table"
-                ? "text-white shadow-md"
-                : "bg-white text-gray-600 hover:bg-forest-50 border border-gray-200"
-            }`}
-            style={
-              view === "table"
-                ? { background: "linear-gradient(135deg, #7c3aed, #5b21b6)" }
-                : {}
-            }
-          >
-            📊 Table View
-          </button>
-          <button
-            data-ocid="admin.tab"
-            type="button"
-            onClick={() => setView("tree")}
-            className={`px-5 py-2 rounded-lg font-semibold text-sm transition-all ${
-              view === "tree"
-                ? "text-white shadow-md"
-                : "bg-white text-gray-600 hover:bg-forest-50 border border-gray-200"
-            }`}
-            style={
-              view === "tree"
-                ? { background: "linear-gradient(135deg, #7c3aed, #5b21b6)" }
-                : {}
-            }
-          >
-            🌲 Tree View
-          </button>
+        <div
+          className="flex gap-1.5 p-1 rounded-xl w-fit"
+          style={{
+            background: "rgba(15,7,40,0.7)",
+            border: "1px solid rgba(129,140,248,0.1)",
+          }}
+        >
+          {(["table", "tree"] as const).map((v) => (
+            <button
+              key={v}
+              data-ocid="admin.tab"
+              type="button"
+              onClick={() => setView(v)}
+              className="px-4 py-2 rounded-lg font-semibold text-sm transition-all"
+              style={
+                view === v
+                  ? {
+                      background: "rgba(99,102,241,0.2)",
+                      color: "#a5b4fc",
+                      border: "1px solid rgba(129,140,248,0.25)",
+                    }
+                  : { color: "#64748b" }
+              }
+            >
+              {v === "table" ? "📊 Table View" : "🌲 Tree View"}
+            </button>
+          ))}
         </div>
 
         {/* Table View */}
         {view === "table" && (
-          <div className="rounded-xl border border-violet-700/30 overflow-hidden">
+          <div
+            className="rounded-xl overflow-hidden"
+            style={{ border: "1px solid rgba(129,140,248,0.1)" }}
+          >
             {reports.length === 0 ? (
               <div
                 data-ocid="admin.empty_state"
-                className="text-center py-16 text-violet-400"
+                className="text-center py-16"
+                style={{ color: "#818cf8" }}
               >
                 <div className="text-5xl mb-3">📭</div>
-                <p className="font-semibold">No reports yet</p>
-                <p className="text-sm mt-1">
+                <p className="font-semibold" style={{ color: "#a5b4fc" }}>
+                  No reports yet
+                </p>
+                <p className="text-sm mt-1" style={{ color: "#64748b" }}>
                   Reports will appear here after users complete payment
                 </p>
               </div>
@@ -416,20 +504,30 @@ export default function AdminPanel() {
                 <table data-ocid="admin.table" className="w-full text-sm">
                   <thead>
                     <tr
-                      className="text-white text-left"
                       style={{
-                        background: "linear-gradient(135deg, #7c3aed, #5b21b6)",
+                        background: "rgba(15,7,40,0.9)",
+                        borderBottom: "1px solid rgba(129,140,248,0.12)",
                       }}
                     >
-                      <th className="px-4 py-3 font-semibold">#</th>
-                      <th className="px-4 py-3 font-semibold">Name</th>
-                      <th className="px-4 py-3 font-semibold">WhatsApp</th>
-                      <th className="px-4 py-3 font-semibold">Referred By</th>
-                      <th className="px-4 py-3 font-semibold">Goal</th>
-                      <th className="px-4 py-3 font-semibold">Amount</th>
-                      <th className="px-4 py-3 font-semibold">Reward (50%)</th>
-                      <th className="px-4 py-3 font-semibold">Date</th>
-                      <th className="px-4 py-3 font-semibold">Action</th>
+                      {[
+                        "#",
+                        "Name",
+                        "WhatsApp",
+                        "Referred By",
+                        "Goal",
+                        "Amount",
+                        "Reward (50%)",
+                        "Date",
+                        "Action",
+                      ].map((h) => (
+                        <th
+                          key={h}
+                          className="px-4 py-3 text-left text-[11px] uppercase tracking-widest font-semibold"
+                          style={{ color: "#64748b" }}
+                        >
+                          {h}
+                        </th>
+                      ))}
                     </tr>
                   </thead>
                   <tbody>
@@ -437,52 +535,95 @@ export default function AdminPanel() {
                       <tr
                         key={r.id}
                         data-ocid={`admin.row.${idx + 1}`}
-                        className={`border-t border-gray-100 ${
-                          idx % 2 === 0 ? "bg-white" : "bg-forest-50/40"
-                        }`}
+                        style={{
+                          background:
+                            idx % 2 === 0
+                              ? "rgba(15,7,40,0.5)"
+                              : "rgba(15,7,40,0.3)",
+                          borderBottom: "1px solid rgba(129,140,248,0.06)",
+                        }}
                       >
-                        <td className="px-4 py-3 text-gray-400 font-mono">
+                        <td
+                          className="px-4 py-3 font-mono text-xs"
+                          style={{ color: "#475569" }}
+                        >
                           {idx + 1}
                         </td>
-                        <td className="px-4 py-3 font-semibold text-gray-900">
+                        <td
+                          className="px-4 py-3 font-semibold text-sm"
+                          style={{ color: "#f1f5f9" }}
+                        >
                           {r.name}
                         </td>
-                        <td className="px-4 py-3 text-gray-600">
+                        <td
+                          className="px-4 py-3 text-sm"
+                          style={{ color: "#94a3b8" }}
+                        >
                           {r.whatsapp}
                         </td>
                         <td className="px-4 py-3">
                           {r.referredBy ? (
-                            <span className="bg-blue-50 text-blue-700 px-2 py-0.5 rounded text-xs font-medium">
+                            <span
+                              className="text-xs px-2 py-0.5 rounded font-medium"
+                              style={{
+                                background: "rgba(99,102,241,0.1)",
+                                color: "#818cf8",
+                              }}
+                            >
                               {r.referredBy}
                             </span>
                           ) : (
-                            <span className="text-gray-300 text-xs">—</span>
+                            <span
+                              className="text-xs"
+                              style={{ color: "#334155" }}
+                            >
+                              —
+                            </span>
                           )}
                         </td>
                         <td className="px-4 py-3">
-                          <span className="bg-forest-50 text-forest-700 px-2 py-0.5 rounded text-xs font-medium">
+                          <span
+                            className="text-xs px-2 py-0.5 rounded font-medium"
+                            style={{
+                              background: "rgba(129,140,248,0.08)",
+                              color: "#a5b4fc",
+                            }}
+                          >
                             {r.goal}
                           </span>
                         </td>
-                        <td className="px-4 py-3 font-bold text-forest-700">
+                        <td
+                          className="px-4 py-3 font-bold text-sm"
+                          style={{ color: "#fbbf24" }}
+                        >
                           ₹{r.amount}
                         </td>
                         <td className="px-4 py-3">
                           {r.referredBy ? (
                             <span
-                              className={`px-2 py-0.5 rounded text-xs font-medium ${
-                                r.rewardPaid
-                                  ? "bg-gray-100 text-gray-400"
-                                  : "bg-gold-50 text-gold-700"
-                              }`}
+                              className="text-xs px-2 py-0.5 rounded font-medium"
+                              style={{
+                                background: r.rewardPaid
+                                  ? "rgba(100,116,139,0.1)"
+                                  : "rgba(250,204,21,0.08)",
+                                color: r.rewardPaid ? "#64748b" : "#fcd34d",
+                              }}
                             >
                               {r.rewardPaid ? "✓ " : ""}₹{r.amount * 0.5}
                             </span>
                           ) : (
-                            <span className="text-gray-300 text-xs">—</span>
+                            <span
+                              className="text-xs"
+                              style={{ color: "#334155" }}
+                            >
+                              —
+                            </span>
                           )}
                         </td>
-                        <td className="px-4 py-3 text-violet-400 text-xs whitespace-nowrap">
+                        <td
+                          className="px-4 py-3 text-xs whitespace-nowrap"
+                          style={{ color: "#818cf8" }}
+                        >
                           {new Date(r.paidAt).toLocaleDateString("en-IN")}
                         </td>
                         <td className="px-4 py-3">
@@ -491,20 +632,24 @@ export default function AdminPanel() {
                               data-ocid="admin.save_button"
                               type="button"
                               onClick={() => handleMarkRewardPaid(r.id)}
-                              className="text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
-                              style={{
-                                background:
-                                  "linear-gradient(135deg, #7c3aed, #5b21b6)",
-                              }}
+                              className="text-white text-xs font-semibold px-3 py-1.5 rounded-lg neo-button transition-all whitespace-nowrap"
                             >
                               Mark Paid
                             </button>
                           ) : r.rewardPaid ? (
-                            <span className="text-forest-600 text-xs font-semibold">
+                            <span
+                              className="text-xs font-semibold"
+                              style={{ color: "#4ade80" }}
+                            >
                               ✓ Paid
                             </span>
                           ) : (
-                            <span className="text-gray-300 text-xs">—</span>
+                            <span
+                              className="text-xs"
+                              style={{ color: "#334155" }}
+                            >
+                              —
+                            </span>
                           )}
                         </td>
                       </tr>
@@ -518,16 +663,30 @@ export default function AdminPanel() {
 
         {/* Tree View */}
         {view === "tree" && (
-          <div className="rounded-xl border border-violet-700/30 p-6">
-            <h2 className="text-lg font-bold text-white mb-4">Referral Tree</h2>
+          <div
+            className="rounded-xl p-6"
+            style={{
+              border: "1px solid rgba(129,140,248,0.1)",
+              background: "rgba(15,7,40,0.5)",
+            }}
+          >
+            <h2
+              className="text-base font-bold mb-4"
+              style={{ color: "#e2e8f0" }}
+            >
+              Referral Tree
+            </h2>
             {tree.length === 0 ? (
               <div
                 data-ocid="admin.empty_state"
-                className="text-center py-16 text-violet-400"
+                className="text-center py-16"
+                style={{ color: "#818cf8" }}
               >
                 <div className="text-5xl mb-3">🌱</div>
-                <p className="font-semibold">No referral data yet</p>
-                <p className="text-sm mt-1">
+                <p className="font-semibold" style={{ color: "#a5b4fc" }}>
+                  No referral data yet
+                </p>
+                <p className="text-sm mt-1" style={{ color: "#64748b" }}>
                   Referral chains will appear here after users join
                 </p>
               </div>

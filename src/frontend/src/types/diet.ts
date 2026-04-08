@@ -1,4 +1,4 @@
-import type { DietPlan } from "../backend.d";
+import type { DietPlan } from "./backend-types";
 
 export interface FormData {
   // Step 1 - Personal Details

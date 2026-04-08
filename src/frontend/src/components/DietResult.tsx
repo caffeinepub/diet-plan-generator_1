@@ -21,7 +21,6 @@ import {
   Heart,
   Layers,
   Leaf,
-  Lock,
   MessageCircle,
   Pill,
   Printer,
@@ -29,13 +28,12 @@ import {
   Share2,
   Star,
   Target,
-  User,
   UtensilsCrossed,
   XCircle,
 } from "lucide-react";
 import { motion } from "motion/react";
 import { type ReactNode, useEffect, useState } from "react";
-import type { DietPlan, Meal } from "../backend.d";
+import type { DietPlan, Meal } from "../types/backend-types";
 import type { FormData } from "../types/diet";
 
 const GOAL_LABELS: Record<string, string> = {
@@ -569,7 +567,10 @@ export default function DietResult({
   return (
     <div
       data-ocid="result.page"
-      className="result-page min-h-screen bg-white text-gray-900"
+      className="result-page min-h-screen bg-white text-gray-900 print:bg-white"
+      style={{
+        background: "linear-gradient(145deg, #020617 0%, #0f0728 100%)",
+      }}
     >
       {/* Print-only professional header */}
       <div className="print-only-header hidden print:flex items-center justify-between border-b-2 border-violet-600 pb-3 mb-4 px-2">
@@ -609,37 +610,83 @@ export default function DietResult({
       </div>
 
       {/* Header */}
-      <header className="no-print sticky top-0 z-10 border-b border-violet-200 bg-white shadow-sm">
+      <header
+        className="no-print sticky top-0 z-10 border-b"
+        style={{
+          background: "rgba(2,6,23,0.92)",
+          borderColor: "rgba(129,140,248,0.12)",
+          backdropFilter: "blur(24px)",
+        }}
+      >
+        {/* Top gradient bar */}
+        <div className="status-bar-gradient" />
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             <img
               src="/assets/uploads/IMG-20260226-WA0000-2.jpg"
-              className="w-9 h-9 rounded-full object-cover border-2 border-violet-500"
+              className="w-9 h-9 rounded-full object-cover"
+              style={{ boxShadow: "0 0 0 2px rgba(129,140,248,0.35)" }}
               alt="HN Coach"
             />
             <div>
-              <span className="font-bold text-gray-900">HN Coach</span>
-              <div className="text-xs text-violet-600 leading-none">
+              <span
+                className="font-bold text-sm"
+                style={{ color: "#f1f5f9", letterSpacing: "-0.01em" }}
+              >
+                HN Coach
+              </span>
+              <div
+                className="text-[9px] uppercase tracking-widest leading-none font-medium"
+                style={{ color: "#818cf8" }}
+              >
                 Diet &amp; Nutrition Plan
               </div>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button
+            {/* Trust badge */}
+            <div
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full"
+              style={{
+                background: "rgba(74,222,128,0.06)",
+                border: "1px solid rgba(74,222,128,0.15)",
+              }}
+            >
+              <span className="text-xs">🔒</span>
+              <span
+                className="text-[10px] font-medium"
+                style={{ color: "#86efac" }}
+              >
+                Verified Report
+              </span>
+            </div>
+            <button
+              type="button"
               data-ocid="result.print_button"
-              variant="outline"
-              size="sm"
               onClick={handlePrint}
-              className="gap-2 no-print border-violet-600 text-violet-700 hover:bg-violet-50"
+              className="no-print flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
+              style={{
+                background: "rgba(129,140,248,0.1)",
+                border: "1px solid rgba(129,140,248,0.2)",
+                color: "#a5b4fc",
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.background =
+                  "rgba(129,140,248,0.18)";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.background =
+                  "rgba(129,140,248,0.1)";
+              }}
             >
               <Printer className="w-4 h-4" />
               <span className="hidden sm:inline">Print Plan</span>
-            </Button>
+            </button>
           </div>
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-4 py-5 space-y-5">
+      <main className="max-w-5xl mx-auto px-4 py-5 space-y-5 print:bg-white print:text-gray-900">
         {/* Hero Section – 2-column: name/heading left, nutrition image + quotes right */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -663,88 +710,6 @@ export default function DietResult({
             <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold text-violet-700 bg-violet-50 border border-violet-200">
               {GOAL_LABELS[formData.goal]}
             </span>
-            {/* Personal Details inline */}
-            <div className="w-full mt-1 border-t border-violet-100 pt-2">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-violet-500 mb-1.5 flex items-center gap-1">
-                <User className="w-3 h-3" /> Personal Details
-              </p>
-              <div className="grid grid-cols-2 gap-x-3 gap-y-0.5 text-xs">
-                <div className="flex gap-1">
-                  <span className="text-gray-400 shrink-0">Name:</span>
-                  <span className="font-semibold text-gray-800 truncate">
-                    {formData.name}
-                  </span>
-                </div>
-                <div className="flex gap-1">
-                  <span className="text-gray-400 shrink-0">Age:</span>
-                  <span className="font-semibold text-gray-800">
-                    {formData.age} yrs
-                  </span>
-                </div>
-                <div className="flex gap-1">
-                  <span className="text-gray-400 shrink-0">Gender:</span>
-                  <span className="font-semibold text-gray-800 capitalize">
-                    {formData.gender}
-                  </span>
-                </div>
-                <div className="flex gap-1">
-                  <span className="text-gray-400 shrink-0">Height:</span>
-                  <span className="font-semibold text-gray-800">
-                    {formData.height} cm
-                  </span>
-                </div>
-                <div className="flex gap-1">
-                  <span className="text-gray-400 shrink-0">Weight:</span>
-                  <span className="font-semibold text-gray-800">
-                    {formData.weight} kg
-                  </span>
-                </div>
-                <div className="flex gap-1">
-                  <span className="text-gray-400 shrink-0">Goal:</span>
-                  <span className="font-semibold text-gray-800 truncate">
-                    {GOAL_LABELS[formData.goal]}
-                  </span>
-                </div>
-                {formData.target_weight_kg > 0 && (
-                  <div className="flex gap-1 col-span-2">
-                    <span className="text-gray-400 shrink-0">Target:</span>
-                    <span className="font-semibold text-gray-800">
-                      {formData.target_weight_kg} kg
-                      {formData.goal === "weight_loss" &&
-                      formData.target_belly_inches > 0
-                        ? ` · ${formData.target_belly_inches}" belly`
-                        : ""}
-                    </span>
-                  </div>
-                )}
-                <div className="flex gap-1">
-                  <span className="text-gray-400 shrink-0">Meal Gap:</span>
-                  <span className="font-semibold text-gray-800">
-                    {formData.meal_gap} hrs
-                  </span>
-                </div>
-                {(formData.health_conditions || []).length > 0 && (
-                  <div className="flex gap-1 col-span-2">
-                    <span className="text-gray-400 shrink-0">Health:</span>
-                    <span className="font-semibold text-gray-800 truncate">
-                      {(formData.health_conditions || []).join(", ")}
-                    </span>
-                  </div>
-                )}
-                {formData.referrer_whatsapp && (
-                  <div className="flex gap-1 col-span-2 items-center">
-                    <span className="text-gray-400 shrink-0">Referred By:</span>
-                    <span className="font-semibold text-gray-800 flex items-center gap-1">
-                      <Lock className="w-3 h-3 text-violet-500 shrink-0" />
-                      +91 {formData.referrer_whatsapp}
-                      <span className="text-[9px] bg-violet-50 text-violet-600 rounded-full px-1.5 py-0.5 font-semibold">
-                        Verified ✓
-                      </span>
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
           </div>
           {/* Right: Nutrition Philosophy Image + Quotes */}
           <div className="flex flex-col items-center gap-2">
@@ -1408,7 +1373,11 @@ export default function DietResult({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.38 }}
-          className="bg-white rounded-2xl border border-gray-200 p-3 shadow-sm"
+          className="rounded-2xl border p-3 shadow-sm print:bg-white print:border-gray-200"
+          style={{
+            background: "rgba(255,255,255,0.97)",
+            borderColor: "rgba(226,232,240,0.8)",
+          }}
           data-ocid="result.daily_wellness.section"
         >
           <h2 className="text-sm font-bold text-gray-900 mb-2 flex items-center gap-2">
@@ -1744,11 +1713,17 @@ export default function DietResult({
         </motion.div>
 
         {/* Trust signal */}
-        <div className="border-t border-violet-200 pt-4 pb-6 text-center space-y-1">
-          <p className="text-xs text-violet-500 max-w-xl mx-auto">
+        <div
+          className="no-print border-t pt-4 pb-8 text-center space-y-1"
+          style={{ borderColor: "rgba(129,140,248,0.1)" }}
+        >
+          <p className="text-xs max-w-xl mx-auto" style={{ color: "#64748b" }}>
             🔒 This report is generated based on your personal health data and
             follows evidence-based nutrition guidelines aligned with Indian RDA
             standards.
+          </p>
+          <p className="text-xs" style={{ color: "#818cf8" }}>
+            🔒 256-bit SSL · ✓ Verified Nutrition Platform · 🛡 Razorpay Secured
           </p>
         </div>
       </main>
@@ -1771,9 +1746,12 @@ function ReportCard({
 }) {
   return (
     <div
-      className={`bg-white rounded-xl overflow-hidden border border-gray-200 shadow-sm print:shadow-none print:border print:border-gray-200 print:break-inside-avoid ${
-        className || ""
-      }`}
+      className={`rounded-xl overflow-hidden print:bg-white print:border print:border-gray-200 print:shadow-none print:break-inside-avoid ${className || ""}`}
+      style={{
+        background: "rgba(255,255,255,0.97)",
+        border: "1px solid rgba(226,232,240,0.8)",
+        boxShadow: "0 1px 6px rgba(0,0,0,0.06)",
+      }}
     >
       <div className="border-l-4 border-violet-500 px-3 py-2">
         {title && (

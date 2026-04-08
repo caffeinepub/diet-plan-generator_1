@@ -3,27 +3,19 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Progress } from "@/components/ui/progress";
 import {
-  Activity,
   Apple,
+  CheckCircle2,
   ChevronLeft,
   ChevronRight,
-  Droplets,
-  Heart,
   Leaf,
   Loader2,
   Lock,
-  Moon,
-  Salad,
-  Target,
-  User,
-  UtensilsCrossed,
+  ShieldCheck,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import type { DietPlan } from "../backend.d";
 import { useActor } from "../hooks/useActor";
 import {
   generateDietPlan,
@@ -32,49 +24,12 @@ import {
   mapToGoal,
   mapToStressLevel,
 } from "../lib/dietCalculator";
+import type { DietPlan } from "../types/backend-types";
 import type { FormData } from "../types/diet";
 import { defaultFormData } from "../types/diet";
+import AdminPanel from "./AdminPanel";
 
 const TOTAL_STEPS = 8;
-
-const STEP_META = [
-  { title: "Personal Details", subtitle: "Tell us about yourself", icon: User },
-  {
-    title: "Health Goal",
-    subtitle: "What do you want to achieve?",
-    icon: Target,
-  },
-  {
-    title: "Goal Targets",
-    subtitle: "How much do you want to achieve?",
-    icon: Target,
-  },
-  {
-    title: "Meal Frequency",
-    subtitle: "Select your meal gap preference",
-    icon: UtensilsCrossed,
-  },
-  {
-    title: "Present Health Condition",
-    subtitle: "Any medical conditions to consider?",
-    icon: Heart,
-  },
-  {
-    title: "Sleep Schedule",
-    subtitle: "Your sleep timings",
-    icon: Moon,
-  },
-  {
-    title: "Nutrition Targets",
-    subtitle: "Your macro targets from wellness report",
-    icon: Salad,
-  },
-  {
-    title: "BMR & TDEE",
-    subtitle: "Enter your metabolic rate values",
-    icon: Activity,
-  },
-];
 
 interface Props {
   onComplete: (plan: DietPlan, data: FormData) => void;
@@ -88,19 +43,33 @@ export default function DietForm({
   hasPreviousReport,
 }: Props) {
   const [step, setStep] = useState(1);
+  const [showAdmin, setShowAdmin] = useState(false);
+  const logoClickCount = useRef(0);
+  const logoClickTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  function handleLogoClick() {
+    logoClickCount.current += 1;
+    if (logoClickTimer.current) clearTimeout(logoClickTimer.current);
+    if (logoClickCount.current >= 3) {
+      logoClickCount.current = 0;
+      setShowAdmin(true);
+    } else {
+      logoClickTimer.current = setTimeout(() => {
+        logoClickCount.current = 0;
+      }, 500);
+    }
+  }
   const [direction, setDirection] = useState(1);
   const [data, setData] = useState<FormData>(defaultFormData);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isGenerating, setIsGenerating] = useState(false);
   const { actor } = useActor();
 
-  // Track referral from URL param on mount
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const refParam = urlParams.get("ref");
     if (refParam && /^[6-9]\d{9}$/.test(refParam)) {
       setData((prev) => ({ ...prev, referrer_whatsapp: refParam }));
-      // Increment referrer count (once per session)
       const key = `hncoach_referrals_${refParam}`;
       const current = Number.parseInt(localStorage.getItem(key) || "0");
       if (!sessionStorage.getItem(`counted_${refParam}`)) {
@@ -139,7 +108,6 @@ export default function DietForm({
       if (data.weight < 30 || data.weight > 300)
         errs.weight = "Weight must be between 30 and 300 kg";
     }
-    // Step 3 – Goal targets
     if (step === 3) {
       if (
         (data.goal === "weight_loss" || data.goal === "muscle_gain") &&
@@ -148,14 +116,12 @@ export default function DietForm({
         errs.target_weight_kg = "Please enter your target weight (kg)";
       }
     }
-    // Step 5 – Health conditions required
     if (step === 5) {
       if (data.health_conditions.length === 0) {
         errs.health_conditions =
           "Please select at least one option (or select None)";
       }
     }
-    // Step 7 – Macro targets required
     if (step === 7) {
       if (!data.protein_target || data.protein_target <= 0)
         errs.protein_target = "Please enter your protein target";
@@ -246,104 +212,203 @@ export default function DietForm({
   }
 
   const progress = ((step - 1) / (TOTAL_STEPS - 1)) * 100;
-  const meta = STEP_META[step - 1];
-  const StepIcon = meta.icon;
 
   const variants = {
-    enter: (dir: number) => ({
-      x: dir > 0 ? 60 : -60,
-      opacity: 0,
-    }),
+    enter: (dir: number) => ({ x: dir > 0 ? 60 : -60, opacity: 0 }),
     center: { x: 0, opacity: 1 },
-    exit: (dir: number) => ({
-      x: dir > 0 ? -60 : 60,
-      opacity: 0,
-    }),
+    exit: (dir: number) => ({ x: dir > 0 ? -60 : 60, opacity: 0 }),
   };
 
   return (
     <div
-      className="min-h-screen flex flex-col"
+      className="min-h-screen flex flex-col mesh-bg relative"
       style={{
         background:
-          "linear-gradient(135deg, #0d0520 0%, #1a0533 40%, #2d1066 100%)",
-        backgroundSize: "200% 200%",
-        animation: "gradientShift 8s ease infinite",
+          "linear-gradient(145deg, #020617 0%, #0f0728 45%, #1e1048 100%)",
       }}
     >
+      <div className="mesh-orb" />
+
       {/* View Previous Report - Sticky Top Banner */}
       {step === 1 && hasPreviousReport && onViewPreviousReport && (
-        <button
-          type="button"
-          data-ocid="home.view_previous_report_button"
-          onClick={onViewPreviousReport}
-          className="no-print w-full flex items-center justify-between gap-2 px-4 py-2 sticky top-0 z-50 font-bold text-sm transition-all hover:brightness-110 active:brightness-90 shadow-lg"
+        <div
+          className="no-print sticky top-0 z-50 px-4 pt-3 pb-1"
           style={{
-            background:
-              "linear-gradient(90deg, #b45309 0%, #d97706 40%, #facc15 100%)",
-            color: "#1a0533",
+            background: "rgba(2,6,23,0.95)",
+            backdropFilter: "blur(12px)",
           }}
         >
-          <span className="flex items-center gap-2 text-xs font-black">
-            <span>📋</span>
-            <span>View Previous Report — Access your last diet plan FREE</span>
-          </span>
-          <span className="text-sm font-black shrink-0">→</span>
-        </button>
-      )}
-      {/* Header */}
-      <header
-        className="no-print border-b border-violet-800/30 sticky top-0 z-10 backdrop-blur-xl"
-        style={{ background: "rgba(13,5,32,0.85)" }}
-      >
-        <div className="max-w-2xl mx-auto px-4 py-4">
-          <div className="flex items-center gap-3 mb-4">
-            <img
-              src="/assets/uploads/IMG-20260226-WA0000-2.jpg"
-              alt="HN Coach Logo"
-              className="w-10 h-10 rounded-full object-cover shadow-sm"
-            />
-            <div>
-              <span className="font-display font-bold text-lg text-white">
-                HN Coach
-              </span>
-              <div className="text-xs text-violet-300 leading-none">
-                Diet & Nutrition Plan
+          <button
+            type="button"
+            data-ocid="home.view_previous_report_button"
+            onClick={onViewPreviousReport}
+            className="w-full flex items-center justify-between gap-3 rounded-xl px-4 py-3 transition-all hover:brightness-110 active:scale-[0.99] group"
+            style={{
+              background:
+                "linear-gradient(135deg, rgba(250,204,21,0.12) 0%, rgba(217,119,6,0.18) 100%)",
+              border: "1.5px solid rgba(250,204,21,0.55)",
+              boxShadow:
+                "0 0 18px rgba(250,204,21,0.18), inset 0 1px 0 rgba(250,204,21,0.12)",
+            }}
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <div
+                className="shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-base"
+                style={{
+                  background: "rgba(250,204,21,0.18)",
+                  border: "1px solid rgba(250,204,21,0.35)",
+                }}
+              >
+                📋
+              </div>
+              <div className="min-w-0">
+                <div
+                  className="text-xs font-black leading-tight"
+                  style={{ color: "#facc15" }}
+                >
+                  Welcome Back!
+                </div>
+                <div
+                  className="text-[11px] font-medium truncate"
+                  style={{ color: "#fde68a" }}
+                >
+                  View your previous diet plan — Access FREE
+                </div>
               </div>
             </div>
-            <Badge variant="secondary" className="ml-auto">
-              Step {step} of {TOTAL_STEPS}
-            </Badge>
-          </div>
-          <Progress
-            data-ocid="form.progress_bar"
-            value={progress}
-            className="h-2"
-          />
+            <div
+              className="shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-black transition-all group-hover:gap-2"
+              style={{
+                background: "linear-gradient(135deg, #d97706, #f59e0b)",
+                color: "#1a0533",
+              }}
+            >
+              Open{" "}
+              <span className="group-hover:translate-x-0.5 transition-transform">
+                →
+              </span>
+            </div>
+          </button>
         </div>
+      )}
+
+      {showAdmin && (
+        <div className="fixed inset-0 z-50 overflow-auto bg-black/90 backdrop-blur-sm">
+          <button
+            type="button"
+            onClick={() => setShowAdmin(false)}
+            className="fixed top-4 right-4 z-[60] hover:bg-white/20 text-white rounded-full w-10 h-10 flex items-center justify-center text-lg font-bold transition-colors"
+            style={{
+              background: "rgba(129,140,248,0.15)",
+              border: "1px solid rgba(129,140,248,0.25)",
+            }}
+          >
+            ✕
+          </button>
+          <AdminPanel />
+        </div>
+      )}
+
+      {/* Status bar gradient */}
+      <div className="status-bar-gradient no-print" />
+
+      {/* Header */}
+      <header
+        className="no-print border-b sticky top-0 z-10 backdrop-blur-2xl"
+        style={{
+          background: "rgba(2,6,23,0.88)",
+          borderColor: "rgba(129,140,248,0.1)",
+        }}
+      >
+        <div className="max-w-2xl mx-auto px-4 py-3.5">
+          <div className="flex items-center gap-3 mb-1">
+            <button
+              type="button"
+              onClick={handleLogoClick}
+              aria-label="Open admin panel"
+              className="cursor-pointer select-none p-0 border-0 bg-transparent"
+            >
+              <img
+                src="/assets/uploads/IMG-20260226-WA0000-2.jpg"
+                alt="HN Coach Logo"
+                className="w-10 h-10 rounded-full object-cover"
+                style={{
+                  boxShadow:
+                    "0 0 0 2px rgba(129,140,248,0.3), 0 0 12px rgba(129,140,248,0.15)",
+                }}
+              />
+            </button>
+            <div>
+              <span
+                className="font-display font-bold text-lg"
+                style={{ color: "#f1f5f9", letterSpacing: "-0.02em" }}
+              >
+                HN Coach
+              </span>
+              <div
+                className="text-[9px] uppercase tracking-widest leading-none font-medium"
+                style={{ color: "#64748b" }}
+              >
+                Certified Nutrition Platform
+              </div>
+            </div>
+            <div className="ml-auto flex items-center gap-2">
+              {/* Step dots */}
+              <div className="hidden sm:flex items-center gap-1">
+                {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
+                  <div
+                    // biome-ignore lint/suspicious/noArrayIndexKey: static step indicators
+                    key={i}
+                    className={`step-dot ${i + 1 === step ? "active" : i + 1 < step ? "done" : ""}`}
+                  />
+                ))}
+              </div>
+              <Badge
+                variant="secondary"
+                className="text-xs"
+                style={{
+                  background: "rgba(129,140,248,0.12)",
+                  color: "#a5b4fc",
+                  border: "1px solid rgba(129,140,248,0.2)",
+                }}
+              >
+                {step} / {TOTAL_STEPS}
+              </Badge>
+            </div>
+          </div>
+          {/* Progress bar 2026 */}
+          <div className="progress-2026 mt-2">
+            <div
+              className="progress-2026-fill"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        </div>
+
+        {/* Trust bar — only on step 1 */}
+        {step === 1 && (
+          <div className="trust-bar no-print">
+            <div className="trust-badge">
+              <Lock className="w-3 h-3" style={{ color: "#818cf8" }} />
+              <span>256-bit SSL Encrypted</span>
+            </div>
+            <div className="trust-badge-dot" />
+            <div className="trust-badge">
+              <CheckCircle2 className="w-3 h-3" style={{ color: "#4ade80" }} />
+              <span>Verified Nutrition Platform</span>
+            </div>
+            <div className="trust-badge-dot" />
+            <div className="trust-badge">
+              <ShieldCheck className="w-3 h-3" style={{ color: "#fbbf24" }} />
+              <span>Razorpay Secured Payments</span>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Form Content */}
-      <main className="flex-1 flex items-start justify-center px-4 py-8">
+      <main className="flex-1 flex items-start justify-center px-4 py-8 relative z-[1]">
         <div className="w-full max-w-2xl">
-          {/* Step Header */}
-          <div className="mb-8 text-center">
-            <div
-              className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-4"
-              style={{
-                background: "rgba(109,40,217,0.2)",
-                border: "1px solid rgba(167,139,250,0.3)",
-              }}
-            >
-              <StepIcon className="w-6 h-6 text-violet-300" />
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-display font-bold text-white">
-              {meta.title}
-            </h1>
-            <p className="text-violet-300 mt-1">{meta.subtitle}</p>
-          </div>
-
-          {/* Animated Step Content */}
           <AnimatePresence mode="wait" custom={direction}>
             <motion.div
               key={step}
@@ -353,15 +418,14 @@ export default function DietForm({
               initial="enter"
               animate="center"
               exit="exit"
-              transition={{ duration: 0.25, ease: "easeInOut" }}
-              className="rounded-2xl p-6 sm:p-8 float-3d glass-card"
+              transition={{ duration: 0.22, ease: "easeInOut" }}
+              className="rounded-2xl p-6 sm:p-8 glass-card float-3d"
             >
               {step === 1 && (
                 <Step1 data={data} errors={errors} update={update} />
               )}
               {step === 2 && <Step2 data={data} update={update} />}
               {step === 3 && <StepGoalTargets data={data} update={update} />}
-
               {step === 4 && <Step6 data={data} update={update} />}
               {step === 5 && (
                 <Step8
@@ -372,16 +436,25 @@ export default function DietForm({
               )}
               {step === 6 && <Step9 data={data} update={update} />}
               {step === 7 && <Step10 data={data} update={update} />}
-
               {step === 8 && <StepBmrTdee data={data} update={update} />}
             </motion.div>
           </AnimatePresence>
 
           {/* Error messages */}
           {Object.keys(errors).length > 0 && (
-            <div className="mt-4 rounded-xl px-4 py-3 space-y-1 border rounded-xl px-4 py-3 space-y-1">
+            <div
+              className="mt-4 rounded-xl px-4 py-3 space-y-1"
+              style={{
+                background: "rgba(239,68,68,0.08)",
+                border: "1px solid rgba(239,68,68,0.25)",
+              }}
+            >
               {Object.values(errors).map((err) => (
-                <p key={err} className="text-sm text-destructive font-medium">
+                <p
+                  key={err}
+                  className="text-sm font-medium"
+                  style={{ color: "#f87171" }}
+                >
                   {err}
                 </p>
               ))}
@@ -396,6 +469,11 @@ export default function DietForm({
               onClick={goBack}
               disabled={step === 1 || isGenerating}
               className="gap-2"
+              style={{
+                background: "rgba(15,7,40,0.6)",
+                borderColor: "rgba(129,140,248,0.2)",
+                color: "#94a3b8",
+              }}
             >
               <ChevronLeft className="w-4 h-4" />
               Back
@@ -405,7 +483,8 @@ export default function DietForm({
               <Button
                 data-ocid="form.next_button"
                 onClick={goNext}
-                className="gap-2 bg-primary hover:bg-primary/90"
+                className="gap-2 neo-button border-0"
+                style={{ fontWeight: 700, letterSpacing: "-0.01em" }}
               >
                 Next
                 <ChevronRight className="w-4 h-4" />
@@ -415,7 +494,8 @@ export default function DietForm({
                 data-ocid="form.generate_button"
                 onClick={handleGenerate}
                 disabled={isGenerating}
-                className="gap-2 bg-primary hover:bg-primary/90 px-6"
+                className="gap-2 neo-button border-0 px-6"
+                style={{ fontWeight: 700 }}
               >
                 {isGenerating ? (
                   <>
@@ -446,6 +526,32 @@ interface StepProps {
   toggleArrayItem?: (key: keyof FormData, item: string) => void;
 }
 
+function StepHeading({ children }: { children: React.ReactNode }) {
+  return (
+    <h2
+      className="text-lg font-bold mb-5 section-accent"
+      style={{ color: "#e2e8f0", letterSpacing: "-0.02em" }}
+    >
+      {children}
+    </h2>
+  );
+}
+
+function FieldLabel({
+  children,
+  htmlFor,
+}: { children: React.ReactNode; htmlFor?: string }) {
+  return (
+    <label
+      htmlFor={htmlFor}
+      className="block text-[13px] font-medium mb-1.5"
+      style={{ color: "#94a3b8" }}
+    >
+      {children}
+    </label>
+  );
+}
+
 function HeightInput({ data, errors = {}, update }: StepProps) {
   const [unit, setUnit] = useState<"cm" | "feet">("cm");
   const [feet, setFeet] = useState<number>(5);
@@ -454,14 +560,12 @@ function HeightInput({ data, errors = {}, update }: StepProps) {
   function handleUnitChange(newUnit: "cm" | "feet") {
     setUnit(newUnit);
     if (newUnit === "feet") {
-      // Convert current cm to feet/inches
       const totalInches = data.height / 2.54;
       const f = Math.floor(totalInches / 12);
       const i = Math.round(totalInches % 12);
       setFeet(f || 5);
       setInches(i || 6);
     } else {
-      // Convert feet/inches to cm
       const cm = Math.round(feet * 30.48 + inches * 2.54);
       update("height", cm);
     }
@@ -481,27 +585,31 @@ function HeightInput({ data, errors = {}, update }: StepProps) {
 
   return (
     <div className="space-y-2">
-      <Label>Height</Label>
+      <FieldLabel>Height</FieldLabel>
       <div className="flex gap-2 mb-2">
-        <button
-          type="button"
-          data-ocid="height.unit.select"
-          onClick={() => handleUnitChange("cm")}
-          className={`px-3 py-1.5 rounded-lg border text-sm font-medium transition-all ${unit === "cm" ? "border-violet-400 bg-violet-500/20 text-violet-200" : "border-border text-muted-foreground hover:border-primary/50"}`}
-        >
-          cm
-        </button>
-        <button
-          type="button"
-          data-ocid="height.unit.select"
-          onClick={() => handleUnitChange("feet")}
-          className={`px-3 py-1.5 rounded-lg border text-sm font-medium transition-all ${unit === "feet" ? "border-violet-400 bg-violet-500/20 text-violet-200" : "border-border text-muted-foreground hover:border-primary/50"}`}
-        >
-          Feet &amp; Inches
-        </button>
+        {(["cm", "feet"] as const).map((u) => (
+          <button
+            key={u}
+            type="button"
+            data-ocid="height.unit.select"
+            onClick={() => handleUnitChange(u)}
+            className="px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
+            style={{
+              background:
+                unit === u ? "rgba(129,140,248,0.15)" : "rgba(15,23,42,0.6)",
+              border:
+                unit === u
+                  ? "1px solid rgba(129,140,248,0.4)"
+                  : "1px solid rgba(129,140,248,0.15)",
+              color: unit === u ? "#a5b4fc" : "#64748b",
+            }}
+          >
+            {u === "feet" ? "Feet & Inches" : "cm"}
+          </button>
+        ))}
       </div>
       {unit === "cm" ? (
-        <Input
+        <input
           id="height"
           data-ocid="height.cm.input"
           type="number"
@@ -510,12 +618,12 @@ function HeightInput({ data, errors = {}, update }: StepProps) {
           placeholder="e.g. 170"
           value={data.height || ""}
           onChange={(e) => update("height", Number(e.target.value))}
-          className={errors.height ? "border-destructive" : ""}
+          className={`w-full rounded-lg px-3 py-2.5 text-sm form-input-2026 ${errors.height ? "border-red-500/50" : ""}`}
         />
       ) : (
         <div className="flex gap-2">
           <div className="flex-1">
-            <Input
+            <input
               data-ocid="height.feet.input"
               type="number"
               min={3}
@@ -523,12 +631,14 @@ function HeightInput({ data, errors = {}, update }: StepProps) {
               placeholder="Feet"
               value={feet}
               onChange={(e) => handleFeetChange(Number(e.target.value))}
-              className={errors.height ? "border-destructive" : ""}
+              className="w-full rounded-lg px-3 py-2.5 text-sm form-input-2026"
             />
-            <span className="text-xs text-violet-300 mt-1 block">feet</span>
+            <span className="text-xs mt-1 block" style={{ color: "#818cf8" }}>
+              feet
+            </span>
           </div>
           <div className="flex-1">
-            <Input
+            <input
               data-ocid="height.inches.input"
               type="number"
               min={0}
@@ -536,93 +646,24 @@ function HeightInput({ data, errors = {}, update }: StepProps) {
               placeholder="Inches"
               value={inches}
               onChange={(e) => handleInchesChange(Number(e.target.value))}
-              className={errors.height ? "border-destructive" : ""}
+              className="w-full rounded-lg px-3 py-2.5 text-sm form-input-2026"
             />
-            <span className="text-xs text-violet-300 mt-1 block">inches</span>
+            <span className="text-xs mt-1 block" style={{ color: "#818cf8" }}>
+              inches
+            </span>
           </div>
         </div>
       )}
       {unit === "feet" && data.height > 0 && (
-        <p className="text-xs text-muted-foreground">≈ {data.height} cm</p>
+        <p className="text-xs" style={{ color: "#64748b" }}>
+          ≈ {data.height} cm
+        </p>
       )}
       {errors.height && (
-        <p className="text-sm text-destructive">{errors.height}</p>
+        <p className="text-sm" style={{ color: "#f87171" }}>
+          {errors.height}
+        </p>
       )}
-    </div>
-  );
-}
-
-const TRANSFORMATION_IMAGES = [
-  "/assets/uploads/IMG-20260315-WA0011-1.jpg",
-  "/assets/uploads/IMG-20260315-WA0012-2.jpg",
-  "/assets/uploads/IMG-20260315-WA0025-3.jpg",
-  "/assets/uploads/IMG-20260315-WA0020-5.jpg",
-  "/assets/uploads/IMG-20260315-WA0030-6.jpg",
-  "/assets/uploads/IMG-20260315-WA0029-7.jpg",
-  "/assets/uploads/IMG-20260315-WA0022-8.jpg",
-  "/assets/uploads/IMG-20260315-WA0017-9.jpg",
-  "/assets/uploads/IMG-20260315-WA0018-11.jpg",
-  "/assets/uploads/IMG-20260315-WA0032-12.jpg",
-];
-
-function TransformationSlideshow() {
-  const [current, setCurrent] = useState(0);
-  const [fade, setFade] = useState(true);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setFade(false);
-      setTimeout(() => {
-        setCurrent((prev) => (prev + 1) % TRANSFORMATION_IMAGES.length);
-        setFade(true);
-      }, 400);
-    }, 3500);
-    return () => clearInterval(timer);
-  }, []);
-
-  return (
-    <div className="rounded-2xl overflow-hidden shadow-lg mb-4 relative">
-      <div
-        className="text-center py-2 px-4 text-white font-bold text-sm tracking-wide"
-        style={{
-          background: "linear-gradient(135deg, #1a0533 0%, #6d28d9 100%)",
-        }}
-      >
-        ✨ Real Transformations — Real People ✨
-      </div>
-      <div className="relative bg-black" style={{ height: "340px" }}>
-        <img
-          src={TRANSFORMATION_IMAGES[current]}
-          alt={`Transformation ${current + 1}`}
-          className="w-full h-full object-contain transition-opacity duration-400"
-          style={{ opacity: fade ? 1 : 0, transition: "opacity 0.4s ease" }}
-        />
-        {/* Dot indicators */}
-        <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1.5 flex-wrap px-4">
-          {TRANSFORMATION_IMAGES.map((img, i) => (
-            <button
-              type="button"
-              key={img}
-              onClick={() => {
-                setFade(false);
-                setTimeout(() => {
-                  setCurrent(i);
-                  setFade(true);
-                }, 300);
-              }}
-              className="w-2 h-2 rounded-full transition-all duration-300"
-              style={{
-                background: i === current ? "#facc15" : "rgba(255,255,255,0.5)",
-              }}
-              aria-label={`Go to slide ${i + 1}`}
-            />
-          ))}
-        </div>
-        {/* Counter */}
-        <div className="absolute top-2 right-2 bg-black/50 text-white text-xs px-2 py-0.5 rounded-full">
-          {current + 1} / {TRANSFORMATION_IMAGES.length}
-        </div>
-      </div>
     </div>
   );
 }
@@ -630,109 +671,98 @@ function TransformationSlideshow() {
 function Step1({ data, errors = {}, update }: StepProps) {
   return (
     <div className="space-y-5">
-      {/* Unified Offer + Download Count Card */}
+      {/* Unified Offer Card */}
       <div
-        className="relative overflow-hidden rounded-2xl shadow-xl"
+        className="relative overflow-hidden rounded-2xl"
         style={{
           background:
-            "linear-gradient(135deg, #0d0520 0%, #1a0533 50%, #6d28d9 100%)",
+            "linear-gradient(135deg, rgba(15,7,40,0.9) 0%, rgba(79,70,229,0.2) 100%)",
+          border: "1px solid rgba(129,140,248,0.2)",
+          boxShadow: "0 0 30px rgba(99,102,241,0.1)",
         }}
       >
-        {/* Shimmer overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 animate-shimmer" />
-        {/* FREE corner ribbon */}
+        <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/5 to-white/0 animate-shimmer" />
+        {/* Gold ribbon */}
         <div
           className="absolute top-0 right-0 w-0 h-0"
           style={{
-            borderLeft: "60px solid transparent",
-            borderTop: "60px solid #facc15",
+            borderLeft: "55px solid transparent",
+            borderTop: "55px solid #facc15",
           }}
         />
         <div
-          className="absolute top-1 right-1 text-xs font-black text-forest-900 rotate-45 translate-x-1 -translate-y-1"
-          style={{ fontSize: "9px" }}
+          className="absolute top-1.5 right-1.5 text-[8px] font-black rotate-45 translate-x-0.5 -translate-y-0.5"
+          style={{ color: "#1a0533" }}
         >
           FREE!
         </div>
         <div className="relative p-5 text-center">
-          {/* EXCLUSIVE OFFER badge */}
-          <div className="inline-block bg-yellow-400 text-forest-900 text-xs font-black px-3 py-1 rounded-full tracking-widest uppercase mb-3 shadow-md">
+          <div
+            className="inline-block text-[10px] font-black px-3 py-1 rounded-full tracking-widest uppercase mb-3"
+            style={{
+              background: "rgba(250,204,21,0.15)",
+              border: "1px solid rgba(250,204,21,0.35)",
+              color: "#fcd34d",
+            }}
+          >
             ✨ Exclusive Offer ✨
           </div>
-          <div className="text-3xl mb-2">✨ 🎁 ✨</div>
-          <p className="font-black text-white text-base leading-snug drop-shadow-lg mb-1">
+          <div className="text-2xl mb-2">✨ 🎁 ✨</div>
+          <p className="font-black text-white text-sm leading-snug mb-1">
             Buy your diet plan &amp; get a FREE weekly tracking call!
           </p>
-          <p className="text-yellow-200 text-sm font-semibold drop-shadow">
+          <p className="text-sm font-semibold" style={{ color: "#fcd34d" }}>
             Worth ₹999 — absolutely FREE for you 🎉
           </p>
         </div>
-        {/* Integrated Download Count Bar */}
-        <div className="px-4 pb-3 text-white border-t border-white/10 pt-2">
-          <div className="flex items-center justify-between mb-1">
-            <span className="font-semibold text-xs tracking-wide">
-              🔥 99 Plans Generated!
-            </span>
-            <span className="text-[10px] bg-white/20 rounded-full px-2 py-0.5 font-semibold">
-              1 slot left at discounted price
-            </span>
-          </div>
-          <div className="relative h-1.5 bg-white/20 rounded-full overflow-hidden mb-1.5">
-            <div
-              className="absolute left-0 top-0 h-full bg-white rounded-full"
-              style={{ width: "99%" }}
-            />
-            <div
-              className="absolute top-0 h-full w-0.5 bg-yellow-300"
-              style={{ left: "10%" }}
-            />
-          </div>
-          <div className="flex items-center gap-1 flex-nowrap text-[10px]">
-            <span className="line-through text-white/50 font-medium">
-              ₹1,999
-            </span>
-            <span className="text-white/40">→</span>
-            <span className="bg-green-400 text-green-900 font-bold rounded-full px-2 py-0.5 text-xs animate-pulse">
-              🎉 First 100: ₹499 only!
-            </span>
-            <span className="text-white/60 text-xs ml-1">After 100: ₹999</span>
-          </div>
-        </div>
       </div>
-      <TransformationSlideshow />
+
       <div className="mb-4 rounded-xl overflow-hidden">
         <img
           src="/assets/generated/fit-india-banner.dim_800x200.jpg"
           alt="Fit India Movement - Supporting Wellness for All"
           className="w-full object-cover h-36"
         />
-        <div className="bg-gradient-to-r from-orange-50 via-white to-green-50 border border-orange-100 rounded-b-xl px-4 py-2 text-center text-sm font-medium text-gray-700">
+        <div
+          className="px-4 py-2 text-center text-sm font-medium"
+          style={{
+            background: "rgba(15,7,40,0.7)",
+            border: "1px solid rgba(129,140,248,0.1)",
+            borderTop: "none",
+            color: "#94a3b8",
+          }}
+        >
           🇮🇳 HN Coach proudly supports{" "}
-          <span className="text-orange-600 font-semibold">
+          <span className="font-semibold" style={{ color: "#f97316" }}>
             Fit India Movement
           </span>{" "}
           — Wellness for Every Indian
         </div>
       </div>
+
+      <StepHeading>Personal Information</StepHeading>
+
       <div className="space-y-2">
-        <Label htmlFor="name">Full Name</Label>
-        <Input
+        <FieldLabel htmlFor="name">Full Name</FieldLabel>
+        <input
           id="name"
           data-ocid="personal.name_input"
-          placeholder="e.g. Sarah Johnson"
+          placeholder="e.g. Rahul Sharma"
           value={data.name}
           onChange={(e) => update("name", e.target.value)}
-          className={errors.name ? "border-destructive" : ""}
+          className={`w-full rounded-lg px-3 py-2.5 text-sm form-input-2026 ${errors.name ? "border-red-500/50" : ""}`}
         />
         {errors.name && (
-          <p className="text-sm text-destructive">{errors.name}</p>
+          <p className="text-sm" style={{ color: "#f87171" }}>
+            {errors.name}
+          </p>
         )}
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="age">Age</Label>
-          <Input
+          <FieldLabel htmlFor="age">Age</FieldLabel>
+          <input
             id="age"
             data-ocid="personal.age_input"
             type="number"
@@ -740,15 +770,17 @@ function Step1({ data, errors = {}, update }: StepProps) {
             max={100}
             value={data.age}
             onChange={(e) => update("age", Number(e.target.value))}
-            className={errors.age ? "border-destructive" : ""}
+            className={`w-full rounded-lg px-3 py-2.5 text-sm form-input-2026 ${errors.age ? "border-red-500/50" : ""}`}
           />
           {errors.age && (
-            <p className="text-sm text-destructive">{errors.age}</p>
+            <p className="text-sm" style={{ color: "#f87171" }}>
+              {errors.age}
+            </p>
           )}
         </div>
 
         <div className="space-y-2">
-          <Label>Gender</Label>
+          <FieldLabel>Gender</FieldLabel>
           <div
             data-ocid="personal.gender.radio"
             className="grid grid-cols-2 gap-2"
@@ -758,11 +790,18 @@ function Step1({ data, errors = {}, update }: StepProps) {
                 key={g}
                 type="button"
                 onClick={() => update("gender", g)}
-                className={`p-2.5 rounded-lg border-2 text-sm font-medium capitalize transition-all ${
-                  data.gender === g
-                    ? "border-violet-400 bg-violet-500/20 text-violet-200"
-                    : "border-border text-muted-foreground hover:border-primary/50"
-                }`}
+                className="p-2.5 rounded-lg text-sm font-medium capitalize transition-all"
+                style={{
+                  background:
+                    data.gender === g
+                      ? "rgba(129,140,248,0.15)"
+                      : "rgba(15,23,42,0.6)",
+                  border:
+                    data.gender === g
+                      ? "1.5px solid rgba(129,140,248,0.5)"
+                      : "1px solid rgba(129,140,248,0.15)",
+                  color: data.gender === g ? "#a5b4fc" : "#64748b",
+                }}
               >
                 {g}
               </button>
@@ -773,10 +812,9 @@ function Step1({ data, errors = {}, update }: StepProps) {
 
       <div className="grid grid-cols-2 gap-4">
         <HeightInput data={data} errors={errors} update={update} />
-
         <div className="space-y-2">
-          <Label htmlFor="weight">Weight (kg)</Label>
-          <Input
+          <FieldLabel htmlFor="weight">Weight (kg)</FieldLabel>
+          <input
             id="weight"
             data-ocid="personal.weight_input"
             type="number"
@@ -784,18 +822,20 @@ function Step1({ data, errors = {}, update }: StepProps) {
             max={300}
             value={data.weight}
             onChange={(e) => update("weight", Number(e.target.value))}
-            className={errors.weight ? "border-destructive" : ""}
+            className={`w-full rounded-lg px-3 py-2.5 text-sm form-input-2026 ${errors.weight ? "border-red-500/50" : ""}`}
           />
           {errors.weight && (
-            <p className="text-sm text-destructive">{errors.weight}</p>
+            <p className="text-sm" style={{ color: "#f87171" }}>
+              {errors.weight}
+            </p>
           )}
         </div>
       </div>
 
-      {/* User's WhatsApp Number */}
+      {/* WhatsApp Number */}
       <div className="space-y-2">
-        <Label htmlFor="user_whatsapp">Your WhatsApp Number</Label>
-        <Input
+        <FieldLabel htmlFor="user_whatsapp">Your WhatsApp Number</FieldLabel>
+        <input
           id="user_whatsapp"
           data-ocid="personal.user_whatsapp_input"
           type="tel"
@@ -807,25 +847,23 @@ function Step1({ data, errors = {}, update }: StepProps) {
               e.target.value.replace(/\D/g, "").slice(0, 10),
             )
           }
+          className="w-full rounded-lg px-3 py-2.5 text-sm form-input-2026"
         />
-        <p className="text-xs text-muted-foreground">
+        <p className="text-xs" style={{ color: "#64748b" }}>
           Your referral link will be generated using this number.
         </p>
       </div>
 
       {/* Referrer WhatsApp */}
       <div className="space-y-2">
-        <Label
-          htmlFor="referrer_whatsapp"
-          className="flex items-center gap-1.5"
-        >
-          Who referred you to HN Coach?
-          <span className="text-xs text-muted-foreground font-normal">
+        <FieldLabel htmlFor="referrer_whatsapp">
+          Who referred you to HN Coach?{" "}
+          <span className="font-normal" style={{ color: "#64748b" }}>
             (Optional)
           </span>
-        </Label>
+        </FieldLabel>
         <div className="relative">
-          <Input
+          <input
             id="referrer_whatsapp"
             data-ocid="personal.referrer_whatsapp_input"
             type="tel"
@@ -840,28 +878,44 @@ function Step1({ data, errors = {}, update }: StepProps) {
                 );
               }
             }}
-            className={
+            className={`w-full rounded-lg px-3 py-2.5 text-sm form-input-2026 ${data.referrer_whatsapp ? "pr-24" : ""}`}
+            style={
               data.referrer_whatsapp
-                ? "pr-24 bg-green-50 border-green-300 text-green-800"
-                : ""
+                ? {
+                    borderColor: "rgba(74,222,128,0.4)",
+                    background: "rgba(74,222,128,0.06)",
+                  }
+                : {}
             }
           />
           {data.referrer_whatsapp && (
-            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 bg-green-100 border border-green-300 rounded-md px-2 py-0.5">
-              <Lock className="w-3 h-3 text-green-600" />
-              <span className="text-xs font-semibold text-green-700">
+            <div
+              className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 rounded-md px-2 py-0.5"
+              style={{
+                background: "rgba(74,222,128,0.12)",
+                border: "1px solid rgba(74,222,128,0.3)",
+              }}
+            >
+              <Lock className="w-3 h-3" style={{ color: "#4ade80" }} />
+              <span
+                className="text-xs font-semibold"
+                style={{ color: "#4ade80" }}
+              >
                 Verified
               </span>
             </div>
           )}
         </div>
         {data.referrer_whatsapp && (
-          <p className="text-xs text-green-700 flex items-center gap-1">
+          <p
+            className="text-xs flex items-center gap-1"
+            style={{ color: "#4ade80" }}
+          >
             ✅ Referred by +91 {data.referrer_whatsapp}
           </p>
         )}
         {!data.referrer_whatsapp && (
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs" style={{ color: "#64748b" }}>
             Enter the WhatsApp number of the person who invited you.
           </p>
         )}
@@ -900,6 +954,7 @@ const GOALS = [
 function Step2({ data, update }: StepProps) {
   return (
     <div className="space-y-4">
+      <StepHeading>What's Your Goal?</StepHeading>
       <div className="rounded-xl overflow-hidden mb-4 -mt-2">
         <img
           src="/assets/generated/form-health-goal.dim_400x200.png"
@@ -914,15 +969,32 @@ function Step2({ data, update }: StepProps) {
             type="button"
             data-ocid={`goal.item.${i + 1}`}
             onClick={() => update("goal", g.value)}
-            className={`p-4 rounded-xl border-2 text-left transition-all ${
-              data.goal === g.value
-                ? "border-primary bg-primary/10"
-                : "border-violet-800/50 hover:border-violet-500/60 hover:bg-violet-800/20 text-white"
-            }`}
+            className="p-4 rounded-xl text-left transition-all"
+            style={{
+              background:
+                data.goal === g.value
+                  ? "rgba(99,102,241,0.12)"
+                  : "rgba(15,23,42,0.5)",
+              border:
+                data.goal === g.value
+                  ? "1.5px solid rgba(129,140,248,0.5)"
+                  : "1px solid rgba(129,140,248,0.12)",
+              boxShadow:
+                data.goal === g.value
+                  ? "0 0 12px rgba(99,102,241,0.15)"
+                  : "none",
+            }}
           >
             <div className="text-2xl mb-2">{g.emoji}</div>
-            <div className="font-semibold text-foreground">{g.label}</div>
-            <div className="text-sm text-muted-foreground mt-0.5">{g.desc}</div>
+            <div
+              className="font-semibold text-sm"
+              style={{ color: data.goal === g.value ? "#a5b4fc" : "#e2e8f0" }}
+            >
+              {g.label}
+            </div>
+            <div className="text-xs mt-0.5" style={{ color: "#64748b" }}>
+              {g.desc}
+            </div>
           </button>
         ))}
       </div>
@@ -936,6 +1008,7 @@ function StepGoalTargets({ data, update }: StepProps) {
 
   return (
     <div className="space-y-6">
+      <StepHeading>Set Your Target</StepHeading>
       <div className="rounded-xl overflow-hidden mb-4 -mt-2">
         <img
           src="/assets/generated/form-goal-targets.dim_400x200.png"
@@ -945,19 +1018,25 @@ function StepGoalTargets({ data, update }: StepProps) {
       </div>
       {isLoss && (
         <>
-          <div className="bg-orange-50 border border-orange-200 rounded-xl p-4">
-            <p className="text-sm text-orange-700">
+          <div
+            className="rounded-xl p-4"
+            style={{
+              background: "rgba(249,115,22,0.08)",
+              border: "1px solid rgba(249,115,22,0.2)",
+            }}
+          >
+            <p className="text-sm" style={{ color: "#fdba74" }}>
               Tell us your weight loss targets so we can calculate your goal
               timeline.
             </p>
           </div>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="target_weight_kg">
+              <FieldLabel htmlFor="target_weight_kg">
                 How many kgs do you want to lose?
-              </Label>
+              </FieldLabel>
               <div className="relative">
-                <Input
+                <input
                   id="target_weight_kg"
                   data-ocid="goal_targets.weight_input"
                   type="number"
@@ -968,19 +1047,22 @@ function StepGoalTargets({ data, update }: StepProps) {
                   onChange={(e) =>
                     update("target_weight_kg", Number(e.target.value))
                   }
-                  className="pr-10"
+                  className="w-full rounded-lg px-3 py-2.5 pr-10 text-sm form-input-2026"
                 />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                <span
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-sm"
+                  style={{ color: "#64748b" }}
+                >
                   kg
                 </span>
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="target_belly_inches">
-                How many inches do you want to lose from belly fat?
-              </Label>
+              <FieldLabel htmlFor="target_belly_inches">
+                Inches to lose from belly fat?
+              </FieldLabel>
               <div className="relative">
-                <Input
+                <input
                   id="target_belly_inches"
                   data-ocid="goal_targets.belly_input"
                   type="number"
@@ -991,9 +1073,12 @@ function StepGoalTargets({ data, update }: StepProps) {
                   onChange={(e) =>
                     update("target_belly_inches", Number(e.target.value))
                   }
-                  className="pr-16"
+                  className="w-full rounded-lg px-3 py-2.5 pr-16 text-sm form-input-2026"
                 />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                <span
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-sm"
+                  style={{ color: "#64748b" }}
+                >
                   inches
                 </span>
               </div>
@@ -1001,21 +1086,26 @@ function StepGoalTargets({ data, update }: StepProps) {
           </div>
         </>
       )}
-
       {isGain && (
         <>
-          <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-            <p className="text-sm text-green-700">
+          <div
+            className="rounded-xl p-4"
+            style={{
+              background: "rgba(74,222,128,0.06)",
+              border: "1px solid rgba(74,222,128,0.2)",
+            }}
+          >
+            <p className="text-sm" style={{ color: "#86efac" }}>
               Tell us your weight gain target so we can calculate your goal
               timeline.
             </p>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="target_weight_kg">
+            <FieldLabel htmlFor="target_weight_kg">
               How many kgs do you want to gain?
-            </Label>
+            </FieldLabel>
             <div className="relative">
-              <Input
+              <input
                 id="target_weight_kg"
                 data-ocid="goal_targets.weight_input"
                 type="number"
@@ -1026,20 +1116,28 @@ function StepGoalTargets({ data, update }: StepProps) {
                 onChange={(e) =>
                   update("target_weight_kg", Number(e.target.value))
                 }
-                className="pr-10"
+                className="w-full rounded-lg px-3 py-2.5 pr-10 text-sm form-input-2026"
               />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+              <span
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-sm"
+                style={{ color: "#64748b" }}
+              >
                 kg
               </span>
             </div>
           </div>
         </>
       )}
-
       {!isLoss && !isGain && (
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 text-center">
+        <div
+          className="rounded-xl p-6 text-center"
+          style={{
+            background: "rgba(129,140,248,0.06)",
+            border: "1px solid rgba(129,140,248,0.15)",
+          }}
+        >
           <div className="text-3xl mb-3">⚖️</div>
-          <p className="text-sm text-blue-700 font-medium">
+          <p className="text-sm font-medium" style={{ color: "#a5b4fc" }}>
             Your goal is{" "}
             <strong>
               {data.goal === "maintenance"
@@ -1048,7 +1146,7 @@ function StepGoalTargets({ data, update }: StepProps) {
             </strong>
             .
           </p>
-          <p className="text-sm text-blue-600 mt-1">
+          <p className="text-sm mt-1" style={{ color: "#64748b" }}>
             No specific weight target needed — click Next to continue.
           </p>
         </div>
@@ -1060,6 +1158,7 @@ function StepGoalTargets({ data, update }: StepProps) {
 function StepBmrTdee({ data, update }: StepProps) {
   return (
     <div className="space-y-6">
+      <StepHeading>BMR & TDEE Values</StepHeading>
       <div className="rounded-xl overflow-hidden mb-4 -mt-2">
         <img
           src="/assets/generated/form-bmr.dim_400x200.png"
@@ -1067,20 +1166,29 @@ function StepBmrTdee({ data, update }: StepProps) {
           className="w-full h-32 object-cover object-center"
         />
       </div>
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-        <p className="text-sm text-blue-700">
+      <div
+        className="rounded-xl p-4"
+        style={{
+          background: "rgba(129,140,248,0.06)",
+          border: "1px solid rgba(129,140,248,0.15)",
+        }}
+      >
+        <p className="text-sm" style={{ color: "#a5b4fc" }}>
           To know your BMR/TDEE, check your wellness assessment report. Enter
           your BMR and TDEE values from your{" "}
-          <strong>Wellness Assessment Report</strong> below.
+          <strong style={{ color: "#c7d2fe" }}>
+            Wellness Assessment Report
+          </strong>{" "}
+          below.
         </p>
       </div>
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="bmr_manual">
+          <FieldLabel htmlFor="bmr_manual">
             BMR — Basal Metabolic Rate (kcal/day)
-          </Label>
+          </FieldLabel>
           <div className="relative">
-            <Input
+            <input
               id="bmr_manual"
               data-ocid="bmr_tdee.bmr_input"
               type="number"
@@ -1089,22 +1197,25 @@ function StepBmrTdee({ data, update }: StepProps) {
               placeholder="e.g. 1650"
               value={data.bmr_manual || ""}
               onChange={(e) => update("bmr_manual", Number(e.target.value))}
-              className="pr-16"
+              className="w-full rounded-lg px-3 py-2.5 pr-16 text-sm form-input-2026"
             />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+            <span
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-xs"
+              style={{ color: "#64748b" }}
+            >
               kcal
             </span>
           </div>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs" style={{ color: "#64748b" }}>
             Calories your body burns at complete rest.
           </p>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="tdee_manual">
+          <FieldLabel htmlFor="tdee_manual">
             TDEE — Total Daily Energy Expenditure (kcal/day)
-          </Label>
+          </FieldLabel>
           <div className="relative">
-            <Input
+            <input
               id="tdee_manual"
               data-ocid="bmr_tdee.tdee_input"
               type="number"
@@ -1113,30 +1224,43 @@ function StepBmrTdee({ data, update }: StepProps) {
               placeholder="e.g. 2200"
               value={data.tdee_manual || ""}
               onChange={(e) => update("tdee_manual", Number(e.target.value))}
-              className="pr-16"
+              className="w-full rounded-lg px-3 py-2.5 pr-16 text-sm form-input-2026"
             />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+            <span
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-xs"
+              style={{ color: "#64748b" }}
+            >
               kcal
             </span>
           </div>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs" style={{ color: "#64748b" }}>
             Total calories burned including your daily activities.
           </p>
         </div>
       </div>
       {(data.bmr_manual > 0 || data.tdee_manual > 0) && (
-        <div className="rounded-xl p-4 grid grid-cols-2 gap-3 text-center">
+        <div
+          className="rounded-xl p-4 grid grid-cols-2 gap-3 text-center"
+          style={{
+            background: "rgba(15,23,42,0.5)",
+            border: "1px solid rgba(129,140,248,0.12)",
+          }}
+        >
           <div>
-            <div className="text-xl font-bold text-blue-600">
+            <div className="text-xl font-bold gradient-text-vi">
               {data.bmr_manual || "—"}
             </div>
-            <div className="text-xs text-muted-foreground">BMR (kcal)</div>
+            <div className="text-xs" style={{ color: "#64748b" }}>
+              BMR (kcal)
+            </div>
           </div>
           <div>
-            <div className="text-xl font-bold text-orange-600">
+            <div className="text-xl font-bold" style={{ color: "#fb923c" }}>
               {data.tdee_manual || "—"}
             </div>
-            <div className="text-xs text-muted-foreground">TDEE (kcal)</div>
+            <div className="text-xs" style={{ color: "#64748b" }}>
+              TDEE (kcal)
+            </div>
           </div>
         </div>
       )}
@@ -1153,6 +1277,7 @@ const MEAL_GAP_OPTIONS = [
 function Step6({ data, update }: StepProps) {
   return (
     <div className="space-y-4">
+      <StepHeading>Meal Frequency</StepHeading>
       <div className="rounded-xl overflow-hidden mb-4 -mt-2">
         <img
           src="/assets/generated/form-meal-frequency.dim_400x200.png"
@@ -1160,7 +1285,7 @@ function Step6({ data, update }: StepProps) {
           className="w-full h-32 object-cover object-center"
         />
       </div>
-      <p className="text-sm text-muted-foreground">
+      <p className="text-sm" style={{ color: "#94a3b8" }}>
         Select how long you prefer to wait between meals:
       </p>
       <div className="grid grid-cols-3 gap-4" data-ocid="meal_gap.select">
@@ -1170,20 +1295,38 @@ function Step6({ data, update }: StepProps) {
             type="button"
             data-ocid={`meal_gap.item.${i + 1}`}
             onClick={() => update("meal_gap", opt.value)}
-            className={`p-5 rounded-xl border-2 text-center transition-all ${
-              data.meal_gap === opt.value
-                ? "border-primary bg-primary/10"
-                : "border-violet-800/50 hover:border-violet-500/60 hover:bg-violet-800/20 text-white"
-            }`}
+            className="p-4 rounded-xl text-center transition-all"
+            style={{
+              background:
+                data.meal_gap === opt.value
+                  ? "rgba(99,102,241,0.12)"
+                  : "rgba(15,23,42,0.5)",
+              border:
+                data.meal_gap === opt.value
+                  ? "1.5px solid rgba(129,140,248,0.5)"
+                  : "1px solid rgba(129,140,248,0.12)",
+              boxShadow:
+                data.meal_gap === opt.value
+                  ? "0 0 12px rgba(99,102,241,0.15)"
+                  : "none",
+            }}
           >
-            <div className="text-3xl mb-2">{opt.emoji}</div>
-            <div className="text-2xl font-bold text-foreground">
+            <div className="text-2xl mb-1.5">{opt.emoji}</div>
+            <div
+              className="text-xl font-bold"
+              style={{
+                color: data.meal_gap === opt.value ? "#a5b4fc" : "#e2e8f0",
+              }}
+            >
               {opt.value}h
             </div>
-            <div className="text-sm font-medium text-foreground mt-1">
+            <div
+              className="text-xs font-medium mt-0.5"
+              style={{ color: "#94a3b8" }}
+            >
               {opt.label}
             </div>
-            <div className="text-xs text-muted-foreground mt-0.5">
+            <div className="text-[10px] mt-0.5" style={{ color: "#64748b" }}>
               {opt.desc}
             </div>
           </button>
@@ -1211,6 +1354,7 @@ const HEALTH_CONDITIONS = [
 function Step8({ data, toggleArrayItem }: StepProps) {
   return (
     <div className="space-y-4">
+      <StepHeading>Health Conditions</StepHeading>
       <div className="rounded-xl overflow-hidden mb-4 -mt-2">
         <img
           src="/assets/generated/form-health-condition.dim_400x200.png"
@@ -1218,16 +1362,28 @@ function Step8({ data, toggleArrayItem }: StepProps) {
           className="w-full h-32 object-cover object-center"
         />
       </div>
-      <p className="text-sm font-medium text-foreground">
+      <p className="text-sm font-medium" style={{ color: "#e2e8f0" }}>
         Select your present health conditions:
       </p>
-
-      <div className="grid sm:grid-cols-2 gap-3">
+      <div className="grid sm:grid-cols-2 gap-2">
         {HEALTH_CONDITIONS.map((condition, i) => (
           <div
             key={condition}
             data-ocid={`conditions.checkbox.${i + 1}`}
             className="flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-colors"
+            style={{
+              background: data.health_conditions.includes(condition)
+                ? "rgba(99,102,241,0.1)"
+                : "rgba(15,23,42,0.4)",
+              border: data.health_conditions.includes(condition)
+                ? "1px solid rgba(129,140,248,0.3)"
+                : "1px solid rgba(129,140,248,0.08)",
+            }}
+            onClick={() => toggleArrayItem?.("health_conditions", condition)}
+            onKeyDown={(e) =>
+              e.key === "Enter" &&
+              toggleArrayItem?.("health_conditions", condition)
+            }
           >
             <Checkbox
               checked={data.health_conditions.includes(condition)}
@@ -1235,7 +1391,9 @@ function Step8({ data, toggleArrayItem }: StepProps) {
                 toggleArrayItem?.("health_conditions", condition)
               }
             />
-            <span className="text-sm font-medium">{condition}</span>
+            <span className="text-sm font-medium" style={{ color: "#e2e8f0" }}>
+              {condition}
+            </span>
           </div>
         ))}
       </div>
@@ -1246,6 +1404,7 @@ function Step8({ data, toggleArrayItem }: StepProps) {
 function Step9({ data, update }: StepProps) {
   return (
     <div className="space-y-6">
+      <StepHeading>Sleep Schedule</StepHeading>
       <div className="rounded-xl overflow-hidden mb-4 -mt-2">
         <img
           src="/assets/generated/form-sleep-schedule.dim_400x200.png"
@@ -1254,26 +1413,30 @@ function Step9({ data, update }: StepProps) {
         />
       </div>
       <div className="space-y-4">
-        <p className="text-sm font-medium text-foreground">Sleep timings</p>
+        <p className="text-sm font-medium" style={{ color: "#e2e8f0" }}>
+          Sleep timings
+        </p>
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="bed_time">Bed Time</Label>
-            <Input
+            <FieldLabel htmlFor="bed_time">Bed Time</FieldLabel>
+            <input
               id="bed_time"
               data-ocid="sleep.bed_time_input"
               type="time"
               value={data.bed_time}
               onChange={(e) => update("bed_time", e.target.value)}
+              className="w-full rounded-lg px-3 py-2.5 text-sm form-input-2026"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="wake_up_time">Wake Up Time</Label>
-            <Input
+            <FieldLabel htmlFor="wake_up_time">Wake Up Time</FieldLabel>
+            <input
               id="wake_up_time"
               data-ocid="sleep.wake_up_input"
               type="time"
               value={data.wake_up_time}
               onChange={(e) => update("wake_up_time", e.target.value)}
+              className="w-full rounded-lg px-3 py-2.5 text-sm form-input-2026"
             />
           </div>
         </div>
@@ -1287,9 +1450,15 @@ function Step9({ data, update }: StepProps) {
             const hours = Math.floor(diff / 60);
             const mins = diff % 60;
             return (
-              <div className="bg-primary/5 rounded-xl p-3 text-sm text-center">
-                <span className="text-muted-foreground">Sleep duration: </span>
-                <strong className="text-primary">
+              <div
+                className="rounded-xl p-3 text-sm text-center"
+                style={{
+                  background: "rgba(129,140,248,0.06)",
+                  border: "1px solid rgba(129,140,248,0.12)",
+                }}
+              >
+                <span style={{ color: "#94a3b8" }}>Sleep duration: </span>
+                <strong className="gradient-text-vi">
                   {hours}h {mins > 0 ? `${mins}m` : ""}
                 </strong>
               </div>
@@ -1303,6 +1472,7 @@ function Step9({ data, update }: StepProps) {
 function Step10({ data, update }: StepProps) {
   return (
     <div className="space-y-6">
+      <StepHeading>Daily Macro Targets</StepHeading>
       <div className="rounded-xl overflow-hidden mb-4 -mt-2">
         <img
           src="/assets/generated/form-nutrition.dim_400x200.png"
@@ -1310,73 +1480,95 @@ function Step10({ data, update }: StepProps) {
           className="w-full h-32 object-cover object-center"
         />
       </div>
-      <div className="flex items-start gap-2 bg-green-50 border border-green-200 rounded-xl p-4">
-        <Apple className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
-        <p className="text-sm text-green-700">
+      <div
+        className="flex items-start gap-2 rounded-xl p-4"
+        style={{
+          background: "rgba(74,222,128,0.06)",
+          border: "1px solid rgba(74,222,128,0.15)",
+        }}
+      >
+        <Apple
+          className="w-4 h-4 mt-0.5 shrink-0"
+          style={{ color: "#4ade80" }}
+        />
+        <p className="text-sm" style={{ color: "#86efac" }}>
           Enter your macro targets as recommended in your{" "}
-          <strong>Wellness Assessment Report</strong>. To know your nutrition
-          requirement, check your wellness assessment report.
+          <strong style={{ color: "#a7f3d0" }}>
+            Wellness Assessment Report
+          </strong>
+          . To know your nutrition requirement, check your wellness assessment
+          report.
         </p>
       </div>
-      <p className="text-sm font-medium text-foreground">
+      <p className="text-sm font-medium" style={{ color: "#e2e8f0" }}>
         Daily macro targets (grams)
       </p>
       <div className="grid grid-cols-3 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="protein_target">Protein (g)</Label>
-          <Input
-            id="protein_target"
-            data-ocid="macros.protein_input"
-            type="number"
-            min={0}
-            placeholder="e.g. 120"
-            value={data.protein_target || ""}
-            onChange={(e) => update("protein_target", Number(e.target.value))}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="fat_target">Fat (g)</Label>
-          <Input
-            id="fat_target"
-            data-ocid="macros.fat_input"
-            type="number"
-            min={0}
-            placeholder="e.g. 60"
-            value={data.fat_target || ""}
-            onChange={(e) => update("fat_target", Number(e.target.value))}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="carbs_target">Carbs (g)</Label>
-          <Input
-            id="carbs_target"
-            data-ocid="macros.carbs_input"
-            type="number"
-            min={0}
-            placeholder="e.g. 250"
-            value={data.carbs_target || ""}
-            onChange={(e) => update("carbs_target", Number(e.target.value))}
-          />
-        </div>
+        {[
+          {
+            id: "protein_target",
+            label: "Protein (g)",
+            key: "protein_target" as const,
+            ph: "e.g. 120",
+          },
+          {
+            id: "fat_target",
+            label: "Fat (g)",
+            key: "fat_target" as const,
+            ph: "e.g. 60",
+          },
+          {
+            id: "carbs_target",
+            label: "Carbs (g)",
+            key: "carbs_target" as const,
+            ph: "e.g. 250",
+          },
+        ].map(({ id, label, key, ph }) => (
+          <div key={id} className="space-y-2">
+            <FieldLabel htmlFor={id}>{label}</FieldLabel>
+            <input
+              id={id}
+              data-ocid={`macros.${key}_input`}
+              type="number"
+              min={0}
+              placeholder={ph}
+              value={data[key] || ""}
+              onChange={(e) => update(key, Number(e.target.value))}
+              className="w-full rounded-lg px-3 py-2.5 text-sm form-input-2026"
+            />
+          </div>
+        ))}
       </div>
-      <div className="rounded-xl p-4 grid grid-cols-3 gap-3 text-center">
+      <div
+        className="rounded-xl p-4 grid grid-cols-3 gap-3 text-center"
+        style={{
+          background: "rgba(15,23,42,0.5)",
+          border: "1px solid rgba(129,140,248,0.1)",
+        }}
+      >
         <div>
-          <div className="text-xl font-bold text-green-600">
+          <div className="text-xl font-bold" style={{ color: "#86efac" }}>
             {data.protein_target || "—"}g
           </div>
-          <div className="text-xs text-muted-foreground">Protein</div>
+          <div className="text-xs" style={{ color: "#64748b" }}>
+            Protein
+          </div>
         </div>
         <div>
-          <div className="text-xl font-bold text-amber-600">
+          <div className="text-xl font-bold" style={{ color: "#fbbf24" }}>
             {data.fat_target || "—"}g
           </div>
-          <div className="text-xs text-muted-foreground">Fat</div>
+          <div className="text-xs" style={{ color: "#64748b" }}>
+            Fat
+          </div>
         </div>
         <div>
-          <div className="text-xl font-bold text-blue-600">
+          <div className="text-xl font-bold gradient-text-vi">
             {data.carbs_target || "—"}g
           </div>
-          <div className="text-xs text-muted-foreground">Carbs</div>
+          <div className="text-xs" style={{ color: "#64748b" }}>
+            Carbs
+          </div>
         </div>
       </div>
     </div>

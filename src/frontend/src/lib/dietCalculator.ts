@@ -1,5 +1,10 @@
-import type { DietPlan, MacronutrientBreakdown } from "../backend.d";
-import { ActivityLevel, Gender, HealthGoal, StressLevel } from "../backend.d";
+import type { DietPlan, MacronutrientBreakdown } from "../types/backend-types";
+import {
+  ActivityLevel,
+  Gender,
+  HealthGoal,
+  StressLevel,
+} from "../types/backend-types";
 import type { FormData } from "../types/diet";
 import { generateWeeklyPlan } from "./mealGenerator";
 

@@ -1,0 +1,98 @@
+// Version: 1.0.0
+type ActivityLevel__877784846 =
+  {
+    #extra_active;
+    #lightly_active;
+    #moderately_active;
+    #sedentary;
+    #very_active
+  };
+type AdminReport__634088740 =
+  {
+    amount : Float;
+    goal : Text;
+    id : Text;
+    name : Text;
+    paidAt : Text;
+    referredBy : Text;
+    rewardPaid : Bool;
+    whatsapp : Text
+  };
+type Data__791452850<K, V> =
+  {var count : Nat__490723111; kvs : [var ?(K, V)]};
+type DayPlan__218087539 =
+  {
+    breakfast : Meal__62155794;
+    dinner : Meal__62155794;
+    lunch : Meal__62155794;
+    snacks : [Meal__62155794]
+  };
+type DietPlan__176162815 =
+  {
+    bmr : Float;
+    daily_calories : Float;
+    health_tips : [Text];
+    hydration_recommendation : Float;
+    macros : MacronutrientBreakdown__920123060;
+    profile_id : Text;
+    tdee : Float;
+    weekly_plan : [DayPlan__218087539]
+  };
+type DietProfile__105832394 =
+  {
+    activity_level : ActivityLevel__877784846;
+    age : Nat;
+    dietary_preferences : [Text];
+    food_allergies : [Text];
+    gender : Gender__579703926;
+    goal : HealthGoal__496663043;
+    health_conditions : [Text];
+    height : Float;
+    id : Text;
+    meals_per_day : Nat;
+    name : Text;
+    sleep_hours : Float;
+    stress_level : StressLevel__604180644;
+    supplements : [Text];
+    water_intake : Float;
+    weight : Float
+  };
+type Gender__579703926 = {#female; #male};
+type HealthGoal__496663043 =
+  {#body_recomposition; #maintenance; #muscle_gain; #weight_loss};
+type Internal__8484328<K, V> =
+  {children : [var ?Node__46230540<K, V>]; data : Data__791452850<K, V>};
+type Leaf__809889148<K, V> = {data : Data__791452850<K, V>};
+type MacronutrientBreakdown__920123060 =
+  {carbs : Float; fats : Float; protein : Float};
+type Meal__62155794 =
+  {
+    calories : Float;
+    carbs : Float;
+    fats : Float;
+    ingredients : [Text];
+    name : Text;
+    protein : Float
+  };
+type Nat__490723111 = Nat__920180692;
+type Nat__920180692 = Nat;
+type Node__46230540<K, V> =
+  {#internal : Internal__8484328<K, V>; #leaf : Leaf__809889148<K, V>};
+type StressLevel__604180644 = {#high; #low; #moderate; #very_high};
+actor {
+  stable adminReports :
+    {
+      var root : Node__46230540<Text, AdminReport__634088740>;
+      var size : Nat__490723111
+    };
+  stable plans :
+    {
+      var root : Node__46230540<Text, DietPlan__176162815>;
+      var size : Nat__490723111
+    };
+  stable profiles :
+    {
+      var root : Node__46230540<Text, DietProfile__105832394>;
+      var size : Nat__490723111
+    }
+};

@@ -1,0 +1,107 @@
+type StressLevel = 
+ variant {
+   high;
+   low;
+   moderate;
+   very_high;
+ };
+type Meal = 
+ record {
+   calories: float64;
+   carbs: float64;
+   fats: float64;
+   ingredients: vec text;
+   name: text;
+   protein: float64;
+ };
+type MacronutrientBreakdown = 
+ record {
+   carbs: float64;
+   fats: float64;
+   protein: float64;
+ };
+type HealthGoal = 
+ variant {
+   body_recomposition;
+   maintenance;
+   muscle_gain;
+   weight_loss;
+ };
+type Gender = 
+ variant {
+   female;
+   male;
+ };
+type DietProfile = 
+ record {
+   activity_level: ActivityLevel;
+   age: nat;
+   dietary_preferences: vec text;
+   food_allergies: vec text;
+   gender: Gender;
+   goal: HealthGoal;
+   health_conditions: vec text;
+   height: float64;
+   id: text;
+   meals_per_day: nat;
+   name: text;
+   sleep_hours: float64;
+   stress_level: StressLevel;
+   supplements: vec text;
+   water_intake: float64;
+   weight: float64;
+ };
+type DietPlan = 
+ record {
+   bmr: float64;
+   daily_calories: float64;
+   health_tips: vec text;
+   hydration_recommendation: float64;
+   macros: MacronutrientBreakdown;
+   profile_id: text;
+   tdee: float64;
+   weekly_plan: vec DayPlan;
+ };
+type DayPlan = 
+ record {
+   breakfast: Meal;
+   dinner: Meal;
+   lunch: Meal;
+   snacks: vec Meal;
+ };
+type AdminReport = 
+ record {
+   amount: float64;
+   goal: text;
+   id: text;
+   name: text;
+   paidAt: text;
+   referredBy: text;
+   rewardPaid: bool;
+   whatsapp: text;
+ };
+type ActivityLevel = 
+ variant {
+   extra_active;
+   lightly_active;
+   moderately_active;
+   sedentary;
+   very_active;
+ };
+service : {
+  /// * Admin Report Methods **
+  /// Add admin report. Public, no authentication performed!
+  addAdminReport: (report: AdminReport) -> ();
+  addDietPlan: (plan: DietPlan) -> ();
+  /// * DietPlan Methods **
+  addProfile: (profile: DietProfile) -> ();
+  deleteWrapper: (text) -> (text) query;
+  /// Get all admin reports. Public, no authentication performed!
+  getAdminReports: () -> (vec AdminReport) query;
+  getAllDietPlans: () -> (vec DietPlan) query;
+  getAllProfiles: () -> (vec DietProfile) query;
+  getDietPlan: (profile_id: text) -> (DietPlan) query;
+  getProfile: (id: text) -> (DietProfile) query;
+  /// Set rewardPaid flag to true. Public, no authentication performed!
+  markRewardPaid: (id: text) -> (bool);
+}

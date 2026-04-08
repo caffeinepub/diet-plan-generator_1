@@ -1,4 +1,8 @@
-import type { DayPlan, MacronutrientBreakdown, Meal } from "../backend.d";
+import type {
+  DayPlan,
+  MacronutrientBreakdown,
+  Meal,
+} from "../types/backend-types";
 
 interface MealTemplate {
   name: string;
